@@ -8,15 +8,17 @@ def render_knowledge_check() -> None:
     st.title("Quick Knowledge Check")
 
     st.session_state.setdefault("knowledge_check_skipped", False)
+    st.session_state.setdefault("knowledge_check_answer", None)
 
     if st.session_state["knowledge_check_skipped"]:
         st.success("Assessment skipped")
         if st.button("Restart assessment"):
             st.session_state["knowledge_check_skipped"] = False
+            st.session_state["knowledge_check_answer"] = None
             st.rerun()
         return
 
-    st.radio(
+    st.session_state["knowledge_check_answer"] = st.radio(
         "In supervised Machine Learning, what does a model learn from?",
         options=[
             "Labeled examples with known answers",
@@ -29,6 +31,7 @@ def render_knowledge_check() -> None:
 
     if st.button("Skip assessment"):
         st.session_state["knowledge_check_skipped"] = True
+        st.session_state["knowledge_check_answer"] = None
         st.rerun()
 
 
