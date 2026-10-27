@@ -9,12 +9,14 @@ def render_knowledge_check() -> None:
 
     st.session_state.setdefault("knowledge_check_skipped", False)
     st.session_state.setdefault("knowledge_check_answer", None)
+    st.session_state.setdefault("knowledge_check_submitted_answer", None)
 
     if st.session_state["knowledge_check_skipped"]:
         st.success("Assessment skipped")
         if st.button("Restart assessment"):
             st.session_state["knowledge_check_skipped"] = False
             st.session_state["knowledge_check_answer"] = None
+            st.session_state["knowledge_check_submitted_answer"] = None
             st.rerun()
         return
 
@@ -29,9 +31,20 @@ def render_knowledge_check() -> None:
         index=None,
     )
 
+    answer = st.session_state["knowledge_check_answer"]
+    if st.session_state["knowledge_check_submitted_answer"] != answer:
+        st.session_state["knowledge_check_submitted_answer"] = None
+
+    if st.button("Submit answer", disabled=answer is None):
+        st.session_state["knowledge_check_submitted_answer"] = answer
+
+    if st.session_state["knowledge_check_submitted_answer"] is not None:
+        st.success("Answer submitted")
+
     if st.button("Skip assessment"):
         st.session_state["knowledge_check_skipped"] = True
         st.session_state["knowledge_check_answer"] = None
+        st.session_state["knowledge_check_submitted_answer"] = None
         st.rerun()
 
 
