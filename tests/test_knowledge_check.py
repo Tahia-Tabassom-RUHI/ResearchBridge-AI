@@ -6,6 +6,7 @@ import pytest
 from streamlit.testing.v1 import AppTest
 
 from screens.knowledge_check import QUESTIONS_BY_TOPIC, _calculate_result
+from services.prerequisites import PREREQUISITES_BY_QUESTION
 
 
 SCREEN_PATH = Path(__file__).resolve().parents[1] / "screens" / "knowledge_check.py"
@@ -33,6 +34,35 @@ def _assert_reset(app):
     assert app.session_state["knowledge_check_skipped"] is False
     assert _button(app, "Submit assessment").disabled
     assert not app.success
+    assert not app.expander
+
+
+def _concept_titles(topic):
+    return [
+        PREREQUISITES_BY_QUESTION[question.id].title
+        for question in QUESTIONS_BY_TOPIC[topic]
+    ]
+
+
+def _assert_learning_cards(app, topic, question_indexes):
+    concepts = [
+        PREREQUISITES_BY_QUESTION[QUESTIONS_BY_TOPIC[topic][index].id]
+        for index in question_indexes
+    ]
+    assert [card.label for card in app.expander] == [
+        concept.title for concept in concepts
+    ]
+    assert any("Rule-based demo guidance" in caption.value for caption in app.caption)
+    assert any(
+        "not an AI diagnosis or a validated evaluation" in caption.value
+        for caption in app.caption
+    )
+    for card, concept in zip(app.expander, concepts, strict=True):
+        content = "\n".join(item.value for item in card.markdown)
+        assert concept.explanation in content
+        assert concept.example in content
+        assert concept.research_relevance in content
+        assert concept.reflection_question in content
 
 
 @pytest.mark.parametrize("topic", TOPICS)
@@ -111,12 +141,19 @@ def test_streamlit_submission_and_persistent_results(topic, score, familiarity):
     assert f"Familiarity level: **{familiarity}**" in [
         item.value for item in app.markdown
     ]
+    _assert_learning_cards(app, topic, range(score, 3))
+    if score == 3:
+        assert any(
+            message.value == "This short demo found no immediate foundational gaps."
+            for message in app.success
+        )
 
     app.run()
     assert not app.exception
     assert app.session_state["knowledge_check_result"] == result
     assert [radio.value for radio in app.radio] == result["submitted_answers"]
     assert app.success[0].value == "Assessment submitted"
+    _assert_learning_cards(app, topic, range(score, 3))
 
 
 @pytest.mark.parametrize("topic", TOPICS)
@@ -132,6 +169,7 @@ def test_selection_topic_skip_and_restart_reset_state(topic):
     assert not app.exception
     assert app.session_state["knowledge_check_result"] is None
     assert not app.success
+    assert not app.expander
     _button(app, "Submit assessment").click().run()
     assert app.session_state["knowledge_check_result"]["score"] == 1
 
@@ -155,10 +193,16 @@ def test_selection_topic_skip_and_restart_reset_state(topic):
     assert app.session_state["knowledge_check_result"] is None
     assert app.success[0].value == "Assessment skipped"
     assert [button.label for button in app.button] == ["Restart assessment"]
+    _assert_learning_cards(app, topic, range(3))
+    assert not any(
+        item.value.startswith(("Score:", "Familiarity level:"))
+        for item in app.markdown
+    )
     app.run()
     assert not app.exception
     assert not app.radio
     assert app.success[0].value == "Assessment skipped"
+    _assert_learning_cards(app, topic, range(3))
     _button(app, "Restart assessment").click().run()
     _assert_reset(app)
     assert app.selectbox[0].value == topic
@@ -173,7 +217,69 @@ def test_selection_topic_skip_and_restart_reset_state(topic):
     assert not app.exception
     assert app.session_state["knowledge_check_result"] is None
     assert app.session_state["knowledge_check_answers"] == [None, None, None]
+    _assert_learning_cards(app, topic, range(3))
     app.selectbox[0].select(other_topic).run()
+    _assert_reset(app)
+
+
+@pytest.mark.parametrize("topic", TOPICS)
+def test_mixed_missed_answers_render_only_the_matching_cards(topic):
+    app = _new_app(topic)
+    questions = QUESTIONS_BY_TOPIC[topic]
+    wrong_answer = next(
+        option
+        for option in questions[0].options
+        if option not in (questions[0].correct_answer, "I don't know")
+    )
+    for index, answer in enumerate(
+        [wrong_answer, questions[1].correct_answer, "I don't know"]
+    ):
+        app.radio[index].set_value(answer)
+    app.run()
+    assert not app.expander
+    _button(app, "Submit assessment").click().run()
+
+    assert not app.exception
+    assert app.session_state["knowledge_check_result"]["score"] == 1
+    assert app.session_state["knowledge_check_result"]["familiarity"] == "Beginner"
+    _assert_learning_cards(app, topic, [0, 2])
+
+    app.run()
+    assert not app.exception
+    _assert_learning_cards(app, topic, [0, 2])
+
+    app.radio[2].set_value(None).run()
+    assert not app.exception
+    assert not app.expander
+    assert app.session_state["knowledge_check_result"] is None
+    assert _button(app, "Submit assessment").disabled
+
+
+@pytest.mark.parametrize("topic", TOPICS)
+def test_skipping_without_answers_offers_only_current_topic_cards(topic):
+    app = _new_app(topic)
+    _button(app, "Skip assessment").click().run()
+
+    assert not app.exception
+    assert not app.radio
+    assert app.success[0].value == "Assessment skipped"
+    assert app.session_state["knowledge_check_result"] is None
+    _assert_learning_cards(app, topic, range(3))
+    assert not any(
+        item.value.startswith(("Score:", "Familiarity level:"))
+        for item in app.markdown
+    )
+
+    other_topic = next(other for other in TOPICS if other != topic)
+    app.selectbox[0].select(other_topic).run()
+    _assert_reset(app)
+    _button(app, "Skip assessment").click().run()
+    assert not app.exception
+    _assert_learning_cards(app, other_topic, range(3))
+    assert not set(_concept_titles(topic)) & {
+        card.label for card in app.expander
+    }
+    _button(app, "Restart assessment").click().run()
     _assert_reset(app)
 
 

@@ -1,85 +1,12 @@
 """Standalone Streamlit preview for a simple demo knowledge assessment."""
 
-from dataclasses import dataclass
-
 import streamlit as st
 
-
-@dataclass(frozen=True)
-class Question:
-    """A fixed demo question and its answer key."""
-
-    prompt: str
-    options: tuple[str, ...]
-    correct_answer: str
-
-
-QUESTIONS_BY_TOPIC = {
-    "Supervised Machine Learning": (
-        Question(
-            "In supervised Machine Learning, what does a model learn from?",
-            (
-                "Labeled examples with known answers",
-                "Unlabeled data with no known answers",
-                "Rewards and penalties from interacting with an environment",
-                "I don't know",
-            ),
-            "Labeled examples with known answers",
-        ),
-        Question(
-            "Which task is an example of classification?",
-            (
-                "Predicting tomorrow's temperature as a number",
-                "Labeling an email as spam or not spam",
-                "Storing emails in a database",
-                "I don't know",
-            ),
-            "Labeling an email as spam or not spam",
-        ),
-        Question(
-            "Why test a model on examples it did not train on?",
-            (
-                "To make the training examples disappear",
-                "To guarantee it will always be correct",
-                "To check how well it handles new examples",
-                "I don't know",
-            ),
-            "To check how well it handles new examples",
-        ),
-    ),
-    "Internet of Things (IoT)": (
-        Question(
-            "What is a common purpose of an Internet of Things (IoT) system?",
-            (
-                "Connecting physical devices so they can exchange data",
-                "Keeping every device permanently disconnected",
-                "Replacing all physical devices with websites",
-                "I don't know",
-            ),
-            "Connecting physical devices so they can exchange data",
-        ),
-        Question(
-            "What does a temperature sensor in a smart room do?",
-            (
-                "Choose a Wi-Fi password",
-                "Measure the room's temperature",
-                "Display a movie",
-                "I don't know",
-            ),
-            "Measure the room's temperature",
-        ),
-        Question(
-            "Which action helps keep an internet-connected device secure?",
-            (
-                "Share its password publicly",
-                "Keep its default password forever",
-                "Install security updates from its manufacturer",
-                "I don't know",
-            ),
-            "Install security updates from its manufacturer",
-        ),
-    ),
-}
+from services.prerequisites import (
+    QUESTIONS_BY_TOPIC,
+    Question,
+    recommend_prerequisites,
+)
 
 
 def _calculate_result(
@@ -107,6 +34,36 @@ def _reset_assessment(skipped: bool = False) -> None:
         st.session_state.pop(f"knowledge_check_question_{index}", None)
 
 
+def _render_prerequisites(
+    topic: str, submitted_answers: list[str | None] | None = None, *, skipped: bool = False
+) -> None:
+    """Derive current recommendations without storing a second copy of state."""
+    answers_by_id = None
+    if submitted_answers is not None:
+        answers_by_id = {
+            question.id: answer
+            for question, answer in zip(
+                QUESTIONS_BY_TOPIC[topic], submitted_answers, strict=True
+            )
+        }
+    concepts = recommend_prerequisites(topic, answers_by_id, skipped=skipped)
+
+    st.subheader("Beginner learning cards")
+    st.caption(
+        "Rule-based demo guidance, not an AI diagnosis or a validated evaluation."
+    )
+    if not concepts:
+        st.success("This short demo found no immediate foundational gaps.")
+        return
+
+    for concept in concepts:
+        with st.expander(concept.title):
+            st.write(concept.explanation)
+            st.write(f"**Real-world example:** {concept.example}")
+            st.write(f"**Why it matters for research:** {concept.research_relevance}")
+            st.write(f"**Reflection question:** {concept.reflection_question}")
+
+
 def render_knowledge_check() -> None:
     """Render a topic assessment, persistent results, or skip confirmation."""
     st.title("Quick Knowledge Check")
@@ -128,21 +85,17 @@ def render_knowledge_check() -> None:
     if st.session_state["knowledge_check_skipped"]:
         st.success("Assessment skipped")
         st.button("Restart assessment", on_click=_reset_assessment)
+        _render_prerequisites(topic, skipped=True)
         return
 
     questions = QUESTIONS_BY_TOPIC[topic]
     answers = []
     for index, question in enumerate(questions):
-        saved_answer = st.session_state["knowledge_check_answers"][index]
         answers.append(
             st.radio(
                 f"{index + 1}. {question.prompt}",
                 options=question.options,
-                index=(
-                    question.options.index(saved_answer)
-                    if saved_answer in question.options
-                    else None
-                ),
+                index=None,
                 key=f"knowledge_check_question_{index}",
             )
         )
@@ -161,6 +114,7 @@ def render_knowledge_check() -> None:
         st.success("Assessment submitted")
         st.write(f"Score: **{result['score']} out of 3**")
         st.write(f"Familiarity level: **{result['familiarity']}**")
+        _render_prerequisites(topic, result["submitted_answers"])
 
     st.button("Skip assessment", on_click=_reset_assessment, args=(True,))
 
