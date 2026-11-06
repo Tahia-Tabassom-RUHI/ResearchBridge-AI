@@ -1,0 +1,28 @@
+{
+  "name": "researchbridge-learning-coach-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=22"},
+  "scripts": {
+    "schemas": "node scripts/build-validators.mjs",
+    "typecheck": "npm run schemas && tsc --noEmit",
+    "test": "npm run build && tsx --test --test-reporter=spec --test-concurrency=1 tests/*.test.ts",
+    "build": "node scripts/build-worker.mjs",
+    "dev": "wrangler dev --config wrangler.local.jsonc --local --ip 127.0.0.1",
+    "db:migrate:local": "wrangler d1 migrations apply COACH_DB --config wrangler.d1.local.jsonc --local",
+    "test:db": "tsx --test --test-reporter=spec --test-concurrency=1 tests/d1-schema.test.ts",
+    "test:admission": "tsx --test --test-reporter=spec --test-concurrency=1 tests/d1-quota-admission.test.ts",
+    "test:idempotency": "npm run schemas && tsx --test --test-reporter=spec --test-concurrency=1 tests/d1-idempotency.test.ts",
+    "test:lifecycle": "npm run schemas && tsx --test --test-reporter=spec --test-concurrency=1 tests/d1-reservation-lifecycle.test.ts"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "esbuild": "0.28.2",
+    "miniflare": "5.20261103.0-beta",
+    "typescript": "6.0.3",
+    "tsx": "4.22.4",
+    "wrangler": "4.157.0",
+    "@types/node": "22.19.15"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ResearchBridge legacy abstract explanation response (v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "research_problem": {"$ref": "#/$defs/card"},
+    "method": {"$ref": "#/$defs/card"},
+    "findings": {"$ref": "#/$defs/card"},
+    "limitations": {"$ref": "#/$defs/card"}
+  },
+  "required": ["research_problem", "method", "findings", "limitations"],
+  "$defs": {
+    "card": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "explanation": {"type": "string"},
+        "supporting_excerpt": {"type": ["string", "null"]}
+      },
+      "required": ["explanation", "supporting_excerpt"]
+    }
+  }
+}

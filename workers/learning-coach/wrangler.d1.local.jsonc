@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "researchbridge-learning-coach-schema-local",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-03",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [],
+  "send_metrics": false,
+  "observability": {"enabled": false},
+  "d1_databases": [{
+    "binding": "COACH_DB",
+    "database_name": "researchbridge-coach-schema-local",
+    "database_id": "00000000-0000-0000-0000-000000000000",
+    "migrations_dir": "migrations"
+  }]
+}

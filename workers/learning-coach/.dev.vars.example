@@ -1,0 +1,3 @@
+# Generate a unique 32-byte random value encoded as 64 lowercase hex characters.
+# Copy into ignored .dev.vars for local use; never commit a filled secret.
+COACH_SERVICE_SECRET=

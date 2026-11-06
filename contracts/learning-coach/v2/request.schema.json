@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ResearchBridge Learning Coach request (v2)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "task_id", "input"],
+  "properties": {
+    "contract_version": {"const": "2"},
+    "task_id": {"enum": ["abstract_explanation", "learning_hints", "term_clarification"]},
+    "input": {"type": "object"},
+    "learner_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "level": {"enum": ["beginner", "intermediate", "advanced"]},
+        "learning_goal": {"type": "string", "maxLength": 1000}
+      }
+    }
+  },
+  "oneOf": [
+    {"properties": {"task_id": {"const": "abstract_explanation"}, "input": {"$ref": "#/$defs/abstractInput"}}},
+    {"properties": {"task_id": {"const": "learning_hints"}, "input": {"$ref": "#/$defs/hintsInput"}}},
+    {"properties": {"task_id": {"const": "term_clarification"}, "input": {"$ref": "#/$defs/termInput"}}}
+  ],
+  "$defs": {
+    "source": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "title"],
+          "properties": {
+            "kind": {"const": "user_abstract"},
+            "title": {"type": "string", "minLength": 1, "maxLength": 12000, "pattern": "[^ \\t\\n\\r\\f\\v]"},
+            "abstract": {"type": ["string", "null"], "maxLength": 12000}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "source_id"],
+          "properties": {
+            "kind": {"const": "retrieved_paper"},
+            "source_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"}
+          }
+        }
+      ]
+    },
+    "abstractInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source"],
+      "properties": {"source": {"$ref": "#/$defs/source"}}
+    },
+    "hintsInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "question"],
+      "properties": {
+        "source": {"$ref": "#/$defs/source"},
+        "question": {"type": "string", "minLength": 1, "maxLength": 1000, "pattern": "[^ \\t\\n\\r\\f\\v]"}
+      }
+    },
+    "termInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["term"],
+      "properties": {
+        "term": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "[^ \\t\\n\\r\\f\\v]"}
+      }
+    }
+  }
+}
