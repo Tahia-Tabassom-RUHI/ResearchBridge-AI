@@ -3,7 +3,6 @@
 An interactive research-learning web application intended to help students
 explore scholarly research and build prerequisite knowledge.
 
-**Hackathon:** STEM2Connect AI Hackathon 2026  
 **Primary track:** Education
 
 ## Current development status
