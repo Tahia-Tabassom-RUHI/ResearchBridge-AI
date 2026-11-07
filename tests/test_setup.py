@@ -27,4 +27,4 @@ def test_starter_app_runs():
     assert not app.exception
     assert app.title[0].value == "ResearchBridge AI"
     assert app.markdown[0].value
-    assert app.info[0].value == "Development is currently in progress."
+    assert "One step at a time" in app.info[0].value

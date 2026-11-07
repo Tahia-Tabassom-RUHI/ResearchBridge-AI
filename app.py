@@ -1,10 +1,6 @@
-"""Minimal Streamlit entry point for ResearchBridge AI."""
-
+"""ResearchBridge entry point; learning-coach service is owned separately."""
 import streamlit as st
+from screens.home import render
 
-st.title("ResearchBridge AI")
-st.write(
-    "An interactive research-learning web application that helps students "
-    "explore scholarly research and build prerequisite knowledge."
-)
-st.info("Development is currently in progress.")
+st.set_page_config(page_title='ResearchBridge · Follow your curiosity', page_icon='🌱', layout='wide', initial_sidebar_state='expanded')
+render()

@@ -1,0 +1,3189 @@
+[
+  {
+    "label": "Food storage",
+    "query": "fruit juice shelf life",
+    "papers": [
+      {
+        "id": "https://europepmc.org/article/MED/42413373",
+        "title": "Genetic algorithm combined with back-propagation artificial neural network (GA-BP-ANN) to optimize ultrahigh pressure Actinidia arguta juice sterilization conditions to extend shelf life.",
+        "authors": [
+          "Sheng X",
+          "Wang T",
+          "Yang M",
+          "Chen L"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Sheng X",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Wang T",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Yang M",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Chen L",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1016/j.foodchem.2026.150271",
+        "abstract": "In this study, response surface methodology and GA-BP-ANN model were used to optimize the process conditions for ultrahigh pressure (UHP) killing of E. coli in Actinidia arguta juice. The results showed that the GA-BP artificial neural network model predicted the optimal UHP sterilization conditions (holding time 17 min, 350 MPa, and 2 times) with an E. coli death order of magnitude of 7.56. Both UHP and pasteurization had better sterilizing efficacy and mitigated the changes in pH and TSS values of the juice during storage. UHP sterilization preserved the polyphenols, flavonoids and ascorbic acid content of the juice better. A first-order kinetic model predicted that the UHP group could store Actinidia arguta juice at 4 °C for 95 days, whereas the untreated juice could only be stored for 21 days.",
+        "publication_date": "2026-06-30",
+        "source_name": "Food chemistry",
+        "paper_url": "https://europepmc.org/article/MED/42413373",
+        "oa_url": null,
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [
+          "Actinidia",
+          "Escherichia coli",
+          "Food Preservation",
+          "Food Storage",
+          "Fruit and Vegetable Juices",
+          "Genetic Algorithms",
+          "Kinetics",
+          "Neural Networks, Computer",
+          "Pressure",
+          "Sterilization"
+        ],
+        "keywords": [
+          "Artificial neural Network",
+          "genetic algorithm",
+          "Storage Analysis",
+          "Quality Attribute",
+          "Ultrahigh Pressure Treatment"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.487207+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42268732",
+        "title": "Engineering a Robust Glucose Oxidase for Juice Preservation: Enhanced Catalytic Performance Drives Browning Inhibition and Shelf Life Extension.",
+        "authors": [
+          "Peng YZ",
+          "Li J",
+          "Jiang XC",
+          "He JY",
+          "Xu BY",
+          "Wu QY",
+          "You S",
+          "Wang J"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Peng YZ",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Li J",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Jiang XC",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "He JY",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Xu BY",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Wu QY",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0009-0007-9511-6258",
+            "name": "You S",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-2569-1461",
+            "name": "Wang J",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1021/acs.jafc.6c03763",
+        "abstract": "Glucose oxidase (GOX) is widely recognized for its potential in food preservation, yet its practical application is often limited by insufficient stability and catalytic efficiency under processing conditions. In this study, a GOX from Aspergillus luchuensis (AlGoxA) was engineered through directed evolution, yielding the combinatorial mutant M1 (A179 V/T302L). The variant exhibited a 10.8-fold increase in catalytic efficiency and an 81.1% reduction in K m compared to the wild type. M1 retained 81.9% of its activity after 60 min at 60 °C, a remarkable improvement over the wild type's 6.2%. It also demonstrated broad pH tolerance, maintaining over 66% activity under alkaline conditions. When applied to apple juice preservation, M1 effectively suppressed browning, with the polyphenol oxidase inhibition rate reaching 87.1%, increased vitamin C retention by 37.9%, and exhibited direct antifungal activity against common spoilage fungi. This study provides a highly efficient and robust biocatalyst for extending juice shelf life while preserving nutritional quality.",
+        "publication_date": "2026-06-10",
+        "source_name": "Journal of agricultural and food chemistry",
+        "paper_url": "https://europepmc.org/article/MED/42268732",
+        "oa_url": null,
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [
+          "Ascorbic Acid",
+          "Aspergillus",
+          "Biocatalysis",
+          "Directed Molecular Evolution",
+          "Enzyme Stability",
+          "Food Preservation",
+          "Fruit and Vegetable Juices",
+          "Fungal Proteins",
+          "Glucose Oxidase",
+          "Hydrogen-Ion Concentration",
+          "Kinetics",
+          "Maillard Reaction",
+          "Malus",
+          "Protein Engineering"
+        ],
+        "keywords": [
+          "Glucose oxidase",
+          "Thermostability",
+          "Antifungal activity",
+          "Directed evolution",
+          "Catalytic Efficiency",
+          "Juice Preservation"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.487787+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42195926",
+        "title": "Kinetic Modeling of Vitamin C Degradation for Predicting Shelf Life in Tropical Juices Made from Camu Camu and Naranjilla Under Accelerated Storage Conditions.",
+        "authors": [
+          "Fernandez-Rosillo F",
+          "Mori-Mestanza D",
+          "Cabrejos-Barrios AS",
+          "Medina-Mendoza M",
+          "Cabrejos-Barrios EM",
+          "León-Roque N",
+          "Hernández-Martínez E",
+          "Rivera-Botonares R",
+          "Castro-Alayo EM",
+          "Minchán-Velayarce H",
+          "Balcázar-Zumaeta CR"
+        ],
+        "author_details": [
+          {
+            "id": "https://orcid.org/0000-0001-8776-2689",
+            "name": "Fernandez-Rosillo F",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-3692-4080",
+            "name": "Mori-Mestanza D",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Cabrejos-Barrios AS",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Medina-Mendoza M",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-3137-0974",
+            "name": "Cabrejos-Barrios EM",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0001-5001-1558",
+            "name": "León-Roque N",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-3839-3244",
+            "name": "Hernández-Martínez E",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-1493-5507",
+            "name": "Rivera-Botonares R",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-4322-8980",
+            "name": "Castro-Alayo EM",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0001-9033-9734",
+            "name": "Minchán-Velayarce H",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-3033-6440",
+            "name": "Balcázar-Zumaeta CR",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.3390/foods15101722",
+        "abstract": "The objective of this study was to predict the degradation kinetics of vitamin C in camu camu and naranjilla juices using accelerated storage tests. The juices were produced under controlled processing conditions, including physicochemical standardization, pasteurization, and hot filling into glass containers. They were then stored at 35, 45, and 55 °C for 21, 14, and 7 days, respectively. The vitamin C content was quantified using high-performance liquid chromatography, showing a progressive decrease depending on temperature. The kinetic data were fitted to zero-order and first-order models, as well as to the nonlinear Weibull model, the latter presenting the best statistical fit (R 2 = 0.9678-0.9931) and adequately describing the nonlinear degradation behavior of vitamin C. Temperature dependence was modeled using the Arrhenius equation, allowing activation energy to be estimated and confirming temperature-dependent degradation behavior in both juices, with different thermal responses depending on the modeling approach. Likewise, shelf life ( t 80 ) was estimated using the Weibull model and showed a significant reduction with increasing storage temperature. Arrhenius-based shelf-life predictions suggested greater vitamin C retention in camu camu juice at lower storage temperatures, whereas naranjilla exhibited a more pronounced decrease as temperature increased. The physicochemical parameters (pH, acidity, and °Brix) showed moderate changes, maintaining the stability of the system during storage. The results confirm the applicability of the Weibull model to describe vitamin C degradation in complex matrices and highlight the importance of thermal control in the preservation of bioactive compounds in tropical juices.",
+        "publication_date": "2026-05-14",
+        "source_name": "Foods (Basel, Switzerland)",
+        "paper_url": "https://europepmc.org/article/MED/42195926",
+        "oa_url": "https://europepmc.org/articles/PMC13205238",
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [],
+        "keywords": [
+          "Ascorbic acid",
+          "Degradation kinetics",
+          "shelf-life",
+          "Naranjilla",
+          "Tropical Juices",
+          "Camu Camu"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.486186+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42761364",
+        "title": "Global Overview of the Use and Effectiveness of Ultraviolet C Technology in Fresh, Minimally Processed Apples and Apple Juice Over the Last 10 Years.",
+        "authors": [
+          "Silva MDPE",
+          "de Azevedo CR",
+          "Coelho CCS",
+          "Belas JPR",
+          "Soares AG",
+          "Rosenthal A",
+          "Freitas-Silva O"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Silva MDPE",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0009-0005-0619-5536",
+            "name": "de Azevedo CR",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Coelho CCS",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-0230-8204",
+            "name": "Belas JPR",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0001-5796-2516",
+            "name": "Soares AG",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-0580-4214",
+            "name": "Rosenthal A",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-7658-8010",
+            "name": "Freitas-Silva O",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1002/fsn3.72316",
+        "abstract": "The apple is a fruit with significant economic value and a rich nutritional profile, containing high levels of fiber, vitamins, minerals, and bioactive compounds. However, it is susceptible to chemical-enzymatic oxidation and microbial spoilage. To extend shelf life, UV-C radiation is a promising technology because it can achieve microbial safety without compromising post-harvest quality. This bibliometric analysis reviewed publications from the past ten years on the use of UV-C technology in fresh, minimally processed apples and apple juice as an alternative sanitization method. The results demonstrate the effectiveness of UV-C, especially when combined with other technologies. Among the 52 scientific publications selected, the most notable contributions to the application of radiation in fresh apples and their derivatives came from Spain (11 articles), the United States (9 articles), and China (7 articles). Food Control was the primary scientific source of information. Overall, the results indicate that UV-C can increase microbiological safety, extend shelf life, and preserve the sensory and nutritional qualities of apples and apple products. However, important challenges remain, such as limited radiation penetration, the lack of standardized application protocols, and the need for studies that address actual industrial-scale processing conditions. In summary, UV-C radiation emerges as a promising and sustainable tool for sanitizing apples and apple products, with the potential to replace or complement chlorine use. Therefore, strengthening applied research focused on industrial applications will be essential to establish this technology in the fruit and vegetable sector.",
+        "publication_date": "2026-09-17",
+        "source_name": "Food science & nutrition",
+        "paper_url": "https://europepmc.org/article/MED/42761364",
+        "oa_url": null,
+        "paper_type": "review",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [],
+        "keywords": [
+          "Bibliometric Analysis",
+          "Apple Products",
+          "Microbial Inactivation",
+          "Quality Preservation",
+          "Uv‐c Technology",
+          "Non‐Thermal Technologies"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.485870+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42727922",
+        "title": "The impact of Escherichia coli O157:H7, Salmonella spp., and Listeria monocytogenes preparation methods on high-pressure processing efficacy in apple and orange juices.",
+        "authors": [
+          "Felice Rolfe CA",
+          "Anderson NM",
+          "Black DG",
+          "Lee A"
+        ],
+        "author_details": [
+          {
+            "id": "https://orcid.org/0000-0002-3377-987X",
+            "name": "Felice Rolfe CA",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Anderson NM",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Black DG",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Lee A",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1016/j.jfp.2026.100918",
+        "abstract": "The use of high-pressure processing (HPP) to inactivate foodborne pathogens within fruit- and vegetable-based juices is well understood; however, less is known regarding HPP-induced sublethal injury of bacterial cells and potential detection of stress-adapted bacterial cells during post-HPP cold storage. FDA Juice HACCP requires HPP-treated juice manufacturers to demonstrate a 5-log reduction of the pertinent microorganism and maintain the 5-log reduction throughout the product's shelf-life. A barotolerant, or tolerant of high pressure, and a barosensitive, easily damaged by high pressure, strain of Escherichia coli O157:H7, Salmonella spp., and Listeria monocytogenes were prepared in three growth conditions (neutral, cold-adapted, or acid-adapted) and used to evaluate HPP inactivation with increasing pressure levels (200-600 MPa) in two juice matrices (apple and orange). A 75-day shelf-life analysis was conducted on HPP-treated juices inoculated with acid-adapted, barotolerant strains for each pathogen and assessed for inactivation and detection. Acid-adapted cells provided the most conservative results for inactivation studies, and E. coli O157:H7 was the most barotolerant of the three microorganisms. Under the conditions tested, a 5-log reduction of L. monocytogenes MAD328 was achieved immediately following pressure treatment, S. Cubana required 24 h, and E. coli O157:H7 TW14359 required 4 days of post-HPP cold storage to attain a 5-log reduction. Positive enrichments of L. monocytogenes in orange juice were observed during cold storage while maintaining the 5-log reduction. These results suggest, under the conditions tested, the preferred inoculum preparation for HPP validation studies is the use of acid-adapted, barotolerant strains. At 586-600 MPa (180 s, 4 °C), a 5-log reduction was achieved during post-HPP cold storage, suggesting sufficient HPP lethality is reached at elevated pressure levels combined with a subsequent cold holding duration.",
+        "publication_date": "2026-09-11",
+        "source_name": "Journal of food protection",
+        "paper_url": "https://europepmc.org/article/MED/42727922",
+        "oa_url": null,
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [
+          "Beverages",
+          "Citrus sinensis",
+          "Colony Count, Microbial",
+          "Consumer Product Safety",
+          "Escherichia coli O157",
+          "Food Contamination",
+          "Food Handling",
+          "Food Microbiology",
+          "Food Preservation",
+          "Fruit and Vegetable Juices",
+          "Humans",
+          "Listeria monocytogenes",
+          "Malus",
+          "Pressure",
+          "Salmonella"
+        ],
+        "keywords": [
+          "Pathogen Inactivation",
+          "Acid Adaptation",
+          "High-pressure Processing",
+          "Shelf-life Analysis",
+          "Juice Haccp",
+          "Hpp Validation"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.485663+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42835567",
+        "title": "Physicochemical, Bioactive, Sensory, and Microbial Evaluation of Functional Drinking Yoghurt Fortified With Beetroot and Orange Juice.",
+        "authors": [
+          "Khan MMI",
+          "Ali MN",
+          "Tabassum A",
+          "Bhattacharjee D",
+          "Alam S",
+          "Islam MS"
+        ],
+        "author_details": [
+          {
+            "id": "https://orcid.org/0000-0002-4769-0147",
+            "name": "Khan MMI",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0009-0008-6197-1106",
+            "name": "Ali MN",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0009-0007-9328-803X",
+            "name": "Tabassum A",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0009-0009-4995-276X",
+            "name": "Bhattacharjee D",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0009-0004-9035-0705",
+            "name": "Alam S",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-9931-2965",
+            "name": "Islam MS",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1002/fsn3.72452",
+        "abstract": "This study aimed to formulate and quality-characterize drinking yoghurt with beetroot pulp, abundant in antioxidants, rich in betalains and phenolic compounds and to enhance its nutritional, bioactive, and sensory attributes by adding orange juice. In this study, three different mixtures of beetroot pulp and orange juice were used: Sample A: 240 g yoghurt, 30 g beetroot pulp, and 30 mL orange juice; Sample B: 225 g yoghurt, 45 g beetroot pulp, and 30 mL orange juice; and Sample C: 255 g yoghurt, 15 g beetroot pulp, and 30 mL orange juice. Formulation-dependent differences were observed in the measured bioactive parameters. Sample B showed the highest DPPH radical-scavenging activity at 800 ppm (56.1% ± 2.1%) and the lowest estimated IC 50 (429.4 ppm), together with the highest TPC (51.4 ± 1.5 mg GAE/100 g) and TFC (14 ± 1 mg CE/100 g). The sensory analysis showed that sample A achieved the highest mean sensory scores across the evaluated attributes, whereas Sample C received the lowest taste score. During 0-35 days of refrigerated storage, no coliforms or Escherichia coli were detected in any sample, that is, < 1 CFU/mL yoghurt, whereas the pH of all drinking yoghurt samples remained relatively stable, ranging from 4.0 to 4.5, with sample B demonstrating the highest pH and sample C the lowest. The findings demonstrate formulation-dependent differences in sensory and bioactive characteristics and support further investigation of beetroot-orange fortified drinking yoghurt using independently replicated production batches and broader shelf-life assessment.",
+        "publication_date": "2026-10-04",
+        "source_name": "Food science & nutrition",
+        "paper_url": "https://europepmc.org/article/MED/42835567",
+        "oa_url": null,
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [],
+        "keywords": [
+          "Fruit juice",
+          "Functional food",
+          "Immune Booster",
+          "Nutritional Enhancement",
+          "Drinking Yoghurt",
+          "Plant‐Fortified Dairy Beverage"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.486385+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42271234",
+        "title": "Streptomyces corchorusii, sodium silicate, and potassium silicate as eco-friendly alternatives to control fungal rot of navel oranges during cold storage and shelf life.",
+        "authors": [
+          "Elsayed MI",
+          "Almasoudi NM",
+          "Awad MA",
+          "Al-Qurashi AD",
+          "Abo-Elyousr KAM"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Elsayed MI",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Almasoudi NM",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Awad MA",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Al-Qurashi AD",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Abo-Elyousr KAM",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1186/s12870-026-09108-2",
+        "abstract": "Oranges undergo internal metabolic changes during cold storage and shelf life at ambient conditions, resulting in physiological and pathological disorders, mainly caused by Penicillium digitatum (green mold) and Penicillium italicum (blue mold), which decrease consumer preferences and marketability. To elucidate the effects of eco-friendly, safe treatments to control mold spoilage and maintain the quality of Navel oranges during cold storage and shelf life, freshly mature fruits were dipped for 15 min in 1% potassium silicate (PS), 0.5% sodium silicate (SS), or 10 6 CFU/ml Streptomyces corchorusii phytstc7 (STC), either alone or in combinations. The fruits were cold stored at (5 °C and 85-90% RH) for 50 days, followed by 3 days of shelf life (23 ± 1 °C and 60-70% RH). All treatments recorded no green mold incidence during 30 days of cold storage followed by 3 days of shelf life. However, after 40 and 50 days, the control treatment demonstrated a progressive increase in disease incidence, reaching 16.6 and 23.3%, respectively. Conversely, single treatments with PS, SS, and STC significantly suppressed disease development by 2.6%, 4.7%, and 2.0%, respectively. The combined treatment (PS + SS + STC) exhibited synergistic effects, and no visible disease was observed during 50 days of cold storage and 3 days of shelf life. This treatment also exhibited superior effects in maintaining regular physical and biochemical parameters of fruit quality. Other combinations, such as PS + STC and SS + STC, also performed exceptionally well, with a mean incidence of 1.3% and 0.7%, respectively. The severity of the disease followed a pattern similar to that of the disease incidence. Overall, postharvest dipping in 106 CFU/ml STC alone or combined with 1% PS and 0.5% SS could be an effective treatment to control green and blue mold and to retain the quality of 'Navel oranges' during 50 days of cold storage and shelf life.",
+        "publication_date": "2026-06-10",
+        "source_name": "BMC plant biology",
+        "paper_url": "https://europepmc.org/article/MED/42271234",
+        "oa_url": "https://europepmc.org/articles/PMC13295235",
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [
+          "Citrus sinensis",
+          "Cold Temperature",
+          "Food Preservation",
+          "Food Storage",
+          "Fruit",
+          "Penicillium",
+          "Plant Diseases",
+          "Potassium Compounds",
+          "Silicates",
+          "Streptomyces"
+        ],
+        "keywords": [
+          "Penicillium",
+          "Antioxidants",
+          "Phenolic compounds",
+          "Orange",
+          "shelf life",
+          "acidity",
+          "Actinomycest",
+          "Blue And Green Mold"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.486783+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42883625",
+        "title": "Processing of Strawberry Juice Using High-Power Ultra-Sound (HPU) and Pulsed Electric Field (PEF): Synergistic Effects on Quality, Color and Anthocyanins Revealed by Chemometrics.",
+        "authors": [
+          "Bebek Markovinović A",
+          "Stulić V",
+          "Putnik P",
+          "Janči T",
+          "Herceg Z",
+          "Mousavi Khaneghah A",
+          "Pavlić B",
+          "Bursać Kovačević D"
+        ],
+        "author_details": [
+          {
+            "id": "https://orcid.org/0000-0003-3014-1675",
+            "name": "Bebek Markovinović A",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Stulić V",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-0342-6114",
+            "name": "Putnik P",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Janči T",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Herceg Z",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Mousavi Khaneghah A",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-3551-7478",
+            "name": "Pavlić B",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-6829-6472",
+            "name": "Bursać Kovačević D",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.3390/foods15193519",
+        "abstract": "Minimally processed, non-thermal technologies are increasingly used to preserve fruit juice quality and safety while extending shelf life. This study evaluated high-power ultrasound (HPU; 25% amplitude, 50% pulse, 2.5-7.5 min) combined with pulsed electric field (PEF; 30 kV cm -1 , 100 Hz, 1.5-4.5 min), applied in the HPU → PEF sequence, as a hurdle strategy for strawberry juice stored for 7 days at 4 °C. The aim was to assess effects on anthocyanin content, color, and physicochemical properties (conductivity, browning index, dissolved oxygen, HMF) and to identify optimal processing conditions using a chemometric approach. Storage significantly affected all parameters ( p ≤ 0.01), increasing conductivity, browning index, and total color difference while reducing anthocyanin, oxygen, and HMF levels. Among HPU-PEF combinations, the mildest treatment (HPU 2.5 min + PEF) preserved the highest anthocyanin content (19.48 ± 0.05 mg 100 mL -1 ), lowest conductivity, browning index, and HMF, while more intensive treatments caused progressive degradation. Optimization identified HPU 2.5 min + PEF 1.5 min (no storage) as maximizing anthocyanin retention (20.07 mg 100 mL -1 ), while minimal HMF (4.29 mg L -1 ) required HPU 3.5 min + PEF 1.5 min. Short-duration HPU-PEF combinations thus provide an effective mild-intensity hurdle strategy for maintaining fresh-like strawberry juice quality.",
+        "publication_date": "2026-10-01",
+        "source_name": "Foods (Basel, Switzerland)",
+        "paper_url": "https://europepmc.org/article/MED/42883625",
+        "oa_url": null,
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [],
+        "keywords": [
+          "Storage stability",
+          "Electrical conductivity",
+          "Color stability",
+          "Non-thermal Technology",
+          "Juice Processing",
+          "Hydroxymethylfurfural (Hmf)"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.487291+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42388645",
+        "title": "Fruit Juice Processing Technologies and Their Impact on the Content of Bioactive Compounds-A Review of Current Approaches.",
+        "authors": [
+          "Soja J",
+          "Nowak D"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Soja J",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-5493-1949",
+            "name": "Nowak D",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1002/fsn3.72073",
+        "abstract": "Fruit juices are valued for their antioxidant content and role in a balanced diet, prompting growing interest in novel, non-thermal processing technologies that better preserve nutritional and sensory qualities compared to traditional thermal methods. The purpose of this review was to determine the effect of various fruit juice processing methods on the content of bioactive compounds in fruit juices. This work compares thermal methods with emerging innovative methods such as high pressure processing, sonication, pulsed electric fields, cold atmospheric plasma, and high pressure homogenization. A review of the current literature indicates that sonication is a promising technique, enabling effective product preservation while maintaining its nutritional quality. Furthermore, sonication often does not reduce the antioxidant activity of fruit juices; in fact, they tend to have higher levels of polyphenols, anthocyanins, and vitamin C compared to thermal methods. High pressure processing is a method which eliminates preservatives and stabilizers, while effectively preserving the nutritional value. This method maintains the stability of bioactive compounds with antioxidant activity compared to pasteurization. Cold atmospheric plasma and high pressure processing have also demonstrated high potential, combining effective microbial control with substantial preservation of bioactive compounds. This work presents an up-to-date overview (2002-2026) of fruit juice processing technologies, emphasizing the importance of selecting appropriate preservation methods to optimize the nutritional quality of the final product. It also outlines future research directions and highlights the challenges associated with implementing innovative technological solutions in the fruit juice industry.",
+        "publication_date": "2026-06-30",
+        "source_name": "Food science & nutrition",
+        "paper_url": "https://europepmc.org/article/MED/42388645",
+        "oa_url": "https://europepmc.org/articles/PMC13319417",
+        "paper_type": "review",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [],
+        "keywords": [
+          "Polyphenols",
+          "Sonication",
+          "Pasteurization",
+          "antioxidant properties",
+          "Fruit Juices",
+          "High‐pressure Processing",
+          "Innovative Processing Methods"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.486002+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42794084",
+        "title": "Active Packaging, Fruit Volatilome, and the Preservation of Taste and Aroma Quality in Fresh Fruits: A Review.",
+        "authors": [
+          "Melgarejo-Martínez P",
+          "López-Gómez A",
+          "Acosta-Motos JR",
+          "Martínez-Hernández GB",
+          "Franco-Navarro JD",
+          "Pérez-López AJ"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Melgarejo-Martínez P",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-4601-8954",
+            "name": "López-Gómez A",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0001-5828-6177",
+            "name": "Acosta-Motos JR",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0001-9668-1450",
+            "name": "Martínez-Hernández GB",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0001-7144-3499",
+            "name": "Franco-Navarro JD",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-1140-998X",
+            "name": "Pérez-López AJ",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.3390/foods15183299",
+        "abstract": "Fresh fruits are highly perishable products whose acceptance depends not only on external appearance and firmness, but also on the preservation of taste and aroma. This review addresses the relationship between active packaging and the maintenance of fruit sensory quality, with special emphasis on the volatilome as a dynamic marker of aroma integrity. The first part examines how taste and aroma are formed during ripening through the interaction of sugars, organic acids, phenolics, amino acids, and a wide range of volatile compounds, including fatty-acid-derived esters and aldehydes, terpenoids, carotenoid-derived norisoprenoids, phenylpropanoids, sulfur-containing compounds, and glycosidically bound precursors. It then analyzes how these traits deteriorate during packaged shelf life through temperature effects, refrigerated and room-temperature storage, microbial and enzymatic activity, mechanical damage, and packaging-atmosphere imbalance, showing that visual and sensory shelf life do not necessarily decline together. The second part reviews how active packaging can preserve-or unintentionally distort-this volatilome, covering modified-atmosphere and gas-regulating systems, antimicrobial and ethylene-managing systems based on released essential oils, sulfur dioxide and ethanol emitters, oxygen and carbon dioxide regulators, moisture absorbers, multi-active combinations, and packaging-adjacent edible coatings. A recurring principle emerges: every active function is double-edged, as an intervention that delays spoilage or senescence may itself add exogenous notes or trigger fermentative off-flavors unless it is tuned to a sensory compatibility threshold. The packaging material is also decisive, since paper and cardboard buffer humidity and interact weakly with aroma compounds, whereas high-barrier polymers sustain a modified atmosphere but can scalp esters and terpenes; conversely, releasing volatiles compatible with the native aroma can act as an aroma-positive strategy that restores characteristic notes. Active packaging should therefore be evaluated not only by conventional quality parameters, but also by headspace gas evolution, sugar/acid balance, odor-active volatiles, off-flavor markers, and sensory validation, together with consumer acceptance, odor-threshold relevance, migration and safety considerations, and kinetic matching between active-agent release, fruit respiration, and flavor evolution.",
+        "publication_date": "2026-09-17",
+        "source_name": "Foods (Basel, Switzerland)",
+        "paper_url": "https://europepmc.org/article/MED/42794084",
+        "oa_url": "https://europepmc.org/articles/PMC13606839",
+        "paper_type": "review",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [],
+        "keywords": [
+          "Taste",
+          "off-flavors",
+          "Aroma quality",
+          "Modified Atmosphere Packaging",
+          "Consumer Acceptance",
+          "Active Packaging",
+          "Odor Thresholds",
+          "Volatilome",
+          "Sensory Shelf Life",
+          "Fresh Fruits"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.486620+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/PPR/PPR1300982",
+        "title": "Postharvest Metabolic Responses of ‘Red Chief’ Apples as Influenced by Harvest Maturity and Storage Environment",
+        "authors": [
+          "Akhter S",
+          "Zargar IA",
+          "Hussain SZ",
+          "Bhat TA",
+          "Beigh MA",
+          "Ali S",
+          "Maqbool A",
+          "Qadri T"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Akhter S",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Zargar IA",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Hussain SZ",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Bhat TA",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Beigh MA",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Ali S",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Maqbool A",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Qadri T",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.21203/rs.3.rs-9786653/v1",
+        "abstract": "Abstract Harvest maturity critically determines postharvest physiology, quality retention, and storage potential of apple fruit. This study investigated the influence of four harvest stages (H1–H4; 134–155 days from full bloom) on the postharvest quality of ‘Red Chief’ apples under ambient (21–22°C, 68% RH) and refrigerated (2°C, 95% RH) storage conditions. Fruits were evaluated over 60 days (ambient) and 150 days (refrigerated) for key physicochemical attributes including firmness, total soluble solids (TSS), titratable acidity, sugars, ascorbic acid, pectin, anthocyanins, juice content, physiological weight loss, and color characteristics. Storage duration significantly influenced all quality parameters. Starch degradation and TSS exhibited a biphasic pattern, with initial increases followed by declines due to metabolic substrate utilization. Firmness, acidity, pectin, ascorbic acid, and juice content decreased progressively, reflecting cell wall disassembly, organic acid metabolism, and moisture loss. Conversely, cumulative weight loss increased with storage duration, particularly under ambient conditions. Refrigerated storage effectively delayed metabolic degradation, preserving fruit quality and extending storage life. Among the harvest stages, fruits harvested at intermediate maturity (H3; 148 DFFB) showed superior retention of firmness, sugars, anthocyanins, and juice content, along with reduced physiological weight loss. These findings indicate that optimal harvest maturity ensures balanced metabolic activity and structural integrity during storage. Overall, harvesting at H3 combined with refrigerated storage is recommended as an effective strategy to maximize postharvest quality and extend shelf life of ‘Red Chief’ apples under North-Western Himalayan conditions.",
+        "publication_date": "2026-08-19",
+        "source_name": null,
+        "paper_url": "https://europepmc.org/article/PPR/PPR1300982",
+        "oa_url": null,
+        "paper_type": "preprint",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:44.487065+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42650605",
+        "title": "Optimization of Sensory Quality and Short-Term Colloidal Stability of Akebia trifoliata Cloudy Juice for Beverage Development.",
+        "authors": [
+          "Wen H",
+          "Li Y",
+          "Sani MNH",
+          "Yong JWH",
+          "Song J"
+        ],
+        "author_details": [
+          {
+            "id": "https://orcid.org/0009-0002-1768-1087",
+            "name": "Wen H",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Li Y",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-5946-8092",
+            "name": "Sani MNH",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-3325-8254",
+            "name": "Yong JWH",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-3529-8113",
+            "name": "Song J",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.3390/foods15162911",
+        "abstract": "Akebia trifoliata is an underutilized fruit with distinctive sensory characteristics and potential for beverage development; however, its application is limited by flavor-balance and suspension-stability challenges. This study optimized the formulation and short-term physical stability of A. trifoliata cloudy juice using single-factor tests, orthogonal experiments, and fuzzy mathematical sensory evaluation. Each treatment was independently prepared in triplicate ( n = 3), with each preparation considered an experimental replicate. The effects of pulp, sugar, and citric acid concentrations on sensory quality were evaluated, with citric acid identified as the dominant factor affecting overall acceptability. The highest-performing basic formulation among the tested combinations contained 14% pulp, 8% sugar, and 0.05% citric acid, yielding a cloudy juice with characteristic aroma, smooth texture, and balanced sweet-sour taste. To improve short-term suspension stability, pectin, guar gum, xanthan gum, sodium alginate, and sodium carboxymethyl cellulose were assessed. Pectin showed the strongest individual stabilizing effect, although excessive viscosity reduced sensory acceptability. Orthogonal optimization identified a compound stabilizer system of 0.03% pectin, 0.05% guar gum, and 0.06% xanthan gum as the formulation providing the most favorable balance between the suspension stability coefficient and trained-panel sensory score among the tested combinations. The fuzzy mathematical evaluation approach provided a structured framework for integrating multiple sensory and stability-related indicators into formulation decisions. These findings provide a practical basis for the formulation and short-term stability screening of A. trifoliata cloudy juice as a value-added beverage and support broader utilization of this indigenous fruit resource. Long-term storage stability, microbial safety, bioactive properties, rheological behavior, and consumer acceptance require further evaluation.",
+        "publication_date": "2026-08-20",
+        "source_name": "Foods (Basel, Switzerland)",
+        "paper_url": "https://europepmc.org/article/MED/42650605",
+        "oa_url": "https://europepmc.org/articles/PMC13512717",
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [],
+        "keywords": [
+          "Akebia trifoliata",
+          "sensory evaluation",
+          "Novel Fruit",
+          "Cloudy Juice",
+          "Beverage Processing"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.487517+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42257324",
+        "title": "Fruit and Vegetable Preparation Style in Family Child Care Homes in Oklahoma.",
+        "authors": [
+          "Shariati Z",
+          "Patel D",
+          "Williams BD",
+          "Salvatore AL",
+          "Kracht CL",
+          "Eliot K",
+          "Hays F",
+          "Sisson SB"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Shariati Z",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Patel D",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Williams BD",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Salvatore AL",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-5467-0849",
+            "name": "Kracht CL",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Eliot K",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Hays F",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-2652-2416",
+            "name": "Sisson SB",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1177/21532176261453157",
+        "abstract": "Background Children spend 33-35 hours per week in family child-care homes and may consume up to five meals and snacks there, making these settings important for understanding how food especially fruits and vegetables are prepared and served. The purpose was to examine frequency and variety, preparation styles by meal, and identify predictors of fresh and frozen fruit and vegetable service in Oklahoma family child care homes (FCCH). Methods Ninety-six FCCHs participated in two cohorts ( n = 51 in-person; n = 45 virtual). Frequency, variety, and preparation styles of fruits/vegetables were recorded for both in-person and virtual cohorts. The average frequency and variety of fruits and vegetables, and the frequency of their preparation styles were calculated. The association of FCCH characteristics with fresh/frozen fruits and vegetables service score was examined. Results All FCCH providers identified as female (mean age 43.9 ± 15.1 years). At breakfast, whole fruits and juice were served by 88.6% and 6.8% of providers, respectively. At lunch, whole fruits and juice were served by 86.6%-94.1% and 2.0%-4.4%, and vegetables by 94.1%-97.8%. At snack, fruits, fruit juice, and vegetables were served by 60%, 13.3%, and 11.1%, respectively. Bananas and apples/applesauce were the most common fruits, and carrots and green beans were the most common vegetables served. Fresh fruit was most common at breakfast (77.3%), lunch (53%-61%), and snack (63%). Fresh and frozen vegetables were equally prevalent (50%) at breakfast, canned vegetables (44-57%) at lunch, and fresh vegetables (100%) at snack. No provider/program characteristics were associated with fresh/frozen service scores. Conclusions Opportunities exist to improve fruits/vegetables service in Oklahoma FCCHs by serving vegetables at breakfast and snacks and reducing juice and canned options.",
+        "publication_date": "2026-06-08",
+        "source_name": "Childhood obesity (Print)",
+        "paper_url": "https://europepmc.org/article/MED/42257324",
+        "oa_url": null,
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [
+          "Adult",
+          "Child",
+          "Child Care",
+          "Child Day Care Centers",
+          "Child, Preschool",
+          "Cooking",
+          "Feeding Behavior",
+          "Female",
+          "Fruit",
+          "Humans",
+          "Male",
+          "Meals",
+          "Middle Aged",
+          "Oklahoma",
+          "Snacks",
+          "Vegetables"
+        ],
+        "keywords": [
+          "Fruits",
+          "vegetables",
+          "Child And Adult Care Food Program",
+          "Family Child Care Homes",
+          "Preparation Style"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.487639+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42369224",
+        "title": "Synergistic Regulation of Postharvest Physiology and Biochemical Quality of Peach ( Prunus persica L.) Through Salicylic Acid and Plant-Based Edible Treatments.",
+        "authors": [
+          "Shajari S",
+          "Madani H",
+          "Pourhoseini L",
+          "Paknejad F",
+          "Ilkaee MN"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Shajari S",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-1705-9354",
+            "name": "Madani H",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Pourhoseini L",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Paknejad F",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Ilkaee MN",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1002/pei3.70180",
+        "abstract": "Postharvest deterioration represents a major challenge in maintaining the market quality of peach fruit, and the application of environmentally benign treatments such as edible coatings has gained increasing attention as an effective strategy to extend storage life. Accordingly, the present study evaluated the effects of several natural coating materials on the postharvest quality of peach ( Prunus persica L.). The experimental treatments consisted of salicylic acid at three concentrations (0, 1, and 2 mM), Aloe vera gel at 0%, 20%, and 30%, and clove extract at 0, 150, and 300 ppm. Overall, the application of edible coatings significantly enhanced fruit storability and quality attributes compared with untreated control fruit. Among the treatments, fruit treated with 2 mM salicylic acid and 300 ppm clove extract exhibited the highest fruit weight (89.66 g). Whereas the fruits without salicylic acid application showed the greatest fruit weight loss (15.55%) and the highest vitamin C (32.02 mg 100 g -1 FW) was obtained at 2 mM salicylic acid treatment. In terms of clove extract treatments, fruit coated with 300 ppm clove extract maintained the greatest fruit texture firmness (3.69 kg cm -2 ), total phenolic content (219.88 mg GAE 100 g -1 FW), vitamin C (mg 100 g -1 FW), and total antioxidant capacity (446.94 μmol TE g -1 FW), whereas no application treatment recorded the highest fruit weight loss (14.72%) and total acidity (4.16 g malic acid 100 g -1 FW). In conclusion, the findings demonstrate that natural edible coatings, particularly when applied in combination, are effective in reducing oxidative stress, suppressing enzymatic browning, and improving postharvest quality, thereby representing a promising and sustainable approach for extending the shelf life of peach fruit. These findings suggest that activation of antioxidant system likely stimulated by salicylic acid and supplemented by aloe vera or clove extract was a central mechanism underlying quality preservation.",
+        "publication_date": "2026-06-25",
+        "source_name": "Plant-environment interactions (Hoboken, N.J.)",
+        "paper_url": "https://europepmc.org/article/MED/42369224",
+        "oa_url": "https://europepmc.org/articles/PMC13296571",
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [],
+        "keywords": [
+          "Storage stability",
+          "Phenolic Metabolism",
+          "Natural Bioactive Compounds",
+          "Natural Preservation Strategies"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.487898+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42650480",
+        "title": "Damage-Safety Trade-Offs in the Transition of Apple Harvesting Methods: Impacts of Mechanized and Intelligent Harvesting on Fresh-Market Quality and Food Safety.",
+        "authors": [
+          "Li Y",
+          "Liu H",
+          "Li J",
+          "Wang P",
+          "Liu L",
+          "Yang X"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Li Y",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Liu H",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-2807-3888",
+            "name": "Li J",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Wang P",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Liu L",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Yang X",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.3390/foods15162787",
+        "abstract": "Apple harvesting is transitioning from conventional manual picking to harvest-assist platforms, vibration-based mechanical systems, and selective robotic harvesting. For fresh-market apples, harvesting efficiency cannot be evaluated independently of mechanical damage, postharvest quality deterioration, and food-safety risks. Compression bruising, impact bruising, abrasion, cuts, punctures, and stem-end tearing can disrupt the peel, cuticle, and cellular structure to different degrees, triggering reactive oxygen species accumulation, membrane lipid peroxidation, cell-wall degradation, enzymatic browning, and increased respiration and ethylene metabolism. These responses may subsequently be amplified during storage, transportation, and processing, leading to softening, decay, shortened shelf life, and potential patulin contamination. Centered on the damage-safety trade-off, this review compares the technical characteristics and typical damage profiles of manual harvesting, vibration-based mechanical harvesting, harvest-assist platforms, and selective harvesting robots; explains how mechanical damage is transmitted from cellular physiological responses to food-quality and safety outcomes; and proposes conceptual frameworks for a Damage Risk Index and a Harvest Suitability Score. The central objective of intelligent apple harvesting should therefore be to improve efficiency while preserving appearance, texture, nutritional quality, storage stability, and food safety.",
+        "publication_date": "2026-08-08",
+        "source_name": "Foods (Basel, Switzerland)",
+        "paper_url": "https://europepmc.org/article/MED/42650480",
+        "oa_url": "https://europepmc.org/articles/PMC13511900",
+        "paper_type": "review",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [],
+        "keywords": [
+          "Apple",
+          "Food safety",
+          "Patulin",
+          "Postharvest Quality",
+          "Damage Risk Index"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.486519+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [
+          "Crossref could not respond to one search; other available sources were kept."
+        ],
+        "search_sources": [
+          "Europe PMC"
+        ]
+      }
+    ]
+  },
+  {
+    "label": "Learning and memory",
+    "query": "retrieval practice memory learning",
+    "papers": [
+      {
+        "id": "https://doi.org/10.31234/osf.io/vy7nw_v1",
+        "title": "Neural Mechanisms of Error-Driven Learning in Retrieval Practice: Confidence Gates Memory and Metamemory Networks",
+        "authors": [
+          "Aike Shi",
+          "Yixuan Liu",
+          "Xiaonan L Liu"
+        ],
+        "author_details": [
+          {
+            "id": "https://orcid.org/0009-0006-7175-7758",
+            "name": "Aike Shi",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0009-0007-4159-5935",
+            "name": "Yixuan Liu",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0001-6021-9889",
+            "name": "Xiaonan L Liu",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.31234/osf.io/vy7nw_v1",
+        "abstract": "Retrieval practice is one of the most effective strategies for enhancing long-term memory. Building on recent work (Shi &amp; Liu, 2025), we investigated error-driven learning (EDL) as a unified mechanistic account, which posits that memory improvement is shaped by two key signals: objective error—quantified as retrieval inaccuracy—and subjective error estimates, reflected in confidence judgments, which regulate how objective errors are processed. Using a continuous color-wheel paradigm with fMRI, this study examined the neural substrates of EDL and the modulatory role of confidence. Behaviorally, both larger objective error and lower confidence independently predicted greater subsequent memory improvement. Neurally, analyses of univariate activation, functional connectivity, and multivoxel pattern similarity revealed two dissociable yet interacting systems gated by confidence: Memory-related circuits, such as functional connectivity between the hippocampus and inferior frontal gyrus, were preferentially engaged under low confidence, leveraging objective retrieval errors to drive memory updating. In contrast, metamemory-related regions—including the striatum, thalamus, and supramarginal gyrus—were recruited under high confidence to process prediction errors elicited by unexpected retrieval failures. Together, these findings demonstrate how confidence dynamically regulates the recruitment of distinct neural circuits in support of retrieval-based learning, offering broad implications for educational interventions and memory rehabilitation.",
+        "publication_date": "2025-11-18",
+        "source_name": null,
+        "paper_url": "https://doi.org/10.31234/osf.io/vy7nw_v1",
+        "oa_url": null,
+        "paper_type": "posted-content",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": null,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:43.140013+00:00",
+        "provenance": {
+          "source": "Crossref",
+          "sources": [
+            "Crossref"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42421580",
+        "title": "Neural mechanisms of error-driven learning in retrieval practice: confidence gates memory and metamemory networks.",
+        "authors": [
+          "Shi A",
+          "Liu Y",
+          "Liu XL"
+        ],
+        "author_details": [
+          {
+            "id": "https://orcid.org/0009-0006-7175-7758",
+            "name": "Shi A",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Liu Y",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0001-6021-9889",
+            "name": "Liu XL",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1098/rstb.2025.0240",
+        "abstract": "Retrieval practice is one of the most effective strategies for enhancing long-term memory. Building on recent evidence, we investigated error-driven learning (EDL) as a unified mechanistic account, which posits that memory updating is shaped by two key signals: objective error-quantified as retrieval inaccuracy-and subjective error estimates, reflected in confidence judgements, which regulate how objective errors are processed. Using a continuous colour-wheel paradigm with functional magnetic resonance imaging, this study examined the neural substrates of EDL and the modulatory role of confidence. Behaviourally, both larger objective error and lower confidence independently predicted greater subsequent memory improvement. Neurally, analyses of univariate activation, functional connectivity and multivoxel pattern similarity revealed two dissociable yet interacting systems gated by confidence. Memory-related circuits, such as functional connectivity between the hippocampus and inferior frontal gyrus, were preferentially engaged under low confidence, leveraging objective retrieval errors to drive memory updating. In contrast, metamemory-related regions-including the striatum, thalamus and supramarginal gyrus-were recruited under high confidence to process confidence violations elicited by unexpected retrieval failures. Together, these findings demonstrate how confidence dynamically regulates the recruitment of distinct neural circuits in support of retrieval-based learning, offering broad implications for educational interventions and memory rehabilitation. This article is part of the theme issue 'The role of hippocampal predictions in cognition: bridging perception and memory'.",
+        "publication_date": "2026-07-01",
+        "source_name": "Philosophical transactions of the Royal Society of London. Series B, Biological sciences",
+        "paper_url": "https://europepmc.org/article/MED/42421580",
+        "oa_url": null,
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [
+          "Brain",
+          "Female",
+          "Humans",
+          "Learning",
+          "Magnetic Resonance Imaging",
+          "Male",
+          "Memory",
+          "Memory, Long-Term",
+          "Mental Recall",
+          "Metacognition",
+          "Young Adult"
+        ],
+        "keywords": [
+          "Memory",
+          "Hippocampus",
+          "fMRI",
+          "Metamemory",
+          "Retrieval Practice",
+          "Error-driven Learning"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.348095+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://doi.org/10.1016/j.nlm.2026.108223",
+        "title": "Elaborative processing before retrieval practice enhances semantic organization and long-term memory",
+        "authors": [
+          "Jiaojian Dai",
+          "Yan Zhu",
+          "Chunyu Zhao",
+          "Mingze Sun",
+          "Chunyan Guo"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Jiaojian Dai",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Yan Zhu",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Chunyu Zhao",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Mingze Sun",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Chunyan Guo",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1016/j.nlm.2026.108223",
+        "abstract": "One longstanding goal in psychology is to identify more effective ways of learning. Recent work has shown that elaborative processing can amplify the memory benefits of retrieval practice, yet the mechanisms underlying this advantage remain unclear. Using electroencephalography (EEG), the present study examined how elaborative processing before retrieval practice influences later memory and encoding-related neural processing and representations, relative to context processing. Behaviorally, memory performance was better for elaborative processing plus retrieval practice than for context processing plus retrieval practice. During the first encoding phase, elaborative processing elicited a more negative N400, whereas context processing elicited a more positive LPC. Moreover, the N400 and LPC differences between elaborative and context processing during encoding were significantly correlated with the corresponding differences in 7-day recognition performance. Representational similarity analyses further showed stronger semantic-category organization and greater representational reorganization across repeated encoding under elaborative processing than under context processing. These findings suggest that elaborative processing before retrieval practice enhances long-term memory and is associated with broader semantic processing and stronger semantic organization during encoding. More broadly, the results suggest that richer connections with pre-existing semantic knowledge may be one way in which encoding variability supports long-term memory.",
+        "publication_date": "2026-12",
+        "source_name": "Neurobiology of Learning and Memory",
+        "paper_url": "https://doi.org/10.1016/j.nlm.2026.108223",
+        "oa_url": null,
+        "paper_type": "journal-article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": null,
+        "topics": [],
+        "keywords": [
+          "Elaborative Processing",
+          "Encoding Variability",
+          "Representational Similarity Analysis",
+          "Retrieval Practice"
+        ],
+        "retrieved_at": "2026-11-05T11:35:43.139591+00:00",
+        "provenance": {
+          "source": "Crossref",
+          "sources": [
+            "Crossref",
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42837278",
+        "title": "University students' use of retrieval practice and re-reading: study strategy beliefs and coordination across learning contexts.",
+        "authors": [
+          "Teo DH",
+          "Lee YM",
+          "Yeo DJ"
+        ],
+        "author_details": [
+          {
+            "id": "https://orcid.org/0009-0001-3742-913X",
+            "name": "Teo DH",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0009-0007-2620-2494",
+            "name": "Lee YM",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-1207-259X",
+            "name": "Yeo DJ",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1080/09658211.2026.2739303",
+        "abstract": "How students study outside the classroom shapes learning outcomes, yet most research on strategy use has been conducted in Western contexts with limited attention to how learners coordinate strategies in authentic academic settings. We surveyed 261 mostly high-achieving university students in Singapore about their reported use of retrieval practice and re-reading across memory-based and problem-solving tasks. Students described flexible, goal-sensitive approaches rather than rigid preferences. Most reported coordinating both strategies - using re-reading for initial comprehension and retrieval practice for consolidation - and differentiating by task type. For problem-solving, students strongly favoured retrieval practice over worked examples, potentially reflecting adaptation to assessment demands rather than awareness of effectiveness. Effort during retrieval practice was interpreted as signalling gaps in prior study. Learning how to study occurred largely through trial-and-error. These self-reported patterns suggest adaptive, context-sensitive regulation of study strategies, and that supporting such adaptivity may require attention to the instructional environments that shape students' choices.",
+        "publication_date": "2026-10-06",
+        "source_name": "Memory (Hove, England)",
+        "paper_url": "https://europepmc.org/article/MED/42837278",
+        "oa_url": null,
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [
+          "Adult",
+          "Female",
+          "Humans",
+          "Learning",
+          "Male",
+          "Mental Recall",
+          "Practice, Psychological",
+          "Problem Solving",
+          "Reading",
+          "Singapore",
+          "Students",
+          "Universities",
+          "Young Adult"
+        ],
+        "keywords": [
+          "Higher Education",
+          "Metacognition",
+          "Self-regulated Learning",
+          "Study Strategies",
+          "Retrieval Practice",
+          "Re-reading"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.346151+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/PPR/PPR1341945",
+        "title": "No Evidence that Retrieval Practice Facilitates Cortical Memory Integration: Insights from Novel Word Semantic Priming",
+        "authors": [
+          "Ball LV",
+          "Gaskell MG"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Ball LV",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Gaskell MG",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.31234/osf.io/gjqrn_v1",
+        "abstract": "According to the Rapid Consolidation Hypothesis (RCH), retrieving new information from memory integrates the corresponding memory representations into cortical long-term memory, leading to longer-term memory benefits than restudy or rehearsal. However, this prediction has not been empirically tested. We explored this in the current study by comparing semantic priming effects between novel words taught under retrieval practice and restudy conditions. Words are more effective at priming (speeding up) the recognition of semantically related words once they have integrated with related knowledge in cortical language networks. According to the RCH, semantic priming should therefore be enhanced for novel words taught via retrieval practice. In a learning phase, participants learned 20 novel words and their definitions (e.g., blontack - a type of cat) under restudy conditions and 20 under retrieval practice conditions by retrieving part of the definition (e.g., blontack - a type of ___). The novel words, and a set of familiar words, then served as prime words for related (e.g., dog) and unrelated target words in a primed lexical decision task, both immediately after learning and ~48 hrs later. Familiar prime words successfully primed the recognition of related target words in both tasks. The definitions of novel words taught under retrieval practice were recalled more accurately ~48 hrs later than the restudy condition. However, we found no significant priming effects in either learning condition or task, with exploratory Bayesian analyses revealing moderate evidence in favour of the null hypothesis. Our findings suggest that retrieval practice facilitates the longer-term retention of novel words and their definitions, but may not support their integration with related knowledge in language networks. However, methodological factors could have attenuated the scope for semantic priming with novel words, with future research required to continue this investigation.",
+        "publication_date": "2026-10-13",
+        "source_name": null,
+        "paper_url": "https://europepmc.org/article/PPR/PPR1341945",
+        "oa_url": null,
+        "paper_type": "preprint",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:44.346273+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42651613",
+        "title": "Retrieval Practice Enhances Lexico-Semantic Representations and Facilitates Word Identification During the Attentional Blink: Evidence from L3 French Compound Word Learning.",
+        "authors": [
+          "Liu S",
+          "Huang S",
+          "Han J",
+          "Wang X",
+          "Long S",
+          "Cao HW"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Liu S",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0009-0001-5165-0674",
+            "name": "Huang S",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Han J",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Wang X",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Long S",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Cao HW",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.3390/bs16081438",
+        "abstract": "The present study investigated whether retrieval practice facilitates memory retention and the rapid identification of newly learned French word components under attentional blink (AB) conditions. Specifically, a total of 107 native Chinese speakers participated in the study, and 103 were included in the final analyses after exclusions. In Experiment 1, participants studied novel, semantically opaque French compound words under two learning conditions: retrieval practice and repeated study. Experiment 2 was conducted 15 min after the completion of Experiment 1. Participants performed a two-target rapid serial visual presentation (RSVP) task in which the morphemic components of the learned compound words were presented as the first target (T1) and the second target (T2) at critical lags (Lag 3 and Lag 7). Experiment 1 confirmed the classical testing effect, with the retrieval practice condition showing higher accuracy and faster response times than the repeated study condition. Experiment 2 revealed that participants in the retrieval practice condition exhibited significantly higher T2 identification accuracy at Lag 7 and a numerical advantage at Lag 3 compared with those in the repeated study condition. These findings indicate that retrieval practice facilitates T2 identification, particularly when attentional resources are relatively recovered at Lag 7. Overall, retrieval-based learning appears to strengthen newly acquired lexico-semantic representations and support the rapid identification of newly learned word components under RSVP conditions.",
+        "publication_date": "2026-08-20",
+        "source_name": "Behavioral sciences (Basel, Switzerland)",
+        "paper_url": "https://europepmc.org/article/MED/42651613",
+        "oa_url": "https://europepmc.org/articles/PMC13509901",
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [],
+        "keywords": [
+          "Attentional Blink",
+          "Retrieval Practice",
+          "Rapid Serial Visual Presentation",
+          "Lexico-semantic Access",
+          "Third Language Vocabulary Learning"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.346669+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42487339",
+        "title": "Examining the Roles of Retrieval Practice and Post-Retrieval Feedback in Learning Among Autistic Adults.",
+        "authors": [
+          "Cairney BE",
+          "Haebig E",
+          "Lucas HD"
+        ],
+        "author_details": [
+          {
+            "id": "https://orcid.org/0000-0002-7831-251X",
+            "name": "Cairney BE",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0001-8216-7063",
+            "name": "Haebig E",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-3427-8206",
+            "name": "Lucas HD",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1177/13623613261464659",
+        "abstract": "Retrieval practice enhances learning and is most effective when feedback is provided. Despite robust evidence that retrieval practice and post-retrieval feedback benefit numerous clinical populations, these techniques have not been studied in autism. In two experiments, we measured retrieval practice and post-retrieval feedback effects on associative memory in autistic and non-autistic adults residing in the United States. Participants attempted to memorize semantically unrelated word pairs, which were then reviewed during a practice phase consisting of retrieval practice with and without feedback. In Experiment 1, word pairs were presented to participants (40 autistic; 40 non-autistic) auditorily. In Experiment 2, stimuli were presented visually and restudy trials were added to the practice phase. Additionally, feedback for retrieval practice trials was manipulated between-subjects (80 participants per group) and a four-alternative recognition test was used in the practice phase. In both experiments, the testing phase consisted of cued recall. Both experiments yielded benefits of feedback following initial retrieval practice across groups. In addition, Experiment 2 demonstrated that both groups benefited from retrieval practice compared to restudy, even without feedback. Our results suggest that the well-documented effects of retrieval practice, particularly in concert with post-retrieval feedback, extend to support learning among autistic as well as non-autistic individuals.Lay AbstractEvery autistic person has their own unique sensory, perceptual, and social experiences that impact learning in different ways. Although many autistic learners have average or above-average IQ, individuals with a diagnosis of autism have an increased likelihood of co-occurring learning disabilities and episodic memory difficulties. These memory-related challenges make it especially important to identify strategies that can support learning in autistic populations. Retrieval practice may be one such strategy, which involves testing oneself on previously learned information. Notably, retrieval practice supports learning among many clinical populations who experience memory and learning difficulties, yet it has not been investigated among autistic learners. This study measured the effects of retrieval practice and post-retrieval feedback among autistic and non-autistic adults (40 per group in Experiment 1; 80 per group in Experiment 2) residing in the United States. The task was divided into three sections. First, participants completed a \"learning\" block where they attempted to memorize unrelated word pairings (e.g., typing flower ). Second was a \"practice\" block, in which they reviewed the recently learned word pairs. Practice trials consisted of retrieval practice with feedback, retrieval practice without feedback, and restudy. In restudy trials, participants reviewed the full word pair (e.g., typing flower ) and selected the second word (e.g., flower ) among a list of three similar words (e.g., blossom, bud, bloom ). In retrieval practice trials, participants were given the first word (e.g., typing ) and attempted to remember its corresponding word (e.g., flower ). In feedback trials, after participants made their response, they were presented with the full word pair (e.g., typing flower ) regardless of their accuracy. In the third and final \"testing\" block, participants' memory for word pairs was tested once more. This allowed us to compare the effect of retrieval practice with feedback, retrieval practice without feedback, and restudying on final test performance. In addition, we measured the generalizability of the testing effect in different learning contexts (listening to word pairs in Experiment 1; reading word pairs in Experiment 2) and retrieval practice formats (cued recall in Experiment 1; multiple choice in Experiment 2). In both experiments, the benefits of feedback following retrieval practice were evident, and retrieval practice was a more effective learning strategy than restudying word pairs. These outcomes were present in autistic and non-autistic learners alike. This study is the first to demonstrate that retrieval practice with feedback promotes learning in autistic adults. It is well-documented that autistic individuals face suboptimal educational and vocational outcomes compared to their non-autistic peers; thus, strategies that support learning are important to study. These findings contribute to a large body of existing research affirming retrieval practice as a flexible learning strategy that is most effective when accompanied by feedback and may have the potential to improve outcomes for autistic learners.",
+        "publication_date": "2026-07-22",
+        "source_name": "Autism : the international journal of research and practice",
+        "paper_url": "https://europepmc.org/article/MED/42487339",
+        "oa_url": "https://europepmc.org/articles/PMC13494112",
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [
+          "Adolescent",
+          "Adult",
+          "Autistic Disorder",
+          "Case-Control Studies",
+          "Cues",
+          "Feedback, Psychological",
+          "Female",
+          "Humans",
+          "Learning",
+          "Male",
+          "Mental Recall",
+          "Middle Aged",
+          "Practice, Psychological",
+          "Young Adult"
+        ],
+        "keywords": [
+          "Learning",
+          "Associative memory",
+          "Feedback",
+          "Autism",
+          "Retrieval Practice",
+          "Testing Effect",
+          "Autistic Adults"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.347080+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42401060",
+        "title": "Memory for a dinosaur exhibit: retrieval-based practice vs. restudy.",
+        "authors": [
+          "Henning SJ",
+          "Lutzio AM",
+          "Condorelli S",
+          "Festini SB"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Henning SJ",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Lutzio AM",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Condorelli S",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Festini SB",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1016/j.jecp.2026.106582",
+        "abstract": "Retrieval-based practice (i.e., the testing effect) is a powerful strategy for improving learning and long-term memory retention. Although its benefits are well established across educational and laboratory settings, fewer studies have examined its effectiveness in informal educational settings such as museums. This study addressed that gap by comparing retrieval-based practice and restudy conditions for children learning dinosaur facts at a museum exhibit, using recall and recognition measures. Children aged 4 to 9 years (N = 149) were (1) randomly assigned to retrieval or restudy conditions during an on-site museum learning phase and (2) completed a delayed online memory assessment approximately one week later. Results showed that retrieval-based practice significantly improved recognition memory but did not improve free recall accuracy in children. There was no significant interaction between age and learning condition. The findings suggest that retrieval-based practice can enhance recognition of learned material in informal settings, though its effect on free recall may be limited in 4-9-year-old children. Adjusting retrieval-based learning strategies and testing formats to match children's developmental stages could help maximize learning benefits across educational contexts.",
+        "publication_date": "2026-07-04",
+        "source_name": "Journal of experimental child psychology",
+        "paper_url": "https://europepmc.org/article/MED/42401060",
+        "oa_url": null,
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [
+          "Animals",
+          "Child",
+          "Child, Preschool",
+          "Dinosaurs",
+          "Female",
+          "Humans",
+          "Learning",
+          "Male",
+          "Mental Recall",
+          "Museums",
+          "Practice, Psychological",
+          "Recognition, Psychology"
+        ],
+        "keywords": [
+          "Memory",
+          "Children",
+          "Restudy",
+          "Informal Learning",
+          "Retrieval-based Practice"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.347501+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42866698",
+        "title": "A Systematic Review of Spaced Repetition, Retrieval Practice, and Academic Performance in Undergraduate Medical Students.",
+        "authors": [
+          "Luu NK",
+          "Severance S"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Luu NK",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Severance S",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.7759/cureus.116147",
+        "abstract": "Spaced repetition and active retrieval practice are learning strategies designed to improve long-term memory retention. These approaches target the forgetting curve, which describes the progressive loss of information over time unless learners actively recall and review material at spaced intervals. Modern learning platforms such as Anki and Quizlet use scheduled review and retrieval to strengthen memory consolidation and recall, and their use in undergraduate medical education has increased in recent years. This systematic review aimed to determine whether spaced repetition and active retrieval interventions improve memory retention and examination performance among undergraduate medical students. The review followed PRISMA (Preferred Reporting Items for Systematic Reviews and Meta-Analyses) guidelines. PubMed, ERIC, and Scopus were searched for studies examining spaced repetition or retrieval practice in undergraduate medical students, and studies reporting objective academic outcomes were included. Of 314 records identified, 210 remained after duplicate removal, and 21 studies met the inclusion criteria. Due to heterogeneity in study designs, interventions, and outcome measures, a narrative synthesis was undertaken, and no meta-analysis was performed. Most controlled studies reported improvements in examination performance or knowledge retention following spaced retrieval interventions. Observational studies of self-directed flashcard use reported mixed findings. Several demonstrated positive associations with academic performance, whereas others, including studies that measured platform use objectively rather than by self-report, found no association. These findings were more susceptible to self-selection bias and confounding, and most were judged to be at serious risk of bias. Several studies suggested greater benefit with sustained and longitudinal engagement. Overall, the available evidence suggests that spaced repetition and active retrieval practice may improve academic outcomes in undergraduate medical education, particularly when implemented longitudinally through structured retrieval. Controlled studies provided stronger support for these benefits, whereas evidence from observational studies of self-directed Anki use was weaker because of potential selection bias and confounding. Future research should focus on standardized implementation strategies and longer follow-up to determine whether early use of spaced retrieval produces durable benefits during clinical training and on future examinations.",
+        "publication_date": "2026-09-12",
+        "source_name": "Cureus",
+        "paper_url": "https://europepmc.org/article/MED/42866698",
+        "oa_url": null,
+        "paper_type": "review",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [],
+        "keywords": [
+          "Active Recall",
+          "Spaced Repetition",
+          "Anki",
+          "Spaced Repetition Flashcards",
+          "Anki Flashcards"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.346794+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://doi.org/10.31234/osf.io/ruxmb_v1",
+        "title": "Holistic retrieval of episodic memory: Evidence from retrieval practice",
+        "authors": [
+          "Zehan Ye",
+          "Elkan G. Akyurek",
+          "Mark Nieuwenstein"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Zehan Ye",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Elkan G. Akyurek",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Mark Nieuwenstein",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.31234/osf.io/ruxmb_v1",
+        "abstract": "Imagining an event that comprises several elements (e.g., an object, person, and a location) produces a memory in which all elements and their mutual associates are encoded and stored in memory. In the current study, we asked whether the task of retrieving a specific element from the memory would automatically result in the incidental retrieval of the other associated elements. In Experiment 1 (N = 61), participants encoded 40 events in total, of which half were subjected to a retrieval practice session in which only a single association was practiced. Subsequently, participants performed a cued-recall task in which all associations from all events were probed. Consistent with a holistic retrieval account, the results showed an equivalent retrieval-practice benefit for the practiced and the unpracticed associations from events that had undergone retrieval practice. In Experiment 2 (N = 60), participants encoded the events either through a closed-loop procedure (i.e., all pairwise associations were encoded) or an open-loop procedure (i.e., only two pairwise associations were encoded), with the expectation that the open-loop encoding procedure would result in a less holistic memory representation. Consistent with this reasoning, the results showed a more selective retrieval practice benefit for events encoded through the open-loop procedure. Taken together, the results provide evidence for holistic retrieval of episodic memories.",
+        "publication_date": "2026-03-05",
+        "source_name": null,
+        "paper_url": "https://doi.org/10.31234/osf.io/ruxmb_v1",
+        "oa_url": null,
+        "paper_type": "posted-content",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": null,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:43.140626+00:00",
+        "provenance": {
+          "source": "Crossref",
+          "sources": [
+            "Crossref"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42803776",
+        "title": "Examining the benefits of spaced retrieval practice on transfer and the student experience in the classroom.",
+        "authors": [
+          "Ramgopal V",
+          "Fastrich GM",
+          "Higham PA",
+          "Modirrousta-Galian A",
+          "Pattni M",
+          "Potts R",
+          "Seabrooke T"
+        ],
+        "author_details": [
+          {
+            "id": "https://orcid.org/0009-0009-4366-2390",
+            "name": "Ramgopal V",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0001-7105-9091",
+            "name": "Fastrich GM",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0001-6087-7224",
+            "name": "Higham PA",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-2925-2976",
+            "name": "Modirrousta-Galian A",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0009-0003-7512-4788",
+            "name": "Pattni M",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-4042-2059",
+            "name": "Potts R",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-4119-8389",
+            "name": "Seabrooke T",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1080/09658211.2026.2733327",
+        "abstract": "Spaced retrieval practice is a learning strategy whereby information is retrieved multiple times with each retrieval attempt separated by a time gap. We conducted a semester-long classroom intervention to investigate the benefits of spaced retrieval practice on memory and transfer. Each week, students engaged in three, spaced learning practice sessions (LPSs) during which they either answered multiple-choice (MC) questions about that week's course content (retrieval practice) or were shown the MC questions with the correct answer selected (restudy). Three weeks after the last LPS, participants completed a final MC test comprising (1) repeated questions from the LPSs, (2) transfer questions that had the same answer options as corresponding LPS questions and queried related topics, but had different correct answers, or (3) new questions about lecture content. A typical retrieval practice effect was observed for repeated questions (retrieval > restudy). Although we did not observe a transfer effect on overall final test accuracy (related = new), further exploratory analyses that used purer measures of transfer revealed evidence of both positive and negative transfer. Furthermore, retrieval practice (vs. restudying) contributed to an enhanced student experience (greater sense of mastery, motivation, and attentional control, and reduced anxiety).",
+        "publication_date": "2026-09-28",
+        "source_name": "Memory (Hove, England)",
+        "paper_url": "https://europepmc.org/article/MED/42803776",
+        "oa_url": null,
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [
+          "Female",
+          "Humans",
+          "Learning",
+          "Male",
+          "Mental Recall",
+          "Practice, Psychological",
+          "Students",
+          "Transfer, Psychology",
+          "Young Adult"
+        ],
+        "keywords": [
+          "Transfer",
+          "Retrieval Practice",
+          "Testing Effect",
+          "Spaced Learning",
+          "Spaced Retrieval Practice"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.346528+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42510245",
+        "title": "The Benefits of Covert Retrieval Practice on Short- and Long-Term L3 Vocabulary Retention.",
+        "authors": [
+          "Long S",
+          "Wang Y",
+          "Chen J",
+          "Cao H",
+          "Tang Y"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Long S",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Wang Y",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Chen J",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Cao H",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Tang Y",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.3390/bs16071124",
+        "abstract": "Background The present study investigated the impact of retrieval practice on Japanese vocabulary acquisition by native Chinese speakers (English as the second language), employing a classic retrieval practice paradigm and examining both short-term and long-term effects. Methods Fifty-eight Chinese participants without prior knowledge of Japanese learned 30 Japanese-Chinese word pairs through either repeated studying or retrieval practice. Participants subsequently provided metacognitive predictions before completing a 15-min delayed cued recall test, as well as 30-day and 50-day delayed old/new recognition memory tests. Results Retrieval practice with feedback significantly enhanced vocabulary recall on the 15-min cued recall test and recognition on the 30-day and 50-day tests compared to repeated studying. Regarding metacognitive judgments, participants' predicted performance significantly declined over longer retention intervals, but no significant differences were found between retrieval practice and repeated studying at any retention interval. Conclusions The findings provide behavioral evidence for the advantage of retrieval practice in kana-based (phonographic) L3 vocabulary learning, extending the applicability of the desirable difficulties framework and the retrieval effort hypothesis to this context. The study also highlights the need to raise the awareness of retrieval practice among learners and educators. Future research should explore the generalizability of these findings to logographic (kanji) learning and to more ecologically valid educational settings.",
+        "publication_date": "2026-07-06",
+        "source_name": "Behavioral sciences (Basel, Switzerland)",
+        "paper_url": "https://europepmc.org/article/MED/42510245",
+        "oa_url": "https://europepmc.org/articles/PMC13403799",
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 1,
+        "is_oa": true,
+        "topics": [],
+        "keywords": [
+          "Japanese",
+          "Retrieval Practice",
+          "Metacognitive Judgments",
+          "Third Language Acquisition"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.346958+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/PPR/PPR1312536",
+        "title": "Examining the Benefits of Spaced Retrieval Practice on Transfer and the Student Experience in the Classroom",
+        "authors": [
+          "Ramgopal V",
+          "Fastrich GM",
+          "Higham PA",
+          "Modirrousta-Galian A",
+          "Pattni M",
+          "Potts R",
+          "Seabrooke T"
+        ],
+        "author_details": [
+          {
+            "id": "https://orcid.org/0009-0009-4366-2390",
+            "name": "Ramgopal V",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0001-7105-9091",
+            "name": "Fastrich GM",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0001-6087-7224",
+            "name": "Higham PA",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-2925-2976",
+            "name": "Modirrousta-Galian A",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Pattni M",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-4042-2059",
+            "name": "Potts R",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Seabrooke T",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.31234/osf.io/jgqsh_v1",
+        "abstract": "Spaced retrieval practice is a learning strategy whereby information is retrieved multiple times with each retrieval attempt separated by a time gap. We conducted a semester-long classroom intervention to investigate the benefits of spaced retrieval practice on memory and transfer. Each week, students engaged in three, spaced learning practice sessions (LPSs) during which they either answered multiple-choice (MC) questions about that week’s course content (retrieval practice) or were shown the MC questions with the correct answer selected (restudy). Three weeks after the last LPS, participants completed a final MC test comprising (1) repeated questions from the LPSs, (2) transfer questions that had the same answer options as corresponding LPS questions and queried related topics, but had different correct answers, or (3) new questions about lecture content. A typical retrieval practice effect was observed for repeated questions (retrieval > restudy). Although we did not observe a transfer effect on overall final test accuracy (related = new), further exploratory analyses that used purer measures of transfer revealed evidence of both positive and negative transfer. Furthermore, retrieval practice (vs. restudying) contributed to an enhanced student experience (greater sense of mastery, motivation, and attentional control, and reduced anxiety). Keywords: spaced learning, retrieval practice, transfer, testing effect, spaced retrieval practice",
+        "publication_date": "2026-09-04",
+        "source_name": null,
+        "paper_url": "https://europepmc.org/article/PPR/PPR1312536",
+        "oa_url": null,
+        "paper_type": "preprint",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:44.347856+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://doi.org/10.1037/e528942014-985",
+        "title": "Retrieval Practice Improves Maintenance in Memory- not Memory Retrieval",
+        "authors": [
+          "Simone Malejka",
+          "Edgar Erdfelder"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Simone Malejka",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Edgar Erdfelder",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1037/e528942014-985",
+        "abstract": null,
+        "publication_date": "2014",
+        "source_name": "PsycEXTRA Dataset",
+        "paper_url": "https://doi.org/10.1037/e528942014-985",
+        "oa_url": null,
+        "paper_type": "dataset",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": null,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:43.139359+00:00",
+        "provenance": {
+          "source": "Crossref",
+          "sources": [
+            "Crossref"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://doi.org/10.1037/xlm0000012",
+        "title": "Toward an episodic context account of retrieval-based learning: Dissociating retrieval practice and elaboration.",
+        "authors": [
+          "Melissa Lehman",
+          "Megan A. Smith",
+          "Jeffrey D. Karpicke"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Melissa Lehman",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Megan A. Smith",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Jeffrey D. Karpicke",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1037/xlm0000012",
+        "abstract": null,
+        "publication_date": "2014",
+        "source_name": "Journal of Experimental Psychology: Learning, Memory, and Cognition",
+        "paper_url": "https://doi.org/10.1037/xlm0000012",
+        "oa_url": null,
+        "paper_type": "journal-article",
+        "is_retracted": null,
+        "cited_by_count": 78,
+        "is_oa": null,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:43.139449+00:00",
+        "provenance": {
+          "source": "Crossref",
+          "sources": [
+            "Crossref"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      }
+    ]
+  },
+  {
+    "label": "Plant health",
+    "query": "plant disease smartphone imaging",
+    "papers": [
+      {
+        "id": "https://doi.org/10.3389/fpls.2025.1670593",
+        "title": "Plant stress detection using multimodal imaging and machine learning: from leaf spectra to smartphone applications",
+        "authors": [
+          "Muhammad Shoaib",
+          "Sajid Ullah Khan",
+          "Hala AbdelHameed",
+          "Ayman Qahmash"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Muhammad Shoaib",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Sajid Ullah Khan",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Hala AbdelHameed",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Ayman Qahmash",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.3389/fpls.2025.1670593",
+        "abstract": "Plant leaf spectrophotometry has been used successfully as a means to detect stress, and it has been complemented by fluorescence analysis. This identification can be achieved in the ultraviolet (UV), visible (red, green, blue; RGB), near-infrared (NIR), and infrared (IR) spectral regions. Hyperspectral (measuring continuous wavelength bands) and multispectral (measuring discrete wavelength bands) imaging modalities can provide detailed information concerning the physiological well-being of plants, often diagnosing them at an earlier stage than visual or other more traditional biochemical assays. Because hyperspectral methods are highly sensitive and accurate, they cost a lot and produce vast quantities of data, which demand sophisticated computing software, and compared to multimedia, multispectral, and RGB cameras, they are less expensive and easier to carry but have reduced spectral resolution. Such methods are justified by thermal and fluorescence images revealing variations in the temperature and efficiency of photosynthesis of the leaves in response to stress. New digital imaging, thermal imaging, and optical filter technologies, and advancements in smartphone cameras have rendered low-cost, field-deployable platforms to monitor plant stress in real time feasible. Machine learning also supports these techniques by automating feature extraction, classification, and prediction to reduce the use of expensive instrumentation and human skill. But also problems like sensor calibration in a changing field, low model generalization across species and environments, and large, annotated datasets are needed. Beyond highlighting the relative strengths of the conventional and contemporary sensing approaches, the paper also examines the possibility of applying machine learning to multimodal images, as well as the growing impact of smartphone- based solutions in supplying inexpensive agricultural diagnostics. It concludes by overviewing the current limitations and limits to future research into scalable, cost-effective, and generalizable plant stress models.",
+        "publication_date": "2026-01-02",
+        "source_name": "Frontiers in Plant Science",
+        "paper_url": "https://doi.org/10.3389/fpls.2025.1670593",
+        "oa_url": "https://europepmc.org/articles/PMC12808392",
+        "paper_type": "journal-article",
+        "is_retracted": null,
+        "cited_by_count": 22,
+        "is_oa": null,
+        "topics": [],
+        "keywords": [
+          "Field-deployable Technologies",
+          "Hyperspectral Imaging",
+          "Machine Learning",
+          "Multispectral Imaging",
+          "Plant Stress Detection",
+          "Smartphone-based Sensing"
+        ],
+        "retrieved_at": "2026-11-05T11:35:43.335044+00:00",
+        "provenance": {
+          "source": "Crossref",
+          "sources": [
+            "Crossref",
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://doi.org/10.1094/pdis-03-15-0340-fe",
+        "title": "Plant Disease Detection by Imaging Sensors – Parallels and Specific Demands for Precision Agriculture and Plant Phenotyping",
+        "authors": [
+          "Anne-Katrin Mahlein"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Anne-Katrin Mahlein",
+            "institutions": [
+              {
+                "id": null,
+                "name": "Institute for Crop Science and Resource Conservation (INRES) - Phytomedicine, University of Bonn, Meckenheimer Allee 166a, 53115 Bonn, Germany"
+              }
+            ]
+          }
+        ],
+        "doi": "https://doi.org/10.1094/pdis-03-15-0340-fe",
+        "abstract": "Early and accurate detection and diagnosis of plant diseases are key factors in plant production and the reduction of both qualitative and quantitative losses in crop yield. Optical techniques, such as RGB imaging, multi- and hyperspectral sensors, thermography, or chlorophyll fluorescence, have proven their potential in automated, objective, and reproducible detection systems for the identification and quantification of plant diseases at early time points in epidemics. Recently, 3D scanning has also been added as an optical analysis that supplies additional information on crop plant vitality. Different platforms from proximal to remote sensing are available for multiscale monitoring of single crop organs or entire fields. Accurate and reliable detection of diseases is facilitated by highly sophisticated and innovative methods of data analysis that lead to new insights derived from sensor data for complex plant-pathogen systems. Nondestructive, sensor-based methods support and expand upon visual and/or molecular approaches to plant disease assessment. The most relevant areas of application of sensor-based analyses are precision agriculture and plant phenotyping.",
+        "publication_date": "2016-02",
+        "source_name": "Plant Disease",
+        "paper_url": "https://doi.org/10.1094/pdis-03-15-0340-fe",
+        "oa_url": null,
+        "paper_type": "journal-article",
+        "is_retracted": null,
+        "cited_by_count": 1297,
+        "is_oa": null,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:43.335419+00:00",
+        "provenance": {
+          "source": "Crossref",
+          "sources": [
+            "Crossref"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://doi.org/10.3389/fpls.2021.621168",
+        "title": "Biotic Yield Losses in the Southern Amazon, Brazil: Making Use of Smartphone-Assisted Plant Disease Diagnosis Data",
+        "authors": [
+          "Anna C. Hampf",
+          "Claas Nendel",
+          "Simone Strey",
+          "Robert Strey"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Anna C. Hampf",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Claas Nendel",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Simone Strey",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Robert Strey",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.3389/fpls.2021.621168",
+        "abstract": "Pathogens and animal pests (P&amp;A) are a major threat to global food security as they directly affect the quantity and quality of food. The Southern Amazon, Brazil’s largest domestic region for soybean, maize and cotton production, is particularly vulnerable to the outbreak of P&amp;A due to its (sub)tropical climate and intensive farming systems. However, little is known about the spatial distribution of P&amp;A and the related yield losses. Machine learning approaches for the automated recognition of plant diseases can help to overcome this research gap. The main objectives of this study are to (1) evaluate the performance of Convolutional Neural Networks (ConvNets) in classifying P&amp;A, (2) map the spatial distribution of P&amp;A in the Southern Amazon, and (3) quantify perceived yield and economic losses for the main soybean and maize P&amp;A. The objectives were addressed by making use of data collected with the smartphone application Plantix . The core of the app’s functioning is the automated recognition of plant diseases via ConvNets. Data on expected yield losses were gathered through a short survey included in an “expert” version of the application, which was distributed among agronomists. Between 2016 and 2020, Plantix users collected approximately 78,000 georeferenced P&amp;A images in the Southern Amazon. The study results indicate a high performance of the trained ConvNets in classifying 420 different crop-disease combinations. Spatial distribution maps and expert-based yield loss estimates indicate that maize rust, bacterial stalk rot and the fall armyworm are among the most severe maize P&amp;A, whereas soybean is mainly affected by P&amp;A like anthracnose, downy mildew, frogeye leaf spot, stink bugs and brown spot. Perceived soybean and maize yield losses amount to 12 and 16%, respectively, resulting in annual yield losses of approximately 3.75 million tonnes for each crop and economic losses of US$2 billion for both crops together. The high level of accuracy of the trained ConvNets, when paired with widespread use from following a citizen-science approach, results in a data source that will shed new light on yield loss estimates, e.g., for the analysis of yield gaps and the development of measures to minimise them.",
+        "publication_date": "2021-04-15",
+        "source_name": "Frontiers in Plant Science",
+        "paper_url": "https://doi.org/10.3389/fpls.2021.621168",
+        "oa_url": null,
+        "paper_type": "journal-article",
+        "is_retracted": null,
+        "cited_by_count": 22,
+        "is_oa": null,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:43.335552+00:00",
+        "provenance": {
+          "source": "Crossref",
+          "sources": [
+            "Crossref"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://doi.org/10.56726/irjmets50482",
+        "title": "A SMARTPHONE BASED APPLICATION FOR PLANT DISEASE DETECTION AND REMEDIES",
+        "authors": [],
+        "author_details": [],
+        "doi": "https://doi.org/10.56726/irjmets50482",
+        "abstract": null,
+        "publication_date": "2024-03-20",
+        "source_name": "International Research Journal of Modernization in Engineering Technology and Science",
+        "paper_url": "https://doi.org/10.56726/irjmets50482",
+        "oa_url": null,
+        "paper_type": "journal-article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": null,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:43.335522+00:00",
+        "provenance": {
+          "source": "Crossref",
+          "sources": [
+            "Crossref"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://doi.org/10.1007/978-981-19-5896-0_6",
+        "title": "Fluorescent Imaging System-Based Plant Phenotyping for Disease Recognition",
+        "authors": [
+          "Siddra Ijaz",
+          "Imran Ul Haq",
+          "Maria Babar"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Siddra Ijaz",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Imran Ul Haq",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Maria Babar",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1007/978-981-19-5896-0_6",
+        "abstract": null,
+        "publication_date": "2022",
+        "source_name": "Trends in Plant Disease Assessment",
+        "paper_url": "https://doi.org/10.1007/978-981-19-5896-0_6",
+        "oa_url": null,
+        "paper_type": "book-chapter",
+        "is_retracted": null,
+        "cited_by_count": 1,
+        "is_oa": null,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:43.335797+00:00",
+        "provenance": {
+          "source": "Crossref",
+          "sources": [
+            "Crossref"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://doi.org/10.1016/j.poly.2026.118382",
+        "title": "Zn2+ detection by selective fluorescent chemosensor applicable to test strip, smartphone-based platform, plant and biological imaging",
+        "authors": [
+          "Eunse Kim",
+          "Seoyeon Kim",
+          "Cheal Kim"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Eunse Kim",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Seoyeon Kim",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Cheal Kim",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1016/j.poly.2026.118382",
+        "abstract": null,
+        "publication_date": "2026-11",
+        "source_name": "Polyhedron",
+        "paper_url": "https://doi.org/10.1016/j.poly.2026.118382",
+        "oa_url": null,
+        "paper_type": "journal-article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": null,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:43.335837+00:00",
+        "provenance": {
+          "source": "Crossref",
+          "sources": [
+            "Crossref"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://doi.org/10.1016/j.foodchem.2024.139778",
+        "title": "Ultralong luminescence lifetime imaging of edible plant tissue for humidity sensing in food packaging by a smartphone",
+        "authors": [
+          "Wenxue Chen",
+          "Zece Zhu"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Wenxue Chen",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Zece Zhu",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1016/j.foodchem.2024.139778",
+        "abstract": null,
+        "publication_date": "2024-10",
+        "source_name": "Food Chemistry",
+        "paper_url": "https://doi.org/10.1016/j.foodchem.2024.139778",
+        "oa_url": null,
+        "paper_type": "journal-article",
+        "is_retracted": null,
+        "cited_by_count": 18,
+        "is_oa": null,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:43.335876+00:00",
+        "provenance": {
+          "source": "Crossref",
+          "sources": [
+            "Crossref"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://doi.org/10.1109/icitsi50517.2020.9264942",
+        "title": "Smartphone Application for Deep Learning-Based Rice Plant Disease Detection",
+        "authors": [
+          "Heri Andrianto",
+          "Suhardi",
+          "Ahmad Faizal",
+          "Fladio Armandika"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Heri Andrianto",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Suhardi",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Ahmad Faizal",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Fladio Armandika",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1109/icitsi50517.2020.9264942",
+        "abstract": null,
+        "publication_date": "2020-10-19",
+        "source_name": "2020 International Conference on Information Technology Systems and Innovation (ICITSI)",
+        "paper_url": "https://doi.org/10.1109/icitsi50517.2020.9264942",
+        "oa_url": null,
+        "paper_type": "proceedings-article",
+        "is_retracted": null,
+        "cited_by_count": 56,
+        "is_oa": null,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:43.336090+00:00",
+        "provenance": {
+          "source": "Crossref",
+          "sources": [
+            "Crossref"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42656772",
+        "title": "A MATLAB-Based Image Processing Protocol for Quantitative Differentiation of Diseased and Healthy Plant Tissue From Digital Leaf Images.",
+        "authors": [
+          "Dowarah B",
+          "Borah P",
+          "Laskar RA",
+          "Yasin A",
+          "Kashyap A",
+          "Neog B"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Dowarah B",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Borah P",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Laskar RA",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Yasin A",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Kashyap A",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Neog B",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.21769/bioprotoc.5798",
+        "abstract": "Accurate quantification of plant disease severity is essential for evaluating host-pathogen interactions and assessing the effectiveness of disease management strategies. Traditional visual scoring methods and manual estimation of infected tissue are widely used but are often subjective and prone to observer bias. Digital image analysis offers an objective alternative by enabling automated identification and quantification of symptomatic plant tissues based on color and spatial characteristics. Here, we present a MATLAB-based image processing protocol for differentiating diseased and healthy plant tissue from digital leaf images. The workflow involves acquisition of standardized leaf images, conversion of RGB images into hue-saturation-value (HSV) color space, segmentation of diseased tissue using defined HSV thresholds, refinement of the segmented mask through morphological operations, and extraction of the whole leaf area. The protocol then calculates the diseased area and total leaf area in pixels and computes the percentage of infected tissue. The method uses MATLAB together with the Image Processing Toolbox and can be implemented using simple scripts. This protocol enables rapid and reproducible quantification of disease severity in plant leaves exhibiting visually distinct symptoms such as necrotic lesions or blight patches. By minimizing observer bias and providing quantitative measurements of infected area, the protocol offers a practical and reproducible approach for plant disease phenotyping and evaluation of disease management strategies across diverse plant-pathogen systems where diseased tissues can be clearly distinguished from healthy tissues under reasonably controlled imaging conditions. Key features • A reproducible MATLAB-based workflow for separating diseased and healthy plant tissue using color-space segmentation. • Applicable to plant diseases where symptomatic tissue contrasts clearly with healthy tissue (necrosis, blight lesions, rot patches). • Requires digital leaf images, MATLAB, and the MATLAB Image Processing Toolbox for image processing and disease quantification. • Enables rapid calculation of diseased leaf area and disease severity using automated pixel-based quantification.",
+        "publication_date": "2026-08-20",
+        "source_name": "Bio-protocol",
+        "paper_url": "https://europepmc.org/article/MED/42656772",
+        "oa_url": "https://europepmc.org/articles/PMC13507964",
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [],
+        "keywords": [
+          "Plant Disease Phenotyping",
+          "Digital Plant Pathology",
+          "Disease Severity Analysis",
+          "Leaf Lesion Segmentation",
+          "Image-based Disease Quantification",
+          "Matlab Image Processing"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.573538+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42798959",
+        "title": "A colorimetric sensor array based on merging silver nanozymes and gold nanoparticles for chronic kidney disease diagnosis and post-transplant monitoring.",
+        "authors": [
+          "Bordbar MM",
+          "Alborz M",
+          "Sheini A",
+          "Halabian R",
+          "Rostami Z",
+          "Khoshsafar H",
+          "Bagheri H"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Bordbar MM",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Alborz M",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Sheini A",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-3363-8276",
+            "name": "Halabian R",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Rostami Z",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Khoshsafar H",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-2895-6189",
+            "name": "Bagheri H",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1039/d6ra07056f",
+        "abstract": "Herein, a low cost and non-invasive approach is introduced for identifying individuals with chronic kidney disease through the design and fabrication of a colorimetric sensor array. The proposed platform integrates silver nanozymes with gold nanoparticles as sensing elements. The nanozymes, synthesized via both green and conventional chemical routes, catalyze serum metabolites and convert them into species detectable by gold nanoparticles. A total of 120 serum samples were collected from equal numbers of patients with chronic kidney disease and healthy individuals. Upon exposure of the sensor array to serum metabolites, the resulting colorimetric responses were captured using a smartphone equipped with a dedicated sensor array analysis application capable of performing visual exploratory analysis such as principal component analysis-discriminate analysis (PCA-DA). Complete discrimination between patient and healthy samples was achieved with an overall accuracy of 100%. Furthermore, the sensor correctly identified successful kidney transplantation in 87% of patients. The sensor array proved capable of monitoring treatment progression throughout the one-week to one-year post-transplantation follow-up, characterized by response shifts toward either healthy or diseased clusters. Owing to the limitations of conventional follow-up methods, including high cost and poor user friendliness, the proposed strategy offers a promising and practical alternative for chronic kidney disease diagnosis and post-transplant monitoring.",
+        "publication_date": "2026-09-25",
+        "source_name": "RSC advances",
+        "paper_url": "https://europepmc.org/article/MED/42798959",
+        "oa_url": "https://europepmc.org/articles/PMC13613643",
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:44.574455+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42519072",
+        "title": "From plant oxidative stress to food safety: a versatile fluorescent probe for H 2 O 2 imaging in plant roots, living cells, and residual detection in milk.",
+        "authors": [
+          "Fu YL",
+          "Liu XY",
+          "Chen HH",
+          "Hu YW",
+          "Chang XW"
+        ],
+        "author_details": [
+          {
+            "id": "https://orcid.org/0000-0003-0658-8872",
+            "name": "Fu YL",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Liu XY",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Chen HH",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Hu YW",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-7649-7258",
+            "name": "Chang XW",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1039/d6ra05180d",
+        "abstract": "Hydrogen peroxide (H 2 O 2 ) is an important signaling molecule in plants under stress, and its level can be stimulated by abiotic stress and oxidative stress, which will seriously affect plant growth and development. Additionally, the presence of excessive residual H 2 O 2 in food can pose significant health risks to humans, because intake of H 2 O 2 can lead to serious pathological conditions. Therefore, it is necessary to develop a simple and efficient method to detect H 2 O 2 in both plants and food. In this paper, we designed a fluorescence probe NBP, which has the advantages of high selectivity, low detection limit (80 nM) and long emission wavelength (648 nm). The imaging effect of exogenous H 2 O 2 was realized in the roots of Platycodon grandiflorum . By exploring the interplay between H 2 O 2 , plant metals, and drought stress, we can observe the up-regulation of H 2 O 2 in the roots of Platycodon grandiflorum under adverse conditions, and the root 3D imaging study could be realized. Then we combined the fluorescence probe with a smartphone, which enables on-site detection of residual H 2 O 2 in various milk samples. In addition, we investigated the fluorescence imaging of endogenous and exogenous H 2 O 2 in living cells using NBP. Therefore, this study provides a new way to assess the oxidative stress risk of Platycodon grandiflorum roots under abiotic stress, which is expected to improve plant production and has broad application prospects in food sample detection.",
+        "publication_date": "2026-07-21",
+        "source_name": "RSC advances",
+        "paper_url": "https://europepmc.org/article/MED/42519072",
+        "oa_url": "https://europepmc.org/articles/PMC13384766",
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [],
+        "keywords": [],
+        "retrieved_at": "2026-11-05T11:35:44.574656+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42324331",
+        "title": "GreenAid: a confidence-weighted ensemble deep learning system for real-time plant disease detection and management.",
+        "authors": [
+          "Talaat FM",
+          "Tawfik M",
+          "Tawfik M",
+          "Shaban WM"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Talaat FM",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0009-0004-7622-5991",
+            "name": "Tawfik M",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-1227-387X",
+            "name": "Tawfik M",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Shaban WM",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1038/s41598-026-57979-0",
+        "abstract": "Plant diseases cause 20-40% annual crop losses worldwide, yet conventional detection methods remain slow, subjective, and inaccessible to smallholder farmers. This work presents GreenAid, an end-to-end plant disease detection and management system that bridges the gap between laboratory-level deep learning performance and practical agricultural deployment. The system integrates a confidence-weighted ensemble of three CNN architectures (VGG16, ResNet50, InceptionV3), fused through per-class F1-score reliability weights, with a cross-platform mobile application supporting offline inference via TensorFlow Lite, a web-based analytics dashboard, and an NLP-powered chatbot. On the PlantVillage benchmark (87,000 images, 38 classes, 14 species), the ensemble achieves 98.74% accuracy and 98.48% F1-score. Systematic comparison of six fusion strategies confirms that per-class F1 weighting outperforms alternatives including majority voting, simple averaging, and stacking. The INT8-quantised deployment model (78 MB, 127 ms on a mid-range smartphone) retains 98.43% accuracy with per-class analysis confirming disproportionate impact on the five most challenging categories. All pairwise model comparisons are validated by McNemar's test ([Formula: see text]). The primary contribution is the complete, reproducible integration of competitive classification, edge deployment, and an end-to-end agricultural delivery pipeline (mobile application, web dashboard, and NLP chatbot) rather than the ensemble mechanism itself.",
+        "publication_date": "2026-06-21",
+        "source_name": "Scientific reports",
+        "paper_url": "https://europepmc.org/article/MED/42324331",
+        "oa_url": "https://europepmc.org/articles/PMC13284324",
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [
+          "Agriculture",
+          "Convolutional Neural Networks",
+          "Dashboard Systems",
+          "Deep Learning",
+          "Mobile Applications",
+          "Plant Diseases"
+        ],
+        "keywords": [
+          "Precision agriculture",
+          "Deep Learning",
+          "Plant Disease Detection",
+          "Edge Deployment",
+          "Plantvillage",
+          "Confidence-weighted Ensemble"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.575015+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/41388918",
+        "title": "Smartphone-Based Colorimetric VOC Sensor for Early Detection of Phytophthora Ramorum in Rhododendrons.",
+        "authors": [
+          "Hossain O",
+          "Mainello-Land A",
+          "Wang Y",
+          "Mativenga B",
+          "Jamalzadegan S",
+          "Xu J",
+          "Ristaino JB",
+          "Razavi S",
+          "Li F",
+          "Wei Q"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Hossain O",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Mainello-Land A",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Wang Y",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0009-0006-9530-4032",
+            "name": "Mativenga B",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-6737-9460",
+            "name": "Jamalzadegan S",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Xu J",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-9458-0514",
+            "name": "Ristaino JB",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Razavi S",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-6757-1874",
+            "name": "Li F",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-1214-010X",
+            "name": "Wei Q",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1021/acssensors.5c02872",
+        "abstract": "Traditional plant pathogen detection often relies on molecular technologies, which allow species-level detection but are often time-consuming. Plant volatile organic compounds (VOCs) have recently been harnessed to assist in disease detection and plant health monitoring. However, current VOC detection methods are unsuitable for field use due to the need for expensive laboratory equipment and slow processing times. To address this, we developed a portable paper-based colorimetric sensing technology for early detection of ramorum blight in rhododendron caused by Phytophthora ramorum . This colorimetric sensor array, which includes nanomaterials and organic dyes, was optimized to detect alcohol, terpene, and ester, key VOC biomarkers emitted by infected rhododendron leaves. Color quantification was done quickly by smartphone imaging. Principal component analysis (PCA) was used to cluster and classify individual plant volatiles. Our VOC sensing platform detected ramorum blight 2 days after inoculation, aligning with real-time loop-mediated isothermal amplification (LAMP) analysis. Moreover, the platform distinguished pathogen-induced VOCs from those produced by nonbiological stresses such as drought and mechanical damage. This noninvasive diagnostic technology demonstrates significant potential for disease detection in the field.",
+        "publication_date": "2025-12-13",
+        "source_name": "ACS sensors",
+        "paper_url": "https://europepmc.org/article/MED/41388918",
+        "oa_url": null,
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": false,
+        "topics": [
+          "Colorimetry",
+          "Phytophthora",
+          "Plant Diseases",
+          "Plant Leaves",
+          "Rhododendron",
+          "Smartphone",
+          "Volatile Organic Compounds"
+        ],
+        "keywords": [
+          "Plant disease",
+          "Colorimetric Sensor",
+          "Smartphone",
+          "Volatile Organic Compound (Voc)",
+          "Phytophthora Ramorum"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.575155+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42475572",
+        "title": "Electrochemical lateral flow assay with ELISA-level performance for detecting plant diseases in East Africa.",
+        "authors": [
+          "Flauzino JMR",
+          "Sanli A",
+          "Shirima RR",
+          "Cai Y",
+          "Hu T",
+          "Li L",
+          "Weinstein T",
+          "Lee HS",
+          "Tadlaoui T",
+          "Olenik S",
+          "Gümüşçü A",
+          "Gonzalez-Macia L",
+          "Mahuku G",
+          "Legg J",
+          "Cass AEG",
+          "Güder F"
+        ],
+        "author_details": [
+          {
+            "id": null,
+            "name": "Flauzino JMR",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-9768-9005",
+            "name": "Sanli A",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Shirima RR",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Cai Y",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Hu T",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0009-0000-0844-7219",
+            "name": "Li L",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-1443-2117",
+            "name": "Weinstein T",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-2522-3951",
+            "name": "Lee HS",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Tadlaoui T",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Olenik S",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0002-5948-595X",
+            "name": "Gümüşçü A",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-1372-7965",
+            "name": "Gonzalez-Macia L",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Mahuku G",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Legg J",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Cass AEG",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0001-5454-0609",
+            "name": "Güder F",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.1073/pnas.2602947123",
+        "abstract": "Cassava brown streak disease (CBSD) threatens food security for millions in East Africa, yet its control remains limited by the absence of field-deployable molecular diagnostics. Here, we introduce ELLA (Electrochemical Lateral flow assay with Linked Analytics), a battery-free, smartphone-powered electrochemical lateral flow assay that delivers enzyme-linked immunosorbent assay (ELISA)-grade protein detection directly in the field. ELLA integrates near-field communication, a single-chip potentiostat, metal-pin electrodes, and ferrocene-labeled nanoparticles into a fully disposable cassette, enabling quantitative immunoassays without optical instrumentation or centralized laboratory infrastructure. Validated across laboratory studies and extensive field trials in Tanzania, ELLA achieved 95% agreement with ELISA and 89% agreement with RT-qPCR, outperforming ELISA's limit of detection while maintaining a material cost below US$1. By coupling molecular test results with cloud-linked analytics, we further trained DeepELLA, a smartphone-based image classification model that enables scalable surveillance from field-acquired leaf images. Together, these advances unify electrochemical sensing, digital connectivity, and AI-assisted interpretation, enabling portable, ELISA-level diagnostics for plant, environmental, and health monitoring in resource-limited regions.",
+        "publication_date": "2026-07-20",
+        "source_name": "Proceedings of the National Academy of Sciences of the United States of America",
+        "paper_url": "https://europepmc.org/article/MED/42475572",
+        "oa_url": "https://europepmc.org/articles/PMC13416961",
+        "paper_type": "article",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [
+          "Africa, Eastern",
+          "Electrochemical Techniques",
+          "Enzyme-Linked Immunosorbent Assay",
+          "Manihot",
+          "Plant Diseases",
+          "Potyviridae",
+          "Rapid Diagnostic Tests",
+          "Smartphone",
+          "Tanzania"
+        ],
+        "keywords": [
+          "Biosensors",
+          "Cassava Brown Streak Disease",
+          "Near-field Communication",
+          "Digital Diagnostics"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.575654+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      },
+      {
+        "id": "https://europepmc.org/article/MED/42739331",
+        "title": "Multimodal Deep Learning and Foundation Models for Early Detection and Forecasting of Plant Diseases.",
+        "authors": [
+          "Manda T",
+          "Huang T",
+          "Ding Y",
+          "Dai S",
+          "Yang L",
+          "Dai T"
+        ],
+        "author_details": [
+          {
+            "id": "https://orcid.org/0009-0004-6257-690X",
+            "name": "Manda T",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Huang T",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Ding Y",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Dai S",
+            "institutions": []
+          },
+          {
+            "id": null,
+            "name": "Yang L",
+            "institutions": []
+          },
+          {
+            "id": "https://orcid.org/0000-0003-0534-6724",
+            "name": "Dai T",
+            "institutions": []
+          }
+        ],
+        "doi": "https://doi.org/10.3390/plants15172564",
+        "abstract": "Plant diseases destroy 20-40% of global food production annually, posing a critical threat to food security for a projected population of 9.7 billion by 2050. Conventional diagnostic approaches relying on expert visual assessment are slow, costly, and unsuitable for modern agricultural scales. While deep convolutional neural networks demonstrated early promise, single-modality, image-centric systems consistently fail under real-world field conditions characterized by variable lighting, co-occurring infections, and cultivar diversity. This review synthesizes a decade of progress across four interconnected frontiers: the evolution of deep learning architectures for plant disease detection; the adaptation of foundation models including CLIP, SAM, and DINOv2 to agricultural contexts; the development of multimodal fusion frameworks integrating imagery, environmental, genomic, and hyperspectral data; and the transition from static disease diagnosis to descriptive comparison of reported metrics, which suggested that multimodal approaches frequently reported improved diagnostic performance relative to corresponding single-modality baselines, although direct cross-study comparison was limited by methodological heterogeneity. A systematic review following PRISMA guidelines identifies eligible comparative studies. Descriptive comparison of reported performance metrics across these studies indicated that multimodal approaches generally achieved higher accuracy and sensitivity than single-modality models, particularly for pre-symptomatic disease detection. Eight critical research gaps are identified, including the absence of a unified agricultural foundation model and limited climate-aware forecasting under non-stationary climate projections. A structured research agenda is proposed to accelerate translation from laboratory performance to globally equitable, field-deployable crop protection systems.",
+        "publication_date": "2026-08-24",
+        "source_name": "Plants (Basel, Switzerland)",
+        "paper_url": "https://europepmc.org/article/MED/42739331",
+        "oa_url": "https://europepmc.org/articles/PMC13567198",
+        "paper_type": "review",
+        "is_retracted": null,
+        "cited_by_count": 0,
+        "is_oa": true,
+        "topics": [],
+        "keywords": [
+          "Disease Forecasting",
+          "Convolutional Neural Networks",
+          "Multimodal Deep Learning",
+          "Plant Disease Detection",
+          "Vision Transformers",
+          "Foundation Models"
+        ],
+        "retrieved_at": "2026-11-05T11:35:44.575889+00:00",
+        "provenance": {
+          "source": "Europe PMC",
+          "sources": [
+            "Europe PMC"
+          ]
+        },
+        "search_notices": [],
+        "search_sources": [
+          "Crossref",
+          "Europe PMC"
+        ]
+      }
+    ]
+  }
+]
