@@ -3,6 +3,8 @@ import type { D1Binding } from "../storage/d1-quota-admission";
 export interface Env {
   COACH_DB?: D1Binding;
   COACH_SERVICE_SECRET?: string;
+  COACH_FINGERPRINT_SECRET?: string;
+  LOCAL_DURABLE_CONFIG?: string;
   LOCAL_MOCK_ENABLED?: string;
   MOCK_SCENARIO?: string;
 }

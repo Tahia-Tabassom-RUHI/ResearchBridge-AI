@@ -28,6 +28,12 @@ export class D1IdempotencyStore implements IdempotencyStore {
     if (!this.db || !validIdentity(identity)) return status("storage_unavailable");
     try {
       const result = await this.db.prepare(SELECT).bind(identity.serviceId, identity.keyHash).all<Row>();
+      if (result.success && !result.results.length) {
+        const barrier = await this.db.prepare(`SELECT expires_at, unixepoch() AS now FROM request_replay_barriers
+          WHERE service_id = ? AND key_hash = ?`).bind(identity.serviceId, identity.keyHash).all<{ expires_at: number; now: number }>();
+        if (!barrier.success) return status("storage_unavailable");
+        if (barrier.results[0]) return status(barrier.results[0].expires_at <= barrier.results[0].now ? "expired" : "outcome_unknown");
+      }
       return result.success ? describe(result.results[0], identity) : status("storage_unavailable");
     } catch { return status("storage_unavailable"); }
   }
@@ -45,7 +51,7 @@ export class D1IdempotencyStore implements IdempotencyStore {
         db.prepare(`INSERT INTO idempotency_records (id, service_id, key_hash, payload_hash, fingerprint_key_id,
           owner_token_hash, response_version, processing_state, created_at, updated_at, expires_at, lease_expires_at, retain_until)
           VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', unixepoch(), unixepoch(), unixepoch() + ?, unixepoch() + ?, unixepoch() + ?)
-          ON CONFLICT(service_id, key_hash) DO NOTHING`)
+          ON CONFLICT(service_id, key_hash) DO NOTHING RETURNING id`)
           .bind(claimId, identity.serviceId, identity.keyHash, identity.payloadHash, identity.fingerprintKeyId,
             await sha256(token), identity.responseVersion, p.ttlSeconds, p.leaseSeconds, p.retentionSeconds),
         db.prepare(SELECT).bind(identity.serviceId, identity.keyHash),
@@ -53,7 +59,9 @@ export class D1IdempotencyStore implements IdempotencyStore {
       if (results.length !== 2 || results.some(r => !r.success)) return status("storage_unavailable");
       const row = results[1]!.results[0];
       const existing = describe(row, identity);
-      if (results[0]!.meta.changes === 1 && row?.id === claimId && existing.state === "pending") {
+      // Migration 0014 adds one trigger-written barrier. RETURNING must confirm
+      // this exact insert; a duplicate never returns a fresh owner capability.
+      if ([1, 2].includes(results[0]!.meta.changes) && results[0]!.results[0]?.id === claimId && row?.id === claimId && existing.state === "pending") {
         return { state: "acquired", fence: { ...identity, claimId, token, generation: 1 } };
       }
       // Duplicates only get status. No capability is recovered or returned.
@@ -97,7 +105,9 @@ export class D1IdempotencyStore implements IdempotencyStore {
       const owned = (predicate: string) => `EXISTS (SELECT 1 FROM request_reservations r WHERE ${admittedReservation} AND ${predicate})`;
       const predicates = {
         authorize: `i.processing_state = 'reserved' AND ${owned(`r.status = 'reserved' AND r.expires_at > unixepoch() AND ${noAttempt}`)}`,
-        dispatch: `i.processing_state = 'reserved' AND ${owned(`r.status = 'reserved' AND r.expires_at > unixepoch() AND ${prepared}`)}`,
+        dispatch: `i.processing_state = 'reserved' AND ${owned(`r.status = 'reserved' AND r.expires_at > unixepoch() AND ${prepared}
+          AND NOT EXISTS (SELECT 1 FROM provider_policy_revocations v
+            WHERE v.quota_scope_id = r.quota_scope_id AND v.provider = r.provider)`)}`,
         complete: `i.processing_state = 'dispatched' AND ${owned(`r.status = 'sent' AND ${sent}`)}`,
         unknown: `i.processing_state = 'dispatched' AND ${owned(`r.status = 'sent' AND ${sent}`)}`,
         fail: `(i.processing_state = 'pending' AND i.reservation_id IS NULL) OR

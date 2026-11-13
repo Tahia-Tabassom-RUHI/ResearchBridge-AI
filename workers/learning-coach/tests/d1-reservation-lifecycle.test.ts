@@ -21,7 +21,7 @@ const runtime = (directory?: string) => new Miniflare(convertV4MiniflareOptions(
 async function migrate(db: DB, names = files) {
   for (const name of names) {
     const sql = await readFile(new URL(`../migrations/${name}`, import.meta.url), "utf8");
-    for (const statement of sql.replace(/--[^\n]*/g, "").split(";").map(s => s.trim()).filter(Boolean)) await db.prepare(statement).run();
+    for (const statement of sql.replace(/--[^\n]*/g, "").split(/;(?!\s*END\b)/i).map(s => s.trim()).filter(Boolean)) await db.prepare(statement).run();
   }
 }
 async function identity(): Promise<RequestIdentity> {
@@ -354,7 +354,16 @@ test("migration 0005 preserves prior reservation data and counters", { timeout: 
   try {
     const db = await mf.getD1Database("COACH_DB");
     await migrate(db, files.filter(n => n < "0005"));
-    await fixture(db);
+    // Seed the historical schema directly. Current admission requires the metric
+    // column introduced after 0005, and is tested separately on the latest schema.
+    await db.prepare(`INSERT INTO request_reservations (id, service_id, request_id, quota_scope_id, provider, model,
+      reservation_number, created_at, updated_at, expires_at, retain_until)
+      VALUES ('legacy-r', 'streamlit', 'legacy-request', 'local-account', 'mock', 'mock-model', 1, 100, 100, 200, 10000)`).run();
+    await db.prepare(`INSERT INTO provider_quota_windows (id, quota_scope_id, provider, model, dimension, unit,
+      window_start, window_seconds, window_end, limit_amount, reserved_amount, consumed_amount, created_at, updated_at, retain_until)
+      VALUES ('legacy-w', 'local-account', 'mock', 'mock-model', 'requests', 'requests', 100, 60, 160, 10, 1, 2, 100, 100, 10000)`).run();
+    await db.prepare(`INSERT INTO reservation_quota_windows (reservation_id, quota_window_id, reserved_amount, created_at, updated_at)
+      VALUES ('legacy-r', 'legacy-w', 1, 100, 100)`).run();
     const before = await lifecycleSnapshot(db), quota = await quotaSnapshot(db);
     await migrate(db, files.filter(n => n.startsWith("0005")));
     const after = await lifecycleSnapshot(db);

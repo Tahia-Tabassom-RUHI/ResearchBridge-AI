@@ -179,9 +179,14 @@ This does not claim exactly-once provider execution. A crash after dispatch
 intent can leave an unknown outcome. There is no automatic takeover/recovery
 dispatch, verified student identity, private-response replay or cleanup.
 
-After Part 4D-1, subsequent parts must implement repeat-safe usage accounting,
-checking durable claim/attempt fencing in the same transaction and rejecting
-stale settlement authority. Unknown usage must remain conservative, with
-counters, dimension links and accounting records consistent. `UsageReporter`
-remains unimplemented; this stage cannot authorize settlement. Provider holds,
-signed request freshness and live inference remain separate work.
+Part 4D-2 implements `UsageReporter` for successful completed attempts awaiting
+reconciliation, checking durable claim/attempt ownership and the exact generation
+in the same transaction as accounting. See [USAGE_SETTLEMENT.md](USAGE_SETTLEMENT.md)
+for terminal settlement receipts and repeat handling. Part 4D-3 adds
+[failure receipts and accounting](FAILURE_ACCOUNTING.md) with the same current-owner
+checks and status-only replay. Part 4D-4 adds [controlled recovery](RESERVATION_RECOVERY.md)
+with a separate capability and a monotonically advanced claim generation, without
+extending the original owner lease or allowing redispatch. Provider holds, signed
+request freshness and live inference remain separate work. Part 4D-5's
+[local pipeline](DURABLE_PIPELINE.md) now invokes successful settlement or failure
+accounting with the latest acknowledged fence. Replay remains status-only.

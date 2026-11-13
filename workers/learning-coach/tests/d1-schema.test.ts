@@ -39,8 +39,8 @@ test("schema constraints on local D1", { timeout: 60_000 }, async t => {
     const db = await runtime.getD1Database("COACH_DB");
     for (const migration of migrations) {
       const sql = await readFile(new URL(`../migrations/${migration}`, import.meta.url), "utf8");
-      // These migrations contain plain DDL only, with no triggers or SQL string semicolons.
-      for (const statement of sql.replace(/--[^\n]*/g, "").split(";").map(s => s.trim()).filter(Boolean)) {
+      // Trigger bodies contain one statement; keep its semicolon before END intact.
+      for (const statement of sql.replace(/--[^\n]*/g, "").split(/;(?!\s*END\b)/i).map(s => s.trim()).filter(Boolean)) {
         await db.prepare(statement).run();
       }
     }
@@ -66,9 +66,9 @@ test("schema constraints on local D1", { timeout: 60_000 }, async t => {
        compute_units, compute_unit, created_at, updated_at, retain_until)
        VALUES (?, ?, ?, 1, 10, 20, 0.5, 'neurons', 1000, 1000, 100000)`, id, attemptId, kind);
 
-    await t.test("creates all seven tables, indexes, and valid foreign keys", async () => {
+    await t.test("creates accounting and policy receipt tables, indexes, and valid foreign keys", async () => {
       const tables = await db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE '_cf_%' ORDER BY name").all<{ name: string }>();
-      assert.deepEqual(tables.results.map((r: { name: string }) => r.name), ["idempotency_records", "inference_attempts", "provider_holds", "provider_quota_windows", "request_reservations", "reservation_quota_windows", "usage_accounting"].sort());
+      assert.deepEqual(tables.results.map((r: { name: string }) => r.name), ["idempotency_records", "inference_attempts", "provider_capacity_policies", "provider_policy_revocations", "provider_evidence_resolutions", "request_replay_barriers", "provider_hold_operations", "provider_holds", "provider_quota_windows", "request_reservations", "reservation_quota_windows", "usage_accounting"].sort());
       const indexes = await db.prepare("SELECT name FROM sqlite_master WHERE type = 'index'").all<{ name: string }>();
       for (const name of ["quota_windows_retention", "reservations_expiry", "reservation_windows_window", "attempts_retention", "holds_expiry", "idempotency_expiry", "usage_retention"]) {
         assert.ok(indexes.results.some((r: { name: string }) => r.name === name), name);
@@ -152,7 +152,8 @@ test("schema constraints on local D1", { timeout: 60_000 }, async t => {
     });
 
     await t.test("holds are scoped to account/provider/model and have expiry metadata", async () => {
-      const insert = (model: string) => execute(`INSERT INTO provider_holds VALUES
+      const insert = (model: string) => execute(`INSERT INTO provider_holds
+        (quota_scope_id, provider, model, status, reason_code, hold_until, created_at, updated_at, retain_until) VALUES
         ('account-a', 'provider-a', ?, 'active', 'rate_limit', 1100, 1000, 1000, 100000)`, model);
       await insert("model-a"); await insert("model-b");
       await assert.rejects(insert("model-a"), /UNIQUE/);

@@ -26,9 +26,10 @@ for (const mode of ["production", "local"] as const) test(`workerd runtime: ${mo
       method: "POST", headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
       body: JSON.stringify(fixture("retrieved_abstract").request),
     });
-    assert.equal(response.status, mode === "production" ? 503 : 200);
+    // Neither production nor an unconfigured local bundle can generate.
+    assert.equal(response.status, 503);
     const value = await response.json();
-    assert.ok(mode === "production" ? schemas.v2Error(value) : schemas.v2Response(value));
+    assert.ok(schemas.v2Error(value));
     assert.equal(outbound, 0);
   } finally { await runtime.dispose(); }
 });

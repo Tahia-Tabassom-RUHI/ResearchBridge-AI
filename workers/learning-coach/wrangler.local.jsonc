@@ -10,5 +10,11 @@
   "build": {"command": "npm run schemas"},
   "dev": {"ip": "127.0.0.1", "port": 8787, "local_protocol": "http"},
   "vars": {"LOCAL_MOCK_ENABLED": "true", "MOCK_SCENARIO": "success"},
+  "d1_databases": [{
+    "binding": "COACH_DB",
+    "database_name": "researchbridge-coach-schema-local",
+    "database_id": "00000000-0000-0000-0000-000000000000",
+    "migrations_dir": "migrations"
+  }],
   "observability": {"enabled": false}
 }

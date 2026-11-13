@@ -19,7 +19,7 @@ const runtime = (state?: string) => new Miniflare(convertV4MiniflareOptions({
 async function migrate(db: LocalDB, files = migrations) {
   for (const file of files) {
     const sql = await readFile(new URL(`../migrations/${file}`, import.meta.url), "utf8");
-    for (const statement of sql.replace(/--[^\n]*/g, "").split(";").map(s => s.trim()).filter(Boolean)) {
+    for (const statement of sql.replace(/--[^\n]*/g, "").split(/;(?!\s*END\b)/i).map(s => s.trim()).filter(Boolean)) {
       await db.prepare(statement).run();
     }
   }

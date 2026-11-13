@@ -1,11 +1,11 @@
-# Local D1 schema (Parts 4A through 4D-1)
+# Local D1 schema (Parts 4A through 4D-5)
 
 This schema adds persistence structures for the ResearchBridge project.
 `src/storage/d1-quota-admission.ts` implements the `QuotaAdmission` interface
 internally. `D1IdempotencyStore` and `DurableRequests` compose with admission
 in an explicitly configured local mock gateway. Production inference remains
-disabled. No quota values are seeded. Existing limits and both original
-Wrangler configs are unchanged.
+disabled. No quota values are seeded. Existing limits and the production Wrangler
+config remain unchanged; the local entry has a placeholder D1 binding.
 
 | Table | Purpose |
 | --- | --- |
@@ -31,6 +31,19 @@ ownership boundary, state machine and status-only replay policy.
 to reservations without changing previous statuses or accounting. The explicit
 reservation/attempt lifecycle is documented in
 [RESERVATION_LIFECYCLE.md](RESERVATION_LIFECYCLE.md).
+`0006_successful_settlement.sql` persists admission metrics on dimension links,
+adds a reconciliation completion timestamp, and extends usage accounting with
+safe total-token/named-compute summaries and settlement receipts. No new tables
+or changes to existing counters occur during migration. Successful settlement
+is an internal operation documented in [USAGE_SETTLEMENT.md](USAGE_SETTLEMENT.md).
+`0007_failure_accounting.sql` adds one failure receipt slot to each attempt and
+per-link evidence/held-amount fields. Unknown request counts remain unknown;
+failure records do not manufacture successful usage rows. See
+[FAILURE_ACCOUNTING.md](FAILURE_ACCOUNTING.md) for release proof and partial usage.
+`0008_reservation_recovery.sql` adds separate recovery authority/completion fields
+and indexed bounded discovery, preserving original ownership leases and receipts.
+See [RESERVATION_RECOVERY.md](RESERVATION_RECOVERY.md) for authenticated recovery,
+receipt verification and retention/deletion prerequisites. No cleanup is run.
 Apply these files in order through Wrangler's migration ledger; append new
 versions instead of editing migrations after adoption. The migrations use D1
 foreign keys and strict SQLite column types. Foreign keys restrict parent
@@ -87,7 +100,8 @@ window end, and hold deadline. Reservation/window links inherit retention from
 both parents. Cleanup must delete usage, attempts and links before parents and
 respect unresolved reservations/attempts. Expiry never automatically releases
 quota, permits a resend, deletes a claim, or resolves unknown consumption.
-No cleanup or status-transition algorithms are included.
+No cleanup algorithm is included. Lifecycle and successful accounting transitions
+are explicit internal operations; expiry alone has no accounting side effects.
 
 ## Local verification
 
@@ -99,6 +113,9 @@ npm.cmd run test:db
 npm.cmd run test:admission
 npm.cmd run test:idempotency
 npm.cmd run test:lifecycle
+npm.cmd run test:settlement
+npm.cmd run test:failure
+npm.cmd run test:recovery
 ```
 
 The migration command uses `wrangler.d1.local.jsonc` and always passes `--local`.
@@ -118,14 +135,18 @@ Cloudflare references: [migration files and version tracking](https://developers
 [local D1 development](https://developers.cloudflare.com/d1/best-practices/local-development/),
 and [D1 foreign keys](https://developers.cloudflare.com/d1/sql-api/foreign-keys/).
 
-## Remaining after Part 4D-1
+## Remaining after Part 4D-5
 
 Admission reserves every configured window atomically and validates linked
 account/provider/model scopes. Idempotency now binds service ownership and
 payload fingerprints to fenced claim, reservation and dispatch states. Part
 4D-1 adds explicit authorization, coordinated outcomes and reconciliation
-eligibility without changing quota counters. Subsequent parts must define
-validated usage and repeat-safe, fenced accounting/settlement. Provider holds,
+eligibility without changing quota counters. Part 4D-2 settles successful
+attempts atomically using validated usage and durable receipts. Part 4D-3 adds
+proven non-dispatch release and partial failure accounting while retaining unknown
+capacity. Part 4D-4 adds bounded stale discovery and explicit recovery for proven
+non-dispatch only. Part 4D-5 [integrates the local mock pipeline](DURABLE_PIPELINE.md)
+without changing migrations. Post-dispatch evidence resolution, provider holds,
 window provisioning, authorized private replay and safe tombstone retention
 remain future work. No automatic refund or resend follows expiry or an unknown
 outcome. Live inference integration requires separate authorization.

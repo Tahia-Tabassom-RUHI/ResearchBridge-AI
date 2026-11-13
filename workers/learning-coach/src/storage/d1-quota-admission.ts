@@ -1,5 +1,6 @@
 import type { QuotaAdmission, QuotaAdmissionInput, QuotaAdmissionPolicy, QuotaAdmissionResult, QuotaWindowPolicy } from "../storage";
 import { sha256, validFence } from "./request-identity";
+import { admissionAvailabilitySql, inspectAvailability } from "./provider-availability";
 
 // The subset of the Workers D1 binding used here. No runtime SDK dependency.
 export interface D1QueryResult<T = Record<string, unknown>> {
@@ -28,7 +29,7 @@ type WindowRow = {
   id: string; quota_scope_id: string; provider: string; model: string; dimension: string; unit: string;
   window_seconds: number; window_start: number; window_end: number; limit_amount: number;
   safety_margin: number; reserved_amount: number; consumed_amount: number; status: string;
-  created_at: number; updated_at: number; retain_until: number; now: number;
+  created_at: number; updated_at: number; retain_until: number; now: number; quota_metric: string | null; hold_schema?: number; evidence_schema?: number;
 };
 type Denial = Extract<QuotaAdmissionResult, { admitted: false }>;
 type Problem = Pick<Denial, "status" | "reason" | "resetAt">;
@@ -38,6 +39,8 @@ function validPolicy(policy: QuotaAdmissionPolicy): boolean {
   if (!identifier(policy.quotaScopeId) || !positive(policy.leaseSeconds) || !positive(policy.retentionSeconds) ||
       policy.retentionSeconds < policy.leaseSeconds || !Array.isArray(policy.windows) ||
       policy.windows.length === 0 || policy.windows.length > MAX_WINDOWS) return false;
+  if (policy.providerPolicy && (!positive(policy.providerPolicy.version) || !integer(policy.providerPolicy.reviewAfter) ||
+      typeof policy.providerPolicy.hash !== "string" || !/^[0-9a-f]{64}$/.test(policy.providerPolicy.hash))) return false;
   const seen = new Set<string>();
   for (const w of policy.windows) {
     if (!w || !identifier(w.windowId) || seen.has(w.windowId) || (w.model !== "" && w.model !== policy.model) ||
@@ -82,7 +85,8 @@ function inspect(rows: (WindowRow | undefined)[], policy: QuotaAdmissionPolicy, 
     const row = rows[index];
     if (!row) return { status: "configuration_missing", reason: "window_unavailable" };
     if (row.quota_scope_id !== policy.quotaScopeId || row.provider !== policy.provider || row.model !== w.model ||
-        row.dimension !== dimension(w.metric) || row.unit !== w.unit || row.limit_amount !== w.capacity ||
+        row.dimension !== dimension(w.metric) || (row.quota_metric != null && row.quota_metric !== w.metric) ||
+        row.unit !== w.unit || row.limit_amount !== w.capacity ||
         row.safety_margin !== w.safetyMargin || row.window_start !== w.windowStart || row.window_seconds !== w.windowSeconds ||
         row.window_end !== w.windowStart + w.windowSeconds ||
         ![row.limit_amount, row.consumed_amount, row.reserved_amount, row.safety_margin, row.window_start,
@@ -144,13 +148,24 @@ export class D1QuotaAdmission implements QuotaAdmission {
     if (!db) return deny({ status: "storage_unavailable", reason: "database_binding_missing" });
 
     const readWindows = async (): Promise<(WindowRow | undefined)[]> => {
-      const results = await db.batch<WindowRow>(wanted.map(({ policy: w }) =>
-        db.prepare("SELECT *, unixepoch() AS now FROM provider_quota_windows WHERE id = ?").bind(w.windowId)));
+      const results = await db.batch<WindowRow>(wanted.map(({ policy: w }, index) =>
+        db.prepare(`SELECT *, unixepoch() AS now ${index === 0 ? ", (SELECT count(*) FROM pragma_table_info('provider_holds') WHERE name = 'hold_key') AS hold_schema, (SELECT count(*) FROM pragma_table_info('inference_attempts') WHERE name = 'provider_evidence_state') AS evidence_schema" : ""}
+          FROM provider_quota_windows WHERE id = ?`).bind(w.windowId)));
       if (results.length !== wanted.length || results.some(r => !r.success)) throw new Error("Quota read failed");
       return results.map(r => r.results[0]);
     };
     try {
-      const problem = inspect(await readWindows(), policy, wanted);
+      const currentWindows = await readWindows();
+      // Preserve legacy admission during staged migrations. Current databases
+      // expose the metric column; omit its predicate only on older schemas.
+      const hasWindowMetric = currentWindows.every(row => row && Object.hasOwn(row, "quota_metric"));
+      const modernHolds = currentWindows[0]?.hold_schema === 1;
+      const evidenceSchema = currentWindows[0]?.evidence_schema === 1;
+      // This read only classifies denials. Both checks are repeated in SQL in
+      // the authoritative batch, not used as read-then-reserve authorization.
+      const availability = await inspectAvailability(db, policy, modernHolds, hasWindowMetric, evidenceSchema);
+      if (availability) return deny(availability);
+      const problem = inspect(currentWindows, policy, wanted);
       if (problem) return deny(problem);
       const reservationId = crypto.randomUUID();
       const end = Math.min(...wanted.map(({ policy: w }) => w.windowStart + w.windowSeconds));
@@ -176,13 +191,17 @@ export class D1QuotaAdmission implements QuotaAdmission {
         statements.push(db.prepare("UPDATE request_reservations SET ownership_check = changes() WHERE id = ?").bind(reservationId));
       }
       for (const { policy: w, amount } of wanted) {
-        statements.push(db.prepare(RESERVE_WINDOW).bind(amount, w.windowId, policy.quotaScopeId, policy.provider, w.model,
-          dimension(w.metric), w.unit, w.capacity, w.safetyMargin, w.windowStart, w.windowSeconds, w.windowStart + w.windowSeconds));
+        const values: (string | number | null)[] = [amount, w.windowId, policy.quotaScopeId, policy.provider, w.model,
+            dimension(w.metric), w.unit, w.capacity, w.safetyMargin, w.windowStart, w.windowSeconds, w.windowStart + w.windowSeconds,
+            ...(hasWindowMetric ? [w.metric] : [])];
+        const checks = admissionAvailabilitySql(policy, modernHolds, hasWindowMetric, value => { values.push(value); return `?${values.length}`; }, evidenceSchema);
+        statements.push(db.prepare(RESERVE_WINDOW + (hasWindowMetric ? " AND (quota_metric IS NULL OR quota_metric = ?13)" : "") +
+          ` AND (${checks.eligible}) AND NOT EXISTS (SELECT 1 FROM provider_holds h WHERE ${checks.held})`).bind(...values));
         // Keep this immediately after its UPDATE. SELECT or JS checks after batch
         // completion cannot provide the required rollback on zero affected rows.
         statements.push(db.prepare(`INSERT INTO reservation_quota_windows
-          (reservation_id, quota_window_id, reserved_amount, status, created_at, updated_at, admission_check)
-          VALUES (?, ?, ?, 'reserved', unixepoch(), unixepoch(), changes())`).bind(reservationId, w.windowId, amount));
+          (reservation_id, quota_window_id, reserved_amount, status, created_at, updated_at, admission_check, quota_metric)
+          VALUES (?, ?, ?, 'reserved', unixepoch(), unixepoch(), changes(), ?)`).bind(reservationId, w.windowId, amount, w.metric));
       }
       const results = await db.batch<{ expires_at: number }>(statements);
       const expiry = results[0]?.results[0]?.expires_at;
@@ -196,7 +215,11 @@ export class D1QuotaAdmission implements QuotaAdmission {
       if (message.includes("idempotency_admission_succeeded")) return deny({ status: "invalid_request", reason: "stale_claim" });
       if (message.includes("quota_admission_succeeded")) {
         try {
-          const problem = inspect(await readWindows(), policy, wanted);
+          const rows = await readWindows();
+          const availability = await inspectAvailability(db, policy, rows[0]?.hold_schema === 1,
+            rows.every(row => row && Object.hasOwn(row, "quota_metric")), rows[0]?.evidence_schema === 1);
+          if (availability) return deny(availability);
+          const problem = inspect(rows, policy, wanted);
           if (problem) return deny(problem);
         } catch { /* Return a closed decision below when diagnostic reads fail. */ }
         return deny({ status: "storage_unavailable", reason: "admission_not_confirmed" });

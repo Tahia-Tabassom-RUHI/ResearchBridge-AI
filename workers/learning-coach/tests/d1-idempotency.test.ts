@@ -15,6 +15,9 @@ import { DurableRequests } from "../src/storage/durable-requests";
 import { canonicalJson, identifyRequest } from "../src/storage/request-identity";
 import type { ClaimDecision, IdempotencyFence, QuotaAdmissionPolicy, TransitionDecision } from "../src/storage";
 import { fixture } from "./fixtures";
+import { D1UsageSettlement } from "../src/storage/d1-usage-settlement";
+import { D1FailureAccounting } from "../src/storage/d1-failure-accounting";
+import { readOwnedAttempt } from "../src/storage/d1-owned-attempt";
 
 type DB = Awaited<ReturnType<Miniflare["getD1Database"]>>;
 const secret = "a".repeat(64);
@@ -31,7 +34,7 @@ const makeRuntime = (state?: string, script = "export default { fetch() { return
 async function migrate(db: DB, names = files) {
   for (const name of names) {
     const sql = await readFile(new URL(`../migrations/${name}`, import.meta.url), "utf8");
-    for (const statement of sql.replace(/--[^\n]*/g, "").split(";").map(s => s.trim()).filter(Boolean)) await db.prepare(statement).run();
+    for (const statement of sql.replace(/--[^\n]*/g, "").split(/;(?!\s*END\b)/i).map(s => s.trim()).filter(Boolean)) await db.prepare(statement).run();
   }
 }
 const uuid = () => crypto.randomUUID();
@@ -53,7 +56,9 @@ const plan = () => ({ provider: "mock", model: "mock-model", estimate: { kind: "
 function services(db: D1Binding | undefined, policy: QuotaAdmissionPolicy) {
   const store = new D1IdempotencyStore(db, retention);
   const admission = new D1QuotaAdmission(db, [policy]);
-  return { store, admission, durable: new DurableRequests(store, admission, secret, plan) };
+  return { store, admission, durable: new DurableRequests(store, admission, secret, plan, {
+    readAttempt: (fence, id) => readOwnedAttempt(db, fence, id), success: new D1UsageSettlement(db), failure: new D1FailureAccounting(db),
+  }) };
 }
 function acquired(result: ClaimDecision): IdempotencyFence {
   assert.equal(result.state, "acquired", JSON.stringify(result));
@@ -73,7 +78,8 @@ async function ready(durable: DurableRequests, id = uuid()) {
 }
 const count = async (db: DB, name: string) => (await db.prepare(`SELECT count(*) AS n FROM ${name}`).first()).n as number;
 async function consistent(db: DB) {
-  const rows = (await db.prepare(`SELECT w.*, coalesce(sum(l.reserved_amount), 0) AS linked
+  const rows = (await db.prepare(`SELECT w.*, coalesce(sum(CASE l.status WHEN 'reserved' THEN l.reserved_amount
+    WHEN 'unknown' THEN l.failure_held_amount ELSE 0 END), 0) AS linked
     FROM provider_quota_windows w LEFT JOIN reservation_quota_windows l ON l.quota_window_id = w.id GROUP BY w.id`).all()).results;
   for (const row of rows) {
     assert.equal(row.reserved_amount, row.linked);
@@ -105,7 +111,7 @@ test("durable idempotency and admission on real local D1", { timeout: 120_000 },
     const db = await mf.getD1Database("COACH_DB");
     await migrate(db);
     const scenario = (name: string, fn: (p: QuotaAdmissionPolicy) => Promise<void>, capacity = 10) => t.test(name, async () => {
-      await db.batch(["idempotency_records", "inference_attempts", "reservation_quota_windows", "request_reservations", "provider_quota_windows"].map(n => db.prepare(`DELETE FROM ${n}`)));
+      await db.batch(["usage_accounting", "idempotency_records", "inference_attempts", "reservation_quota_windows", "request_reservations", "provider_quota_windows"].map(n => db.prepare(`DELETE FROM ${n}`)));
       await fn(await seed(db, capacity));
     });
 
@@ -383,7 +389,7 @@ test("durable idempotency and admission on real local D1", { timeout: 120_000 },
       let calls = 0;
       const mock = new LocalMockProvider();
       const gateway = createGateway({ mode: "local", enabled: true, durable: services(db, p).durable,
-        sources: new MockSourceResolver(), provider: { async generate(task, signal) { calls++; return mock.generate(task, signal); } } });
+        sources: new MockSourceResolver(), provider: { identity: mock.identity, async generate(task, signal, attempt) { calls++; return mock.generate(task, signal, attempt); } } });
       const id = uuid();
       const responses = await Promise.all(Array.from({ length: 20 }, () => gateway.fetch(httpRequest(id), { COACH_SERVICE_SECRET: authSecret })));
       assert.equal(calls, 1);
@@ -402,7 +408,7 @@ test("durable idempotency and admission on real local D1", { timeout: 120_000 },
     await scenario("gateway provider timeout records unknown and never regenerates on retry", async p => {
       let calls = 0;
       const gateway = createGateway({ mode: "local", enabled: true, durable: services(db, p).durable, timeoutMs: 10,
-        sources: new MockSourceResolver(), provider: { async generate() { calls++; return new Promise(() => {}); } } });
+        sources: new MockSourceResolver(), provider: { identity: new LocalMockProvider().identity, async generate() { calls++; return new Promise(() => {}); } } });
       const id = uuid();
       assert.equal((await gateway.fetch(httpRequest(id), { COACH_SERVICE_SECRET: authSecret })).status, 504);
       const replay = await gateway.fetch(httpRequest(id), { COACH_SERVICE_SECRET: authSecret });
@@ -477,13 +483,15 @@ test("durable mock gateway executes Web Crypto and fenced D1 writes inside worke
     import { D1QuotaAdmission } from './src/storage/d1-quota-admission';
     import { D1IdempotencyStore } from './src/storage/d1-idempotency';
     import { DurableRequests } from './src/storage/durable-requests';
+    import { localServices } from './src/local-services';
     export default { fetch(request, env) {
       const policy = { provider: 'mock', model: 'mock-model', quotaScopeId: 'local-account', leaseSeconds: 120, retentionSeconds: 7200,
         windows: [{ windowId: 'rpm', model: 'mock-model', metric: 'requests', unit: 'requests', capacity: 1, safetyMargin: 0,
           windowStart: ${start}, windowSeconds: 3600 }] };
       const store = new D1IdempotencyStore(env.COACH_DB, { leaseSeconds: 300, ttlSeconds: 3600, retentionSeconds: 7200 });
-      const durable = new DurableRequests(store, new D1QuotaAdmission(env.COACH_DB, [policy]), '${secret}',
-        () => ({ provider: 'mock', model: 'mock-model', estimate: { kind: 'estimated' } }));
+      const durable = localServices({ ...env, COACH_FINGERPRINT_SECRET: '${secret}' }, {
+        ownership: { leaseSeconds: 300, ttlSeconds: 3600, retentionSeconds: 7200 }, quota: policy, estimate: { kind: 'estimated' }
+      }).durable;
       return createGateway({ mode: 'local', enabled: true, durable, provider: new LocalMockProvider(), sources: new MockSourceResolver() }).fetch(request, env);
     } };` }, bundle: true, format: "esm", platform: "browser", write: false });
   const mf = makeRuntime(undefined, result.outputFiles[0]!.text);

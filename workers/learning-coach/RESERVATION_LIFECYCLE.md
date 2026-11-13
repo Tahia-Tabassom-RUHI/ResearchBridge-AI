@@ -129,10 +129,28 @@ leases, restart persistence, rollback, ambiguous acknowledgements and migration
 preservation. Every scenario compares quota windows, dimension links and usage
 records to prove they remain unchanged.
 
-## Requirements for Part 4D-2
+## Successful settlement in Part 4D-2
 
-Define validated usage measurements and their units, trusted provenance, attempt
-identity and conservative treatment of missing or unknown usage. Specify
-repeat-safe, fenced accounting/settlement preconditions, preserving these
-terminal outcomes and ownership guarantees. Actual counter settlement, refund
-policy, reconciliation execution and recovery are not implemented in Part 4D-1.
+The separate internal `D1UsageSettlement` now converts reservations for completed,
+awaiting attempts into consumption and records `reconciliation_completed_at`.
+The original `awaiting` marker remains as the request history; pending work must
+also require a NULL completion timestamp. Settlement preserves terminal outcomes
+and the current owner generation, while a unique usage receipt makes identical
+retries safe. Lifecycle-only methods above still never change quota counters.
+See [USAGE_SETTLEMENT.md](USAGE_SETTLEMENT.md) for the usage rules, transaction,
+receipt, conservative-estimate policy and remaining failure/recovery scope.
+
+Part 4D-3 adds [failure accounting](FAILURE_ACCOUNTING.md) after acknowledged
+`failBeforeDispatch` or `markUnknown` plus `awaitReconciliation`. Non-dispatch
+closure excludes competing dispatch through the existing generation transition;
+`prepared` alone is not release evidence. Failure accounting preserves terminal
+outcomes and leaves unknown dimensions held. These lifecycle-only methods still
+do not mutate quota counters.
+
+Part 4D-4 [recovery](RESERVATION_RECOVERY.md) accepts only previously closed
+`not_sent` attempts for refunds. Prepared/authorized state alone remains uncertain.
+Recovery increments the durable generation, uses a separate recovery capability,
+and preserves terminal outcomes; it cannot authorize provider dispatch.
+
+Part 4D-5 [integrates the local request pipeline](DURABLE_PIPELINE.md), preserving
+these transitions and requiring acknowledged accounting before returning content.

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
-import { test } from "node:test";
+import { test, after } from "node:test";
 import * as schemas from "../.generated/validators.cjs";
 import production from "../src/index";
 import localEntry from "../src/local";
@@ -10,6 +10,13 @@ import { MAX_REQUEST_BYTES } from "../src/config/index";
 import { LocalMockProvider, MockSourceResolver, type MockScenario } from "../src/providers/mock";
 import type { InferenceProvider } from "../src/providers/types";
 import { fixture } from "./fixtures";
+import { runtime, migrate, seed } from "./local-pipeline-fixture";
+import { localServices } from "../src/local-services";
+
+const mf = runtime(), db = await mf.getD1Database("COACH_DB");
+await migrate(db);
+const config = await seed(db);
+after(() => mf.dispose());
 
 const secret = randomBytes(32).toString("hex");
 const env = { COACH_SERVICE_SECRET: secret };
@@ -17,10 +24,11 @@ const headers = { Authorization: `Bearer ${secret}`, "Content-Type": "applicatio
 const path = "http://127.0.0.1/api/coach/generate";
 const body = () => fixture("term_clarification").request;
 function request(value: unknown = body(), extra: Record<string, string> = {}): Request {
-  return new Request(path, { method: "POST", headers: { ...headers, ...extra }, body: JSON.stringify(value) });
+  return new Request(path, { method: "POST", headers: { ...headers, "X-ResearchBridge-Request-ID": crypto.randomUUID(), ...extra }, body: JSON.stringify(value) });
 }
 function local(scenario: MockScenario = "success", provider: InferenceProvider = new LocalMockProvider(scenario)) {
-  return createGateway({ mode: "local", enabled: true, provider, sources: new MockSourceResolver(), timeoutMs: 25 });
+  const durable = localServices({ ...env, COACH_DB: db, COACH_FINGERPRINT_SECRET: "b".repeat(64) }, config)!.durable;
+  return createGateway({ mode: "local", enabled: true, provider, durable, sources: new MockSourceResolver(), timeoutMs: 25 });
 }
 async function error(response: Response, status: number, code?: string): Promise<void> {
   assert.equal(response.status, status);
@@ -37,7 +45,7 @@ async function error(response: Response, status: number, code?: string): Promise
 for (const authorization of ["", "Bearer wrong", `Bearer ${randomBytes(32).toString("hex")}`, `Basic ${secret}`]) {
   test(`unauthorized request ${authorization ? authorization.split(" ")[0] : "missing"}`, async () => {
     let calls = 0;
-    const gateway = local("success", { async generate() { calls++; throw new Error("Must not be called"); } });
+    const gateway = local("success", { identity: new LocalMockProvider().identity, async generate() { calls++; throw new Error("Must not be called"); } });
     const req = request(body(), { Authorization: authorization });
     await error(await gateway.fetch(req, env), 401, "invalid_request");
     assert.equal(req.bodyUsed, false);
@@ -150,13 +158,13 @@ test("a stalled body reader has a bounded deadline", async () => {
 
 for (const [scenario, status] of [["error", 502], ["timeout", 504], ["rate_limit", 429], ["malformed", 502]] as const) test(`mock fault: ${scenario}`, async () => {
   const response = await local(scenario).fetch(request(), env);
-  if (scenario === "rate_limit") assert.equal(response.headers.get("Retry-After"), "30");
+  if (scenario === "rate_limit") assert.equal(response.headers.get("Retry-After"), null);
   await error(response, status, "invalid_response");
 });
 
 test("provider errors and invalid results never leak raw secrets or source text", async () => {
   const privateText = "private-student-source-content";
-  const provider: InferenceProvider = { async generate() { throw new Error(`${secret} ${privateText}`); } };
+  const provider: InferenceProvider = { identity: new LocalMockProvider().identity, async generate() { throw new Error(`${secret} ${privateText}`); } };
   const response = await local("success", provider).fetch(request(), env);
   const text = await response.clone().text();
   assert.ok(!text.includes(privateText));
@@ -164,7 +172,7 @@ test("provider errors and invalid results never leak raw secrets or source text"
 });
 
 test("the timeout also bounds a provider that ignores cancellation", async () => {
-  const provider: InferenceProvider = { generate() { return new Promise(() => undefined); } };
+  const provider: InferenceProvider = { identity: new LocalMockProvider().identity, generate() { return new Promise(() => undefined); } };
   await error(await local("success", provider).fetch(request(), env), 504);
 });
 

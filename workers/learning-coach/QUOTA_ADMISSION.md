@@ -154,6 +154,12 @@ expired configuration denies admission.
 Part 4C now binds claims to authenticated service identity and keyed payload
 fingerprints, couples claim ownership with reservation writes, and fences
 dispatch/completion states. See [IDEMPOTENCY.md](IDEMPOTENCY.md). Replay is status
-only; no private response is stored. Later parts must add fenced settlement,
-reconciliation, provider holds and safe tombstone retention. Production dispatch,
+only; no private response is stored. Part 4D-2 adds internal successful settlement;
+admission now persists each link's configured metric for that accounting. See
+[USAGE_SETTLEMENT.md](USAGE_SETTLEMENT.md). Part 4D-3 adds
+[evidence-based failure accounting](FAILURE_ACCOUNTING.md), retaining unknown
+dimensions and recording overages without reopening admission. Part 4D-4 adds
+[proven non-dispatch recovery](RESERVATION_RECOVERY.md); unknown holds remain reserved.
+Part 4D-5 [composes these operations](DURABLE_PIPELINE.md) in the local mock gateway.
+Provider holds and safe tombstone retention remain future work. Production dispatch,
 provider routing and inference enablement remain separate work.

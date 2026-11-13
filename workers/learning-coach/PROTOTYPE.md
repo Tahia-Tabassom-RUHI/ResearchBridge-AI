@@ -2,8 +2,9 @@
 
 This isolated TypeScript Worker implements the existing contracts with local
 mock inference. The Streamlit application, its providers and quotas, the shared
-JSON schemas, and all educational behavior remain unchanged. There are no AI,
-D1, KV, or other remote resource bindings in either Wrangler configuration.
+JSON schemas, and all educational behavior remain unchanged. Production has no
+inference binding. The local entry now requires local D1 and the integrated
+[durable pipeline](DURABLE_PIPELINE.md); its D1 ID is an all-zero local placeholder.
 
 ## Layout
 
@@ -17,7 +18,8 @@ workers/learning-coach/
     index.ts, local.ts
     auth.ts                     server-to-server authentication
     sources.ts                  future retrieval resolver interface
-    storage.ts                  future D1 interfaces; no persistence implementation
+    storage.ts, storage/        durable admission, lifecycle, accounting and recovery
+    local-services.ts           explicit local D1 composition
     config/index.ts             limits and environment types
     contracts/                  v1/v2 validation and pinned Unicode semantics
     errors/index.ts             sanitized contract-compatible errors
@@ -81,9 +83,10 @@ the authentication mechanism and no permissive CORS headers are returned.
 
 The authenticated identity is the Streamlit service, not a verified student.
 Client-supplied `user_id`, `verified`, or source catalogs are not trusted. The
-bearer credential is reusable: this stateless prototype does not prevent replay,
-enforce a shared quota, or provide idempotency. These are explicit D1-stage
-requirements, not in-memory approximations.
+bearer credential is reusable. The local durable pipeline now enforces shared
+quota admission and service-scoped idempotency using D1. Repeated request IDs
+receive status only; private response replay and verified student identity are
+not provided. See [IDEMPOTENCY.md](IDEMPOTENCY.md).
 
 The generation endpoint accepts POST with UTF-8 `application/json`. It rejects
 encoded bodies, malformed UTF-8/JSON, and unexpected fields. Both declared and
@@ -95,7 +98,7 @@ These are prototype transport bounds, not provider-derived student allowances.
 
 ## Error compatibility
 
-All error bodies satisfy the existing v2 error schema:
+Contract and provider error bodies satisfy the existing v2 error schema:
 
 ```json
 {"contract_version":"2","error":{"code":"invalid_response","message":"Inference is unavailable; manual learning remains available.","retryable":false}}
@@ -105,6 +108,8 @@ The existing error enum has no authentication, timeout, rate-limit, or unavailab
 codes. This prototype preserves it: HTTP status distinguishes transport/provider
 failures, using `invalid_request` or `invalid_response` with a static sanitized
 message. `retryable` remains false, so clients must not automatically retry.
+Durable ownership/accounting decisions additionally use the status-only shape
+documented in [DURABLE_PIPELINE.md](DURABLE_PIPELINE.md).
 
 | HTTP status | Condition |
 | --- | --- |
@@ -139,14 +144,14 @@ is general background. Missing abstracts fail before provider invocation. Only
 source title/text enters the prepared task; generated publication metadata is
 not accepted. Source text and learner context remain untrusted data.
 
-`InferenceProvider.generate(validatedTask, signal)` returns an output and optional
-internal usage measurements. Future adapters can implement this interface after
-persistent quota admission exists. `UsageMeasurement.kind` distinguishes measured,
-estimated, and simulated values. Mock zero counters are explicitly simulated and
-are not sent as actual consumption or a remaining balance.
+`InferenceProvider.generate(validatedTask, signal, attempt)` receives operational
+IDs without an ownership capability. It returns content and internal evidence.
+The local pipeline validates attempt-bound synthetic accounting separately from
+the legacy simulated counters; missing evidence cannot imply zero usage. Real
+provider adapters and their trusted evidence conversion remain future work.
 
-`MOCK_SCENARIO` selects `success`, `error`, `timeout`, `rate_limit`, or `malformed`
-through local server configuration only. Requests cannot select it. Timeout
+`MOCK_SCENARIO` selects enumerated success, error, timeout, malformed-output and
+usage/accounting cases through local server configuration only. Requests cannot select it. Timeout
 simulation waits for cancellation; the handler also bounds providers that ignore
 the abort signal. No mock makes a network request or fabricates scholarly data.
 
@@ -187,10 +192,14 @@ node -e "require('node:fs').writeFileSync('.dev.vars','COACH_SERVICE_SECRET='+re
 npm run dev
 ```
 
+The secret file above alone is insufficient for generation. Also supply an
+independent `COACH_FINGERPRINT_SECRET`, explicit `LOCAL_DURABLE_CONFIG`, and local
+D1 with migrations and matching synthetic quota windows. See
+[DURABLE_PIPELINE.md](DURABLE_PIPELINE.md) and the local integration fixtures.
+Without those protections the entry returns unavailable; health remains usable.
 The local configuration sets `LOCAL_MOCK_ENABLED=true` and `MOCK_SCENARIO=success`.
-The production configuration sets neither. No provider keys, account ID, remote
-AI binding, D1 database ID, or paid service configuration is required. No deploy
-script is supplied and no Cloudflare resources were created by this step.
+The production configuration sets neither. No live provider keys, remote resource
+or paid service configuration is used. No deployment is performed.
 
 ## Python/TypeScript parity
 
@@ -216,11 +225,12 @@ fixture acceptance differences remain on the audited runtime. This does not
 establish semantic correctness of generated interpretations or resistance to
 every possible prompt injection.
 
-## D1 work required next
+## Durable implementation and remaining work
 
-`src/storage.ts` defines small interfaces for quota admission, usage settlement,
-provider holds, and idempotency. It contains no in-memory admission implementation.
-The next stage needs these persistent records and invariants:
+Parts 4A through 4D-5 now implement the quota, reservation, idempotency and
+accounting records below and compose them in the local gateway. Provider holds,
+signed freshness and caching remain separate work. See [D1_SCHEMA.md](D1_SCHEMA.md)
+and [DURABLE_PIPELINE.md](DURABLE_PIPELINE.md) for the current implementation.
 
 | Record | Required behavior |
 | --- | --- |
