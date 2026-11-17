@@ -130,7 +130,7 @@ def topic_partition(plan, namespace='topic'):
     chosen = [item for item in plan['directions'] if item['label'] in selected]
     sample=st.session_state.get('discovery_sample')
     signals=topic_signals(st.session_state.get('topic',''),plan['directions'],sample) if sample is not None else None
-    st.caption('Size: retrieved items · colour: relevance')
+    st.caption('Tap topics to combine them. Bigger = more matches · teal = closer to your question.')
     left,right=st.columns(2)
     left.caption('TOPICS')
     right.caption('COMBINATION')
@@ -284,21 +284,85 @@ def render_combo_tray():
         else 'Local vault storage is unavailable. Keep this app session open.')
 
 
+def open_combo_reading(index):
+    open_combo(index)
+    st.session_state.ui_step='Combo reading'
+
+
+def page_combo_reading(ai_key='',enabled=False,model='',provider='huggingface'):
+    from screens.discovery_workspace import choose_reader
+    index=st.session_state.get('active_combo_id')
+    combos=st.session_state.get('saved_combos',[])
+    if not isinstance(index,int) or index>=len(combos):
+        st.session_state.ui_step='Vault'
+        st.rerun()
+    combo=combos[index]
+    st.header(combo['name'])
+    with st.container(horizontal=True):
+        st.button('← Vault',on_click=go,args=('Vault',))
+        st.button('Find more',on_click=open_combo,args=(index,))
+    catalog={p['id']:p for p in [*combo.get('papers',[]),*combo.get('articles',[])]}
+    catalog.update(st.session_state.get('saved_papers',{}))
+    items=[catalog[i] for i in combo.get('reading_ids',[]) if i in catalog]
+    if not items:
+        st.caption('Reading list is empty. Use Find more to add items.')
+        return
+    library,reader=st.columns([1,3],gap='small')
+    with library:
+        st.caption(f'{len(items)} saved items')
+        selected=st.radio('Documents',[p['id'] for p in items],
+            format_func=lambda key:catalog[key]['title'],key=f'study_document_{index}',label_visibility='collapsed')
+    with reader:
+        paper=catalog[selected]
+        st.subheader(paper['title'])
+        text,original,notes,coach,foundations=st.tabs(['Read','Original paper','Notes & board','Learning tools','Foundations'])
+        with text:
+            with st.container(height=540,border=True):
+                st.write(paper.get('abstract') or 'No text supplied. Use Original paper to read the source.')
+            st.caption('Retrieved text. Use Original paper for the complete document.')
+        with original:
+            url=safe_url(paper.get('oa_url') or paper.get('paper_url'))
+            if url:
+                st.link_button('Open source ↗',url)
+                st.iframe(url,height=560)
+                st.caption('Some publishers block embedded viewing. Use Open source if needed.')
+            else:
+                st.caption('No source link supplied.')
+        with notes:
+            reading_workspace(paper,{p['id']:p for p in items},st.session_state.get('light_mode',False))
+
+        with coach:
+            st.session_state.reader_id=paper['id']
+            st.session_state.setdefault('reading_catalog',{})[paper['id']]=paper
+            page_reader(ai_key,enabled,model,provider)
+        with foundations:
+            from screens.knowledge_check import render_knowledge_check
+            render_knowledge_check()
+
+
 def page_vault():
     st.header('Vault')
     combos=st.session_state.get('saved_combos',[])
     if not combos:
         st.caption('No saved combinations.')
         return
-    rows=[{'Combination':c['name'],'Topics':' + '.join(c.get('selected_directions',[])),
+    rows=[{'Combination':c['name'],'Topics':' + '.join(c.get('selected',[])),
         'Results':len(c.get('papers',[])), 'Reading list':len(c.get('reading_ids',[]))} for c in combos]
-    event=st.dataframe(rows,hide_index=True,width='stretch',height=520,
-        on_select='rerun',selection_mode='single-row',key='vault_table')
-    selected=event.selection.rows
+    import streamlit.components.v1 as components
+    from pathlib import Path
+    table=components.declare_component('vault_double_click',path=str(Path(__file__).resolve().parents[1]/'components'/'vault_table'))
+    event=table(rows=rows,light=st.session_state.get('light_mode',False),key='vault_table',default=None)
+    selected=[]
+    if event and 0<=event.get('index',-1)<len(combos):
+        selected=[event['index']]
+        if event.get('action')=='open' and event.get('nonce')!=st.session_state.get('vault_open_event'):
+            st.session_state.vault_open_event=event['nonce']
+            open_combo_reading(selected[0])
+            st.rerun()
     if selected:
         index=selected[0]
         with st.container(horizontal=True):
-            st.button('Open',on_click=open_combo,args=(index,),key='vault_open')
+            st.button('Open study set',on_click=open_combo_reading,args=(index,),key='vault_open')
             with st.popover('Rename'):
                 st.text_input('Name',value=combos[index]['name'],key=f'combo_name_{index}',max_chars=75)
                 st.button('Save',on_click=rename_combo,args=(index,))
@@ -318,7 +382,7 @@ def open_nav(step):
     st.session_state.nav_panel_open=step in ('Settings',) and not (st.session_state.get('nav_panel_open') and st.session_state.get('nav_panel_step')==step)
     st.session_state.nav_panel_step=step
     if step in STEPS or step=='Vault':
-        st.session_state.ui_step=step
+        st.session_state.ui_step='Direction' if step=='Question' else step
 
 
 def close_nav():
@@ -331,7 +395,7 @@ def toggle_theme():
 
 
 def sidebar():
-    ready={'Question':True,'Direction':'discovery_plan' in st.session_state,
+    ready={'Question':True,'Direction':True,
         'Papers':bool(st.session_state.get('papers')),
         'Vault':True,'Saved':True,'Sources':bool(st.session_state.get('papers'))}
     st.session_state.setdefault('nav_panel_open',False)
@@ -339,8 +403,8 @@ def sidebar():
     icons={'Question':'⌕','Direction':'◌','Papers':'▤','Vault':'▣','Saved':'☆','Sources':'ⓘ'}
     with st.sidebar:
         st.markdown('**RB**')
-        for name in ('Question','Direction','Papers','Vault'):
-            st.button(icons[name],key='rail_'+name,help=name,width='stretch',
+        for name in ('Direction','Papers','Vault'):
+            st.button(icons[name],key='rail_'+name,help='Workspace' if name=='Direction' else name,width='stretch',
                 type='primary' if st.session_state.get('nav_panel_open') and st.session_state.nav_panel_step==name else 'secondary',
                 disabled=not ready[name],on_click=open_nav,args=(name,))
         st.button('⚙',key='rail_Settings',help='Settings and demo tools',width='stretch',
@@ -382,6 +446,9 @@ def sidebar():
                 st.caption('Where the results came from')
                 st.write('OpenAlex, Crossref and Europe PMC source records when available.')
             elif panel=='Settings':
+              with st.popover('Learning tools'):
+                st.button('Knowledge check & learning cards',on_click=go,args=('Knowledge check',))
+                st.button('Guided reader · paste an abstract',on_click=go,args=('Guided reading',))
               st.toggle('Light mode',key='light_mode',on_change=persist_vault)
               with st.expander('AI connection'):
                 provider=st.selectbox('Provider', ['Hugging Face','Gemini'], key='ai_provider')
@@ -419,8 +486,8 @@ def install_search(papers,query,year,step):
 
 
 def page_question(ai_key,enabled,model,provider):
-    question = st.text_area(
-        'Your research question', key='question', height=140,
+    question = st.text_input(
+        'Your research question', key='question',
         placeholder='wondering that…', max_chars=700, label_visibility='collapsed',
     )
     if st.button('Turn into search', type='primary', disabled=not question.strip()):
@@ -445,14 +512,17 @@ def page_question(ai_key,enabled,model,provider):
         st.rerun()
 
 
-def page_direction(openalex_key):
+def page_direction(openalex_key,ai_key='',enabled=False,model='',provider='huggingface'):
     plan=st.session_state.discovery_plan
     st.header('Topic workspace')
     if st.session_state.pop('ai_notice', None):
         st.caption('Showing guided suggestions. You can edit the search.')
     with st.container(horizontal=True, key='topic_tools', vertical_alignment='center', gap='small'):
-        with st.popover('⌕', help='Edit search', width='content'):
-            query = st.text_input('Search terms', key='query', max_chars=500)
+        with st.popover('⌕ Search', width='content'):
+            page_question(ai_key,enabled,model,provider)
+            with st.expander('Exact search terms'):
+                st.text_input('Search terms', key='query', max_chars=500)
+        query=st.session_state.get('query','')
         with st.popover('⚑', help='Search filters', width='content'):
             year = st.selectbox('Publication window', ['Any year', 'Since 2024', 'Since 2020', 'Since 2015'], key='year_filter')
             if query.strip():
@@ -721,18 +791,35 @@ def render():
         [data-testid="stMain"] button:not([kind="primary"]), [data-testid="stSidebar"] button:not([kind="primary"]) {background:#fff!important;color:#174a59!important;border-color:#bad8dc!important;}
         [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"] {border-color:#c5e0e3!important;}
         </style>''',unsafe_allow_html=True)
+    st.markdown("""<style>
+    [data-testid="stSidebar"] button,
+    [data-testid="stSidebar"] button:not([kind="primary"]) {
+        background:transparent!important;border:0!important;box-shadow:none!important;
+        border-radius:0!important;
+    }
+    [data-testid="stSidebar"] button:hover {color:#41c6c7!important;background:transparent!important;}
+    [data-testid="stSidebar"] button:focus-visible {outline:1px solid #41c6c7!important;outline-offset:-4px;}
+    </style>""",unsafe_allow_html=True)
     ai_key,enabled,provider,model=sidebar()
     step=st.session_state.ui_step
-    if step=='Question':
-        page_question(ai_key,enabled,model,provider)
+    if step=='Question' or (step=='Direction' and 'discovery_plan' not in st.session_state):
+        st.header('Workspace')
+        with st.container(horizontal=True,key='topic_tools'):
+            with st.popover('⌕ Search',width='content'):
+                page_question(ai_key,enabled,model,provider)
     elif step=='Direction' and 'discovery_plan' in st.session_state:
-        page_direction(secret('OPENALEX_API_KEY'))
+        page_direction(secret('OPENALEX_API_KEY'),ai_key,enabled,model,provider)
     elif step=='Papers' and st.session_state.get('papers'):
         page_papers(ai_key,enabled,model,provider)
     elif step=='Read paper':
         page_reader(ai_key,enabled,model,provider)
+    elif step=='Knowledge check':
+        from screens.knowledge_check import render_knowledge_check
+        render_knowledge_check()
     elif step=='Guided reading':
         page_guided_reading()
+    elif step=='Combo reading':
+        page_combo_reading(ai_key,enabled,model,provider)
     elif step=='Vault':
         page_vault()
     elif step=='Saved':

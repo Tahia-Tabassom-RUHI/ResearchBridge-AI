@@ -163,7 +163,7 @@ def render_discovery_workspace(papers,articles,query,weights,on_explain=None):
     left,right=st.columns([5,7],gap='medium')
     with left:
         kind=st.selectbox('Type',TYPES,key='reading_type')
-        st.markdown('**Bubble lens**')
+        st.caption('GROUP RESULTS BY')
         label=st.selectbox('Lens',list(LENSES),key='bubble_lens',label_visibility='collapsed')
         view=LENSES[label]
         st.session_state.map_view=view
@@ -172,7 +172,7 @@ def render_discovery_workspace(papers,articles,query,weights,on_explain=None):
         by_id={paper['id']:paper for paper in data['records']}
         recurring=[(key,item) for key,item in positive.items() if item['value']>=2]
         candidates=recurring if view=='Topic volume' and recurring else list(positive.items())
-        shown={key:{**item,'relevance':sum(relevance_details(by_id[paper_id],query)[0]
+        shown={key:{**item,'unit':'citations' if view=='Citation attention' else 'papers','relevance':sum(relevance_details(by_id[paper_id],query)[0]
             for paper_id in item['paper_ids'] if paper_id in by_id)/max(len(item['paper_ids']),1)}
             for key,item in candidates[:10]}
         signature=(query,view)
@@ -188,7 +188,7 @@ def render_discovery_workspace(papers,articles,query,weights,on_explain=None):
         key=st.session_state.get('map_selected')
         if key in data['groups']:
             item=data['groups'][key]
-            st.caption(f"Showing {len(item['paper_ids'])} records for {item['label']} · {item['value']} {('reported citations' if view=='Citation attention' else 'records')}")
+            st.caption(f"{item['label']} · {len(item['paper_ids'])} matching papers")
             if st.button('Show all results',key='clear_map_selection'):
                 st.session_state.pop('map_selected',None)
                 st.rerun()

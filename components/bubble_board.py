@@ -57,7 +57,7 @@ def bubble_board(weights, metrics=None, on_select=None, namespace='packed_board'
     {board_class} .stButton, {board_class} .stButton > div {{height:100%!important;width:100%!important;}}
     {board_class} button:hover {{filter:brightness(1.08); outline:2px solid #a8f1ef; outline-offset:1px;}}
     {board_class} button:focus-visible {{outline:3px solid #a8f1ef!important; outline-offset:2px;}}
-    {board_class} button p {{font-size:clamp(9px,1.5vw,13px); line-height:1.12; overflow-wrap:anywhere;}}
+    {board_class} button p {{font-size:clamp(9px,1.5vw,13px); line-height:1.12; overflow-wrap:normal;word-break:normal;hyphens:none;}}
     </style>'''
     rules = []
     for n in nodes:
@@ -71,14 +71,17 @@ def bubble_board(weights, metrics=None, on_select=None, namespace='packed_board'
         for node in nodes:
             with st.container(key=f'{orb_class}{node["index"]}'):
                 metric_label=metrics[node['term']]['label'] if metrics else ''
-                label = ((metric_label[:20]+'…' if len(metric_label)>21 else metric_label) + '\n\n' + str(metrics[node['term']]['value'])) if metrics else node['term']
+                short_label=metric_label.replace(' (name match, unverified)','')
+                short_label=(short_label[:27]+'…') if len(short_label)>28 else short_label
+                unit=metrics[node['term']].get('unit','items') if metrics else ''
+                label = (short_label + '\n\n' + str(metrics[node['term']]['value'])+' '+unit) if metrics else node['term']
                 description = (descriptions or {}).get(node['term'], '')
                 if description and not metrics and show_descriptions:
                     label += '\n\n' + description[:52] + ('…' if len(description)>52 else '')
                 if on_select is not None:
                     st.button(label, key=(button_prefix or 'direction_')+node['term'], help=description or None, on_click=on_select, args=(node['term'],))
                 elif st.button(label, key=('metric_' if metrics else 'bubble_')+node['term'],
-                    help=(metric_label+' · '+str(metrics[node['term']]['value'])) if metrics else description or None):
+                    help=None):
                     if metrics:
                         selected = node['term']
                     else:
@@ -109,7 +112,7 @@ def combination_board(directions, selected, on_select, namespace='topic', signal
       .st-key-{board} .stButton, .st-key-{board} .stButton > div {{height:100%!important;width:100%!important;}}
       .st-key-{board} button {{height:100%!important;width:100%!important;min-height:0!important;aspect-ratio:1!important;border-radius:50%!important;border:2px solid {background}!important;padding:5px!important;color:#092531!important;box-shadow:0 5px 16px #071a2430!important;}}
       .st-key-{board} button:hover {{filter:brightness(1.08);outline:2px solid #a8f1ef;outline-offset:1px;}}
-      .st-key-{board} button p {{font-size:clamp(10px,1.65vw,14px);line-height:1.1;overflow-wrap:anywhere;}}
+      .st-key-{board} button p {{font-size:clamp(10px,1.65vw,14px);line-height:1.1;overflow-wrap:normal;word-break:normal;hyphens:none;}}
     </style>''']
     for node in nodes:
         size=node['size']/2
@@ -125,7 +128,7 @@ def combination_board(directions, selected, on_select, namespace='topic', signal
         for node in nodes:
             with st.container(key=f'{board}_orb_{node["index"]}'):
                 count=signals.get(node['term'],{}).get('count')
-                help_text=(meanings[node['term']]+'\n\n' if meanings[node['term']] else '')+(f'{count} matching records in the preview sample.' if count is not None else 'Material count unavailable.')
-                label=node['term']+(f'\n\n{count} in sample' if count is not None else '')
+                help_text=(meanings[node['term']]+'\n\n' if meanings[node['term']] else '')+(f'{count} matching items in the preview search. Tap to add or remove this topic.' if count is not None else 'Tap to add or remove this topic.')
+                label=node['term']
                 st.button(label,key=f'{namespace}_bubble_{node["index"]}',
-                    help=help_text,on_click=on_select,args=(node['term'],))
+                    help=None,on_click=on_select,args=(node['term'],))

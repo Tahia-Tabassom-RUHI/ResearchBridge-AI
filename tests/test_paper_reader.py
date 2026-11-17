@@ -266,7 +266,7 @@ def test_imported_renderer_and_app_navigation_preserve_existing_flows():
     paper = normalize({'id':'https://openalex.org/W123','title':TITLE})
     paper['abstract'] = ABSTRACT
     app = AppTest.from_file(str(ROOT / "app.py")).run(timeout=15)
-    app.text_area[0].input('classroom reading exercise').run()
+    app.text_input(key='question').input('classroom reading exercise').run()
     _button(app, 'Turn into search').click().run()
     with patch('screens.home.retrieve', return_value=[paper]):
         _button(app, 'Find real papers →').click().run()
