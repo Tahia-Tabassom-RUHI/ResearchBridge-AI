@@ -1,5 +1,15 @@
 [server]
 headless = true
+fileWatcherType = "poll"
+runOnSave = true
 
 [browser]
 gatherUsageStats = false
+
+[theme]
+base = "dark"
+primaryColor = "#40c5c5"
+backgroundColor = "#0b1721"
+secondaryBackgroundColor = "#142b36"
+textColor = "#e7f3f4"
+font = "sans serif"

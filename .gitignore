@@ -1,5 +1,6 @@
 # Virtual environments
 .venv/
+.venv-runtime/
 venv/
 env/
 ENV/
@@ -44,3 +45,8 @@ Desktop.ini
 *.swo
 *~
 .ipynb_checkpoints/
+node_modules/
+.generated/
+.wrangler/
+.dev.vars
+.researchbridge/

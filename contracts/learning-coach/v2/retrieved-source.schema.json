@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Server-owned retrieval record; never accepted from a learner or model",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["paper_id", "title", "provenance"],
+  "properties": {
+    "paper_id": {"type": "string", "minLength": 1, "maxLength": 1000, "pattern": "[^ \\t\\n\\r\\f\\v]"},
+    "title": {"type": "string", "minLength": 1, "maxLength": 12000, "pattern": "[^ \\t\\n\\r\\f\\v]"},
+    "abstract": {"type": ["string", "null"], "maxLength": 12000},
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "record_id", "retrieved_at"],
+      "properties": {
+        "provider": {"type": "string", "minLength": 1, "maxLength": 100, "pattern": "[^ \\t\\n\\r\\f\\v]"},
+        "record_id": {"type": "string", "minLength": 1, "maxLength": 1000, "pattern": "[^ \\t\\n\\r\\f\\v]"},
+        "retrieved_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"}
+      }
+    }
+  }
+}
