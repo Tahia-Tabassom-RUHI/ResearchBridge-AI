@@ -1,12 +1,13 @@
 """Bounded public scholarly searches; source records, never generated citations."""
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from html import unescape
 import json
 import re
 from urllib.parse import urlencode, quote
 from urllib.request import Request, urlopen
-from services.papers import DiscoveryError, safe_url
+from services.papers import DiscoveryError, biomedical_ids, doi_url, safe_url
 
 
 def clean(value):
@@ -19,6 +20,18 @@ def get_json(url):
         return json.load(response)
 
 
+def publication_date(value):
+    """Keep a valid provider date at its original precision."""
+    value = str(value)
+    if not re.fullmatch(r'[0-9]{4}(?:-[0-9]{2}){0,2}',value):
+        return None
+    try:
+        date.fromisoformat(value+{4:'-01-01',7:'-01',10:''}[len(value)])
+    except ValueError:
+        return None
+    return value
+
+
 def base_record(identifier, title, source):
     return dict(id=identifier, title=clean(title), authors=[], author_details=[], doi=None,
         abstract=None, publication_date=None, source_name=None, paper_url=None, oa_url=None,
@@ -28,14 +41,14 @@ def base_record(identifier, title, source):
 
 
 def crossref_record(work):
-    doi = work.get('DOI')
+    doi = doi_url(work.get('DOI'))
     title = clean((work.get('title') or [''])[0])
     if not doi or not title:
         return None
-    paper = base_record('https://doi.org/'+doi.lower(), title, 'Crossref')
-    paper['doi'] = paper['paper_url'] = 'https://doi.org/'+quote(doi, safe='/():;._-')
+    paper = base_record(doi, title, 'Crossref')
+    paper['doi'] = paper['paper_url'] = doi
     paper['abstract'] = clean(work.get('abstract'))
-    for author in work.get('author', []):
+    for author in work.get('author') or []:
         name = clean(author.get('name') or ' '.join([author.get('given',''), author.get('family','')]))
         if not name:
             continue
@@ -45,16 +58,20 @@ def crossref_record(work):
     for field in ('published', 'published-online', 'published-print'):
         parts = (work.get(field) or {}).get('date-parts') or []
         if parts and parts[0]:
-            paper['publication_date'] = '-'.join(str(p).zfill(4 if i==0 else 2) for i,p in enumerate(parts[0][:3]))
-            break
+            candidate = '-'.join(str(p).zfill(4 if i==0 else 2) for i,p in enumerate(parts[0][:3]))
+            if published:=publication_date(candidate):
+                paper['publication_date'] = published
+                break
     paper['source_name'] = (work.get('container-title') or [None])[0]
     paper['paper_type'] = work.get('type')
     paper['keywords'] = work.get('subject') or []
     paper['cited_by_count'] = work.get('is-referenced-by-count')
-    # Crossref update relationships can identify retraction notices, not universal status.
-    updates = work.get('update-to') or []
-    if any(u.get('type') == 'retraction' for u in updates):
-        paper['is_retracted'] = True
+    retractions = [update for update in work.get('update-to') or []
+        if isinstance(update,dict) and str(update.get('type')).lower()=='retraction']
+    if retractions:
+        paper['paper_type'] = 'retraction-notice'
+        paper['retraction_targets'] = [target for update in retractions
+            if (target:=doi_url(update.get('DOI'))) and target!=doi]
     return paper
 
 
@@ -65,16 +82,25 @@ def europe_record(work):
     url = 'https://europepmc.org/article/'+quote(work.get('source','MED'))+'/'+quote(work['id'])
     paper = base_record(url, title, 'Europe PMC')
     paper['paper_url'] = url
-    if work.get('doi'):
-        paper['doi'] = 'https://doi.org/'+quote(work['doi'], safe='/():;._-')
+    paper['doi'] = doi_url(work.get('doi'))
+    paper['identifiers'] = biomedical_ids(
+        work.get('pmid') or (work['id'] if work.get('source')=='MED' else None),
+        work.get('pmcid') or (work['id'] if work.get('source')=='PMC' else None),
+    )
     paper['abstract'] = clean(work.get('abstractText'))
-    paper['publication_date'] = work.get('firstPublicationDate') or work.get('pubYear')
+    paper['publication_date'] = publication_date(work.get('firstPublicationDate')) or publication_date(work.get('pubYear'))
     paper['source_name'] = ((work.get('journalInfo') or {}).get('journal') or {}).get('title')
-    types = (work.get('pubTypeList') or {}).get('pubType') or []
-    paper['paper_type'] = 'review' if any('review' in t.lower() for t in types) else ('preprint' if work.get('source') == 'PPR' else 'article')
-    if any(t.lower() == 'retracted publication' for t in types):
-        paper['is_retracted'] = True
-    elif any('retraction of publication' in t.lower() for t in types):
+    types = {t.lower() for t in (work.get('pubTypeList') or {}).get('pubType') or []
+        if isinstance(t,str)}
+    if 'retraction of publication' in types:
+        paper['paper_type'] = 'retraction-notice'
+    elif work.get('source')=='PPR' or 'preprint' in types:
+        paper['paper_type'] = 'preprint'
+    elif types & {'review','systematic review','scoping review','meta-analysis'}:
+        paper['paper_type'] = 'review'
+    elif 'journal article' in types:
+        paper['paper_type'] = 'article'
+    if 'retracted publication' in types:
         paper['is_retracted'] = True
     authors = (work.get('authorList') or {}).get('author') or []
     for author in authors:
@@ -114,27 +140,97 @@ def search_europe(query, year=None):
     return [p for w in data.get('resultList',{}).get('result',[]) if (p:=europe_record(w))]
 
 
-def merge_records(records):
-    """Merge duplicate DOIs, filling absent abstracts and retaining provenance."""
-    merged = {}
-    for paper in records:
-        key = (paper.get('doi') or paper['id']).lower().rstrip('/')
-        if key not in merged:
-            merged[key] = dict(paper)
+def _identifiers(paper):
+    return [paper['id'],*paper.get('identifiers',[])]
+
+
+def _merge_metadata(current,paper):
+    provenance = current['provenance']
+    fields = provenance.setdefault('field_sources',{})
+    source = paper['provenance']
+    provenance['sources'] = list(dict.fromkeys(provenance.get('sources',[provenance['source']])
+        + source.get('sources',[source['source']])))
+
+    def take(field):
+        current[field] = paper[field]
+        fields[field] = source.get('field_sources',{}).get(field,source['source'])
+
+    for field in ('doi','abstract','oa_url','source_name','cited_by_count'):
+        if current.get(field) in (None,'') and paper.get(field) not in (None,''):
+            take(field)
+    for field in ('is_oa','is_retracted'):
+        if paper.get(field) is True or (current.get(field) is None and paper.get(field) is False):
+            take(field)
+    old_date,new_date = current.get('publication_date'),paper.get('publication_date')
+    if new_date and (not old_date or new_date.startswith(old_date+'-')):
+        take('publication_date')
+    old_type,new_type = current.get('paper_type'),paper.get('paper_type')
+    if new_type and (not old_type or new_type=='retraction-notice'
+            or (old_type in ('article','journal-article') and new_type in ('review','preprint','posted-content'))):
+        take('paper_type')
+    if len(paper.get('authors') or [])>len(current.get('authors') or []):
+        take('authors')
+        take('author_details')
+    elif current.get('authors')==paper.get('authors') and not current.get('author_details') and paper.get('author_details'):
+        take('author_details')
+    for field in ('topics','keywords','identifiers'):
+        current[field] = sorted(set(current.get(field,[])+paper.get(field,[])))
+
+
+def _identity_keys(records):
+    linked = defaultdict(list)
+    for index,(paper,_) in enumerate(records):
+        for identifier in _identifiers(paper):
+            linked[identifier].append(index)
+
+    keys = {}
+    for start in range(len(records)):
+        if start in keys:
             continue
-        current = merged[key]
-        for field in ('abstract','oa_url','source_name','publication_date'):
-            if not current.get(field) and paper.get(field):
-                current[field] = paper[field]
-        current['is_retracted'] = True if current.get('is_retracted') or paper.get('is_retracted') else None
-        current['topics'] = sorted(set(current.get('topics',[])+paper.get('topics',[])))
-        current['keywords'] = sorted(set(current.get('keywords',[])+paper.get('keywords',[])))
-        sources = list(dict.fromkeys(current['provenance'].get('sources',[current['provenance']['source']])+paper['provenance'].get('sources',[paper['provenance']['source']])))
-        current['provenance'] = {'source':current['provenance']['source'], 'sources':sources}
-        if not current.get('author_details'):
-            current['author_details'] = paper.get('author_details',[])
-        if current.get('cited_by_count') is None:
-            current['cited_by_count'] = paper.get('cited_by_count')
+        # Resolve the whole identifier chain before deciding which DOI it implies.
+        component = {start}
+        pending = [start]
+        while pending:
+            paper,_ = records[pending.pop()]
+            for identifier in _identifiers(paper):
+                for index in linked.pop(identifier,()):
+                    if index not in component:
+                        component.add(index)
+                        pending.append(index)
+
+        dois = {records[index][1] for index in component if records[index][1]}
+        if len(dois)>1:
+            # Keep explicit DOIs and exact record IDs in an ambiguous cluster.
+            for index in component:
+                paper,doi = records[index]
+                keys[index] = ('doi',doi) if doi else ('record',paper['id'])
+        else:
+            key = ('doi',next(iter(dois))) if dois else ('component',start)
+            keys.update(dict.fromkeys(component,key))
+    return keys
+
+
+def merge_records(records):
+    """Match canonical DOIs or shared, unambiguous provider identifiers."""
+    records = [(paper,doi_url(paper.get('doi'))) for paper in records]
+    keys = _identity_keys(records)
+    merged,retractions = {},{}
+    for index,(paper,doi) in enumerate(records):
+        key = keys[index]
+        record = {**paper,'doi':doi,'publication_date':publication_date(paper.get('publication_date'))}
+        if key in merged:
+            _merge_metadata(merged[key],record)
+        else:
+            provenance = paper['provenance']
+            merged[key] = {**record,'provenance':{**provenance,
+                'field_sources':dict(provenance.get('field_sources',{}))}}
+        for target in paper.get('retraction_targets',[]):
+            retractions[target] = paper['provenance']['source']
+
+    for paper in merged.values():
+        if paper['doi'] in retractions:
+            paper['is_retracted'] = True
+            paper['provenance']['field_sources']['is_retracted'] = retractions[paper['doi']]
     return list(merged.values())
 
 

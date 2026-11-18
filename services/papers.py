@@ -1,8 +1,9 @@
 """OpenAlex discovery. All displayed paper metadata comes from retrieved records."""
 import json
 import os
+import re
 from datetime import datetime, timezone
-from urllib.parse import urlencode, urlparse
+from urllib.parse import quote, unquote, urlencode, urlparse
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 
@@ -11,6 +12,51 @@ class DiscoveryError(Exception):
 
 def safe_url(value):
     return value if isinstance(value, str) and urlparse(value).scheme in ('http', 'https') and urlparse(value).netloc else None
+
+def doi_url(value):
+    """Validate DOI syntax and canonicalize resolver URLs and bare identifiers."""
+    if not isinstance(value, str):
+        return None
+    value=value.strip()
+    if value.lower().startswith('doi:'):
+        value=value[4:].strip()
+    elif value.lower().startswith(('http://','https://')):
+        if not value.isprintable():
+            return None
+        try:
+            url=urlparse(value)
+            if url.netloc.lower() not in ('doi.org','dx.doi.org'):
+                return None
+            path=url.path+(';' + url.params if url.params else '')
+            if re.search(r'%(?![0-9a-fA-F]{2})',path):
+                return None
+            value=unquote(path.removeprefix('/'),errors='strict')
+        except ValueError:
+            return None
+    if (not re.fullmatch(r'10\.[0-9]{4,}(?:\.[0-9]+)*/\S+',value)
+            or not value.isprintable() or any(part in ('.','..') for part in value.split('/'))):
+        return None
+    return 'https://doi.org/'+quote(value.lower(),safe='/():;._-')
+
+
+def biomedical_ids(pmid=None,pmcid=None):
+    identifiers=[]
+    if isinstance(pmid,str):
+        pmid=pmid.removeprefix('https://pubmed.ncbi.nlm.nih.gov/').rstrip('/')
+    if isinstance(pmcid,str):
+        pmcid=pmcid.removeprefix('https://www.ncbi.nlm.nih.gov/pmc/articles/')
+        pmcid=pmcid.removeprefix('https://pmc.ncbi.nlm.nih.gov/articles/').rstrip('/')
+    if isinstance(pmid,str) and re.fullmatch(r'[1-9][0-9]*',pmid):
+        identifiers.append('pmid:'+pmid)
+    if isinstance(pmcid,str) and re.fullmatch(r'PMC[1-9][0-9]*',pmcid):
+        identifiers.append('pmcid:'+pmcid)
+    return identifiers
+
+
+def is_retracted_or_notice(paper):
+    return (paper.get('is_retracted') is True
+        or paper.get('paper_type') in ('retraction','retraction-notice'))
+
 
 def abstract_text(index):
     if not isinstance(index, dict):
@@ -23,15 +69,18 @@ def normalize(work):
     location = work.get('primary_location') or {}
     source = location.get('source') or {}
     oa = work.get('open_access') or {}
+    doi = doi_url(work.get('doi'))
+    ids = work.get('ids') or {}
+    identifiers = biomedical_ids(ids.get('pmid'),ids.get('pmcid'))
     return dict(id=work['id'], title=work['title'],
         authors=[a['author']['display_name'] for a in work.get('authorships', []) if (a.get('author') or {}).get('display_name')],
-        doi=safe_url(work.get('doi')), publication_date=work.get('publication_date'), source_name=source.get('display_name'),
+        doi=doi, publication_date=work.get('publication_date'), source_name=source.get('display_name'),
         abstract=abstract_text(work.get('abstract_inverted_index')),
-        paper_url=safe_url(work.get('doi')) or safe_url(location.get('landing_page_url')) or safe_url(work['id']),
+        paper_url=doi or safe_url(location.get('landing_page_url')) or safe_url(work['id']),
         oa_url=safe_url(oa.get('oa_url')), paper_type=work.get('type'), is_retracted=work.get('is_retracted'),
         retrieved_at=datetime.now(timezone.utc).isoformat(), provenance={'source': 'OpenAlex'},
         author_details=[{'id': (a.get('author') or {}).get('id'), 'name': (a.get('author') or {}).get('display_name'), 'institutions': [{'id': inst.get('id'), 'name': inst.get('display_name'), 'country_code':inst.get('country_code')} for inst in a.get('institutions', []) if inst.get('display_name')]} for a in work.get('authorships', []) if (a.get('author') or {}).get('display_name')],
-        cited_by_count=work.get('cited_by_count'), is_oa=oa.get('is_oa'),
+        cited_by_count=work.get('cited_by_count'), is_oa=oa.get('is_oa'), identifiers=identifiers,
         keywords=[k['display_name'] for k in work.get('keywords', []) if k.get('display_name')],
         topics=[t['display_name'] for t in work.get('topics', []) if t.get('display_name')])
 
@@ -53,15 +102,8 @@ def search_openalex(query, year=None, api_key=None):
         raise DiscoveryError(message) from None
     except (URLError, TimeoutError, ValueError):
         raise DiscoveryError('Could not reach the paper service. Your question and focus are still here; try again.') from None
-    seen, papers = set(), []
-    for work in payload.get('results', []):
-        if not work.get('id') or not work.get('title'):
-            continue
-        key = (work.get('doi') or work['id']).lower().rstrip('/')
-        if key not in seen:
-            seen.add(key)
-            papers.append(normalize(work))
-    return papers
+    return [normalize(work) for work in payload.get('results',[])
+        if work.get('id') and work.get('title')]
 
 
 def search_papers(query, year=None, api_key=None, extra_queries=()):

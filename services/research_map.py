@@ -3,7 +3,7 @@ from datetime import date, datetime
 import re
 from zoneinfo import ZoneInfo
 from services.ranking import matches
-from services.papers import safe_url
+from services.papers import doi_url, is_retracted_or_notice, safe_url
 from services.ranking import STOP
 
 VIEWS = {
@@ -23,8 +23,9 @@ VIEWS = {
 def unique_papers(papers):
     seen = set()
     for paper in papers:
-        identity = (paper.get('doi') or paper['id']).lower().rstrip('/')
-        if identity not in seen and paper.get('is_retracted') is not True:
+        doi = doi_url(paper.get('doi'))
+        identity = ('doi',doi) if doi else ('record',paper['id'])
+        if identity not in seen and not is_retracted_or_notice(paper):
             seen.add(identity)
             yield paper
 

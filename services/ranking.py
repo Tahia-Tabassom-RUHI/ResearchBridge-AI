@@ -1,6 +1,7 @@
 """Editable query preparation and explicit interest ranking, never quality scoring."""
 import re
 from collections import Counter
+from services.papers import is_retracted_or_notice
 
 STOP = set('a an the is are was were i we you my me how what why when where can could would should do does did to of in on for and or with that this it be have has long about want know there things world like'.split())
 
@@ -21,7 +22,7 @@ def matches(paper, term):
 
 def rank_papers(papers, weights, mode='Best matches'):
     # Retracted records remain visible under Sources, never recommended.
-    eligible = [p for p in papers if p.get('is_retracted') is not True]
+    eligible = [p for p in papers if not is_retracted_or_notice(p)]
     def score(paper):
         focus = sum(weight for term, weight in weights.items() if matches(paper, term))
         if mode == 'Recent research':
@@ -82,7 +83,7 @@ def relevance_details(paper, query):
 
 
 def shortlist(papers, query, weights, goal='Help me start'):
-    eligible = [p for p in papers if p.get('is_retracted') is not True and p.get('paper_type') not in ('retraction','retraction-notice')]
+    eligible = [p for p in papers if not is_retracted_or_notice(p)]
     def score(p):
         relevance,_ = relevance_details(p,query)
         focus = sum(w for term,w in weights.items() if matches(p,term)) / max(sum(weights.values()),1)

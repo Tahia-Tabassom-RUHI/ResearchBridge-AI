@@ -55,7 +55,7 @@ def test_combo_reading_list_and_quick_preview():
     app.text_area[0].input('Banana good for how long?').run()
     next(b for b in app.button if b.label=='Turn into search').click().run()
     app.button(key='topic_bubble_0').click().run()
-    paper=crossref_record({'DOI':'10.1/shelf','title':['Banana shelf life'],
+    paper=crossref_record({'DOI':'10.1234/shelf','title':['Banana shelf life'],
         'abstract':'Bananas change during storage. This study examines shelf life.',
         'subject':['Shelf life']})
     with patch('screens.home.retrieve',return_value=[paper]):
@@ -79,7 +79,7 @@ def test_removing_from_combo_updates_its_reading_list():
     app.text_area[0].input('Banana good for how long?').run()
     next(b for b in app.button if b.label=='Turn into search').click().run()
     app.button(key='topic_bubble_0').click().run()
-    paper=crossref_record({'DOI':'10.1/remove','title':['Banana shelf life'],'subject':['Shelf life']})
+    paper=crossref_record({'DOI':'10.1234/remove','title':['Banana shelf life'],'subject':['Shelf life']})
     with patch('screens.home.retrieve',return_value=[paper]):
         next(b for b in app.button if b.label=='Find real papers →').click().run()
     app.button(key='reading_add_0').click().run()
@@ -91,8 +91,8 @@ def test_removing_from_combo_updates_its_reading_list():
 
 
 def test_newest_order_really_prioritizes_publication_date():
-    old=crossref_record({'DOI':'10.1/old','title':['Banana shelf life'],
+    old=crossref_record({'DOI':'10.1234/old','title':['Banana shelf life'],
         'published':{'date-parts':[[2020,1,1]]}})
-    new=crossref_record({'DOI':'10.1/new','title':['Fruit study'],
+    new=crossref_record({'DOI':'10.1234/new','title':['Fruit study'],
         'published':{'date-parts':[[2025,1,1]]}})
     assert shortlist([old,new],'banana shelf life',{},'Recent research')[0]['id']==new['id']

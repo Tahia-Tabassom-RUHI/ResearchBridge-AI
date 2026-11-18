@@ -7,7 +7,7 @@ from services.papers import DiscoveryError
 
 
 def test_crossref_record_is_source_metadata_not_ai():
-    p=crossref_record({'DOI':'10.1/real','title':['A <i>title</i>'],'abstract':'<jats:p>An abstract.</jats:p>',
+    p=crossref_record({'DOI':'10.1234/real','title':['A <i>title</i>'],'abstract':'<jats:p>An abstract.</jats:p>',
         'published':{'date-parts':[[2025,3]]},'author':[{'given':'Ada','family':'Lee'}],'is-referenced-by-count':0})
     assert p['title']=='A title' and p['abstract']=='An abstract.'
     assert p['publication_date']=='2025-03' and p['cited_by_count']==0
@@ -16,8 +16,8 @@ def test_crossref_record_is_source_metadata_not_ai():
 
 
 def test_merge_keeps_real_abstract_and_provenance():
-    a=crossref_record({'DOI':'10.1/REAL','title':['Title']})
-    b=europe_record({'id':'123','source':'MED','title':'Title','doi':'10.1/real',
+    a=crossref_record({'DOI':'10.1234/REAL','title':['Title']})
+    b=europe_record({'id':'123','source':'MED','title':'Title','doi':'10.1234/real',
         'abstractText':'Actual retrieved abstract','isOpenAccess':'Y','pmcid':'PMC123'})
     papers=merge_records([a,b])
     assert len(papers)==1 and papers[0]['abstract']=='Actual retrieved abstract'
@@ -26,7 +26,7 @@ def test_merge_keeps_real_abstract_and_provenance():
 
 
 def test_one_search_provider_can_fail():
-    p=crossref_record({'DOI':'10.1/test','title':['Title']})
+    p=crossref_record({'DOI':'10.1234/test','title':['Title']})
     with patch('services.scholarly.search_crossref',return_value=[p]),patch('services.scholarly.search_europe',side_effect=TimeoutError):
         found=discover('topic')
     assert len(found)==1 and found[0]['search_notices']
@@ -101,7 +101,7 @@ def test_guidance_direction_choice_and_focus_changes_real_search():
     next(b for b in app.button if b.label == 'Turn into search').click().run()
     app.button(key='topic_bubble_1').click().run()
     assert app.text_input(key='query').value=='retrieval practice learning'
-    p=crossref_record({'DOI':'10.1/test','title':['Retrieval practice learning'],'subject':['Memory']})
+    p=crossref_record({'DOI':'10.1234/test','title':['Retrieval practice learning'],'subject':['Memory']})
     with patch('screens.home.retrieve',return_value=[p]):
         next(b for b in app.button if b.label=='Find real papers →').click().run()
     assert app.pills(key='bubble_lens').value=='Topics'
@@ -136,7 +136,7 @@ def test_saved_combinations_restore_distinct_searches_and_results():
     app.button(key='topic_bubble_0').click().run()
     first_query=app.text_input(key='query').value
     app.button(key='save_combo').click().run()
-    with patch('screens.home.retrieve',return_value=[crossref_record({'DOI':'10.1/first','title':['Shelf life study']})]):
+    with patch('screens.home.retrieve',return_value=[crossref_record({'DOI':'10.1234/first','title':['Shelf life study']})]):
         next(b for b in app.button if b.label=='Find real papers →').click().run()
     assert len(app.session_state['saved_combos'][0]['papers'])==1
     app.button(key='rail_Direction').click().run()
@@ -189,7 +189,7 @@ def test_steps_preserve_inputs_and_keep_results_out_of_question_screen():
     app.button(key='rail_Direction').click().run()
     assert app.text_input(key='query').value=='my edited search'
     assert app.selectbox(key='year_filter').value=='Since 2020'
-    records=[crossref_record({'DOI':f'10.1/{i}','title':[f'Study {i}']}) for i in range(5)]
+    records=[crossref_record({'DOI':f'10.1234/{i}','title':[f'Study {i}']}) for i in range(5)]
     with patch('screens.home.retrieve',return_value=records):
         next(b for b in app.button if b.label=='Find real papers →').click().run()
     assert not app.text_area
