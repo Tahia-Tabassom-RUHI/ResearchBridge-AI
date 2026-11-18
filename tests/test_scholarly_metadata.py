@@ -1,11 +1,14 @@
+import json
+from io import BytesIO
 from itertools import permutations
+from urllib.parse import urlparse
 
 import pytest
 
-from services.papers import normalize
+from services.papers import DiscoveryError, normalize
 from services.ranking import rank_papers, shortlist
 from services.research_map import map_data
-from services.scholarly import crossref_record, europe_record, merge_records
+from services.scholarly import crossref_record, discover, europe_record, merge_records
 
 
 def test_invalid_doi_does_not_supply_a_resolver_link():
@@ -134,3 +137,82 @@ def test_unknown_type_and_invalid_dates_do_not_override_reported_metadata():
     assert paper['cited_by_count']==0
     assert paper['is_oa'] is False
     assert paper['oa_url'] is None
+
+
+def mock_search_payloads(monkeypatch,*,crossref=None,europe=None,openalex=None):
+    payloads={
+        'api.crossref.org':{'message':{'items':crossref if crossref is not None else []}},
+        'www.ebi.ac.uk':{'resultList':{'result':europe if europe is not None else []}},
+        'api.openalex.org':{'results':openalex if openalex is not None else []},
+    }
+
+    def reply(request,**kwargs):
+        return BytesIO(json.dumps(payloads[urlparse(request.full_url).hostname]).encode())
+
+    monkeypatch.setattr('services.scholarly.urlopen',reply)
+    monkeypatch.setattr('services.papers.urlopen',reply)
+
+
+@pytest.mark.parametrize('provider,rows',[
+    ('crossref',[
+        {'DOI':'10.1234/first','title':['First']},
+        {'DOI':'10.1234/broken','title':['Broken'],'author':[None]},
+        {'DOI':'10.1234/last','title':['Last']},
+    ]),
+    ('europe',[
+        {'id':'123','title':'First'},
+        {'id':'456','title':'Broken','authorList':{'author':[None]}},
+        {'id':'789','title':'Last'},
+    ]),
+    ('openalex',[
+        {'id':'https://openalex.org/W1','title':'First'},
+        {'id':'https://openalex.org/W2','title':'Broken','authorships':[None]},
+        {'id':'https://openalex.org/W3','title':'Last'},
+    ]),
+])
+def test_malformed_provider_row_preserves_its_valid_siblings(monkeypatch,provider,rows):
+    mock_search_payloads(monkeypatch,**{provider:rows})
+    assert [record['title'] for record in discover('topic',api_key='fixture')]==['First','Last']
+
+
+def test_malformed_filter_dates_keep_usable_provider_dates(monkeypatch):
+    mock_search_payloads(monkeypatch,crossref=[
+        {'DOI':'10.1234/recent','title':['Recent'],
+         'published':{'date-parts':[2025]},'published-online':{'date-parts':[[2025,3]]}},
+        {'DOI':'10.1234/unknown','title':['Unknown'],'published':{'date-parts':[[2025,2,30]]}},
+        {'DOI':'10.1234/old','title':['Old'],'published':{'date-parts':[[2019]]}},
+    ],openalex=[{'id':'https://openalex.org/W1','title':'Invalid date','publication_date':42}])
+    assert [(paper['title'],paper['publication_date'])
+        for paper in discover('topic',year=2024,api_key='fixture')]==[('Recent','2025-03')]
+
+
+def test_malformed_keywords_in_duplicate_do_not_break_merge(monkeypatch):
+    mock_search_payloads(monkeypatch,
+        crossref=[{'DOI':'10.1234/shared','title':['Shared'],'subject':'invalid collection'}],
+        europe=[{'id':'123','title':'Shared','doi':'10.1234/shared',
+                 'keywordList':{'keyword':['Verified topic',{'unexpected':'object'}]}}])
+    [paper]=discover('topic')
+    assert paper['keywords']==['Verified topic']
+    assert paper['provenance']['sources']==['Crossref','Europe PMC']
+
+
+def test_malformed_result_collection_is_a_provider_failure(monkeypatch):
+    mock_search_payloads(monkeypatch,crossref={},europe=[{'id':'123','title':'Valid result'}])
+    [paper]=discover('topic')
+    assert paper['search_sources']==['Europe PMC']
+    assert any('Crossref' in notice for notice in paper['search_notices'])
+
+
+def test_all_malformed_provider_responses_raise_a_discovery_error(monkeypatch):
+    mock_search_payloads(monkeypatch,crossref={},europe=[None])
+    with pytest.raises(DiscoveryError,match='paper services'):
+        discover('topic')
+
+
+def test_invalid_publication_filter_is_reported_before_requests(monkeypatch):
+    def unexpected_request(*args,**kwargs):
+        pytest.fail('An invalid filter must not reach a provider')
+
+    monkeypatch.setattr('services.scholarly.urlopen',unexpected_request)
+    with pytest.raises(DiscoveryError,match='publication year'):
+        discover('topic',year='not a year')

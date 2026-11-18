@@ -7,7 +7,7 @@ import json
 import re
 from urllib.parse import urlencode, quote
 from urllib.request import Request, urlopen
-from services.papers import DiscoveryError, biomedical_ids, doi_url, safe_url
+from services.papers import DiscoveryError, biomedical_ids, doi_url, provider_records, safe_url
 
 
 def clean(value):
@@ -56,12 +56,14 @@ def crossref_record(work):
         paper['author_details'].append({'id':safe_url(author.get('ORCID')), 'name':name,
             'institutions':[{'id':None,'name':a.get('name'),'country_code':a.get('country')} for a in author.get('affiliation',[]) if a.get('name')]})
     for field in ('published', 'published-online', 'published-print'):
-        parts = (work.get(field) or {}).get('date-parts') or []
-        if parts and parts[0]:
-            candidate = '-'.join(str(p).zfill(4 if i==0 else 2) for i,p in enumerate(parts[0][:3]))
-            if published:=publication_date(candidate):
-                paper['publication_date'] = published
-                break
+        value = work.get(field)
+        parts = value.get('date-parts') if isinstance(value,dict) else None
+        if not isinstance(parts,list) or not parts or not isinstance(parts[0],list):
+            continue
+        candidate = '-'.join(str(p).zfill(4 if i==0 else 2) for i,p in enumerate(parts[0][:3]))
+        if published:=publication_date(candidate):
+            paper['publication_date'] = published
+            break
     paper['source_name'] = (work.get('container-title') or [None])[0]
     paper['paper_type'] = work.get('type')
     paper['keywords'] = work.get('subject') or []
@@ -126,7 +128,7 @@ def search_crossref(query, year=None):
     if year:
         params['filter'] = f'from-pub-date:{year}-01-01'
     data = get_json('https://api.crossref.org/works?'+urlencode(params))
-    return [p for w in data.get('message',{}).get('items',[]) if (p:=crossref_record(w))]
+    return provider_records(data,crossref_record,'message','items')
 
 
 def search_europe(query, year=None):
@@ -137,7 +139,7 @@ def search_europe(query, year=None):
         search += f' AND FIRST_PDATE:[{int(year)}-01-01 TO 3000-12-31]'
     params = {'query':search, 'format':'json', 'resultType':'core', 'pageSize':20}
     data = get_json('https://www.ebi.ac.uk/europepmc/webservices/rest/search?'+urlencode(params))
-    return [p for w in data.get('resultList',{}).get('result',[]) if (p:=europe_record(w))]
+    return provider_records(data,europe_record,'resultList','result')
 
 
 def _identifiers(paper):
@@ -237,6 +239,10 @@ def merge_records(records):
 def discover(query, year=None, api_key=None, extra_queries=()):
     if not query.strip() or len(query)>500:
         raise DiscoveryError('Use a short search phrase, up to 500 characters.')
+    if year is not None:
+        year = publication_date(year)
+        if not year or len(year)!=4:
+            raise DiscoveryError('Use a valid four-digit publication year.')
     phrases = list(dict.fromkeys([query.strip()]+[q.strip() for q in extra_queries if q.strip()]))[:2]
     results, notices, successful = [], [], []
     jobs = [(name, fn, q) for q in phrases for name,fn in [('Crossref',search_crossref),('Europe PMC',search_europe)]]
@@ -260,7 +266,7 @@ def discover(query, year=None, api_key=None, extra_queries=()):
         raise DiscoveryError('The paper services are temporarily unreachable. Try again, or load a saved real-paper search for rehearsal.')
     papers = merge_records(results)
     if year:
-        papers = [p for p in papers if p.get('publication_date') and int(p['publication_date'][:4]) >= int(year)]
+        papers = [p for p in papers if p.get('publication_date') and p['publication_date'][:4]>=year]
     for paper in papers:
         paper['search_notices'] = list(dict.fromkeys(notices))
         paper['search_sources'] = sorted(set(successful))

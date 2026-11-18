@@ -10,6 +10,50 @@ from urllib.error import HTTPError, URLError
 class DiscoveryError(Exception):
     pass
 
+
+def provider_records(payload, convert, *path):
+    """Parse a provider's result list without dropping valid sibling records."""
+    for field in path:
+        if not isinstance(payload,dict) or field not in payload:
+            raise DiscoveryError('The provider returned an invalid search response.')
+        payload=payload[field]
+    if not isinstance(payload,list):
+        raise DiscoveryError('The provider returned an invalid search response.')
+
+    records=[]
+    malformed=False
+    for row in payload:
+        if not isinstance(row,dict):
+            malformed=True
+            continue
+        try:
+            record=convert(row)
+        except (AttributeError,IndexError,KeyError,TypeError,ValueError):
+            malformed=True
+            continue
+        if record is None:
+            continue
+        if any(not isinstance(record.get(field),str) or not record[field].strip()
+                for field in ('id','title')):
+            malformed=True
+            continue
+        for field in ('keywords','topics'):
+            values=record.get(field)
+            if not isinstance(values,list):
+                values=[]
+            record[field]=[value for value in values if isinstance(value,str) and value.strip()]
+        for field in ('abstract','source_name','paper_type'):
+            if not isinstance(record.get(field),str):
+                record[field]=None
+        count=record.get('cited_by_count')
+        if type(count) is not int or count<0:
+            record['cited_by_count']=None
+        records.append(record)
+    if malformed and not records:
+        raise DiscoveryError('The provider returned malformed paper records.')
+    return records
+
+
 def safe_url(value):
     return value if isinstance(value, str) and urlparse(value).scheme in ('http', 'https') and urlparse(value).netloc else None
 
@@ -102,8 +146,7 @@ def search_openalex(query, year=None, api_key=None):
         raise DiscoveryError(message) from None
     except (URLError, TimeoutError, ValueError):
         raise DiscoveryError('Could not reach the paper service. Your question and focus are still here; try again.') from None
-    return [normalize(work) for work in payload.get('results',[])
-        if work.get('id') and work.get('title')]
+    return provider_records(payload,normalize,'results')
 
 
 def search_papers(query, year=None, api_key=None, extra_queries=()):
