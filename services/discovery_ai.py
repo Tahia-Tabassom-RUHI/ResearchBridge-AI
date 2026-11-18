@@ -7,6 +7,7 @@ from services.ranking import query_from_question, starter_directions
 
 DEFAULT_MODEL = 'gemini-2.5-flash-lite'
 DEFAULT_HF_MODEL = 'Qwen/Qwen3-4B-Thinking-2507'
+NUMBER_TOKEN = re.compile(r'(?<!\d)[+−-]?(?:(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?')
 
 class AIUnavailable(Exception):
     pass
@@ -131,8 +132,9 @@ def explain_abstract(paper, question, key, model=DEFAULT_MODEL, provider='gemini
         quote=' '.join(result['evidence_quote'].split())
         if quote not in ' '.join(abstract.split()):
             raise ValueError()
-        # Precise numbers must actually occur in the supplied text.
-        if any(number not in abstract for number in re.findall(r'\d+(?:\.\d+)?',result['orientation'])):
+        # Compare complete numbers, including any decimal or thousands separator.
+        abstract_numbers = set(NUMBER_TOKEN.findall(abstract))
+        if not abstract_numbers.issuperset(NUMBER_TOKEN.findall(result['orientation'])):
             raise ValueError()
         return result
     except (ValueError,KeyError,TypeError):

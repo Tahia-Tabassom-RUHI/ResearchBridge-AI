@@ -62,6 +62,74 @@ def test_abstract_requires_actual_evidence():
         api.assert_not_called()
 
 
+@pytest.mark.parametrize('reported,claimed,supported',[
+    ('120','20',False),
+    ('12.5','2.5',False),
+    ('20.5','20',False),
+    ('.5','5',False),
+    ('1,020','20',False),
+    ('120','120',True),
+    ('12.5','12.5',True),
+])
+def test_abstract_requires_complete_numeric_values(reported,claimed,supported):
+    paper={'title':'Title','abstract':f'The study involved {reported} participants.'}
+    response={'orientation':f'The study involved {claimed} participants.',
+        'evidence_quote':paper['abstract'],'reading_tip':'Look for the study method.'}
+    with patch('services.discovery_ai.generate_json',return_value=response):
+        if supported:
+            assert explain_abstract(paper,'question','key')==response
+        else:
+            with pytest.raises(AIUnavailable,match='evidence checks'):
+                explain_abstract(paper,'question','key')
+
+
+@pytest.mark.parametrize('legacy_enabled',[False,True])
+def test_server_token_requires_explicit_session_opt_in(monkeypatch,legacy_enabled):
+    from pathlib import Path
+    from streamlit.testing.v1 import AppTest
+
+    monkeypatch.setattr('screens.home.secret',
+        lambda name,default='': 'offline-test-token' if name=='HF_TOKEN' else default)
+    app=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py'))
+    if legacy_enabled:
+        app.session_state['ai_enabled']=True
+
+    def submit(question):
+        app.text_input(key='question').set_value(question).run()
+        next(b for b in app.button if b.label=='Turn into search').click().run()
+
+    def consent():
+        return next(box for box in app.checkbox if box.label=='Use live AI guidance')
+
+    with patch('screens.home.interpret_question',side_effect=lambda question,*args:guided_plan(question)) as ai:
+        app.run()
+        submit('How does memory work?')
+        ai.assert_not_called()
+        assert app.session_state['discovery_plan']['origin'].startswith('Guided')
+        assert 'hf_requests_used' not in app.session_state
+
+        app.button(key='rail_Settings').click().run()
+        assert consent().value is False
+        consent().check().run()
+        app.button(key='nav_close').click().run()
+        submit('How do plants grow?')
+        ai.assert_called_once()
+
+        app.button(key='rail_Settings').click().run()
+        assert consent().value is True
+        consent().uncheck().run()
+        app.button(key='nav_close').click().run()
+        submit('How do students learn?')
+        ai.assert_called_once()
+        assert app.session_state['hf_requests_used']==1
+
+        paper=crossref_record({'DOI':'10.1234/learning','title':['How students learn']})
+        with patch('screens.home.retrieve',return_value=[paper]):
+            next(b for b in app.button if b.label=='Find real papers →').click().run()
+        assert app.session_state['ui_step']=='Papers'
+        assert not app.exception
+
+
 def test_no_secret_in_url_and_no_hidden_extra_fields():
     class Reply:
         def __enter__(self):return self
@@ -169,7 +237,7 @@ def test_saved_real_search_is_labelled_and_secret_can_be_forgotten():
     app.text_input(key='gemini_session_key').input('test-key-never-a-real-secret').run()
     next(b for b in app.button if b.label=='Forget session key').click().run()
     assert app.text_input(key='gemini_session_key').value==''
-    assert not app.session_state['ai_enabled']
+    assert not next(box for box in app.checkbox if box.label=='Use live AI guidance').value
     assert not app.exception
 
 

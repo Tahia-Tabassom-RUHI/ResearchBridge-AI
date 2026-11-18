@@ -94,7 +94,7 @@ def retrieve_background(query):
 def forget_session_key():
     st.session_state.gemini_session_key=''
     st.session_state.hf_session_key=''
-    st.session_state.ai_enabled=False
+    st.session_state.ai_guidance_opt_in=False
 
 
 def combined_direction_query(plan, selected, fallback):
@@ -420,7 +420,7 @@ def sidebar():
     gemini_key=st.session_state.get('gemini_session_key','') or secret('GEMINI_API_KEY')
     ai_key=hf_key if provider=='Hugging Face' else gemini_key
     model=secret('HF_MODEL',DEFAULT_HF_MODEL) if provider=='Hugging Face' else secret('GEMINI_MODEL',DEFAULT_MODEL)
-    enabled=st.session_state.get('ai_enabled',bool(ai_key))
+    enabled=st.session_state.get('ai_guidance_opt_in',False)
     if st.session_state.nav_panel_open:
         with st.container(key='nav_panel'):
             heading,close=st.columns([5,1],vertical_alignment='center')
@@ -462,7 +462,7 @@ def sidebar():
                 gemini_key=st.text_input('Gemini key (this session only)',type='password',key='gemini_session_key') or secret('GEMINI_API_KEY')
                 ai_key=hf_key if provider=='Hugging Face' else gemini_key
                 model=secret('HF_MODEL',DEFAULT_HF_MODEL) if provider=='Hugging Face' else secret('GEMINI_MODEL',DEFAULT_MODEL)
-                enabled=st.checkbox('Use live AI guidance',value=bool(ai_key),key='ai_enabled')
+                enabled=st.checkbox('Use live AI guidance',key='ai_guidance_opt_in')
                 if provider=='Hugging Face':
                     st.link_button('Get a free Hugging Face token ↗','https://huggingface.co/settings/tokens')
                     st.caption(f"Free account credits · {max(0,2-st.session_state.get('hf_requests_used',0))} demo calls left")
@@ -747,7 +747,7 @@ def render():
     if error:=st.session_state.get('vault_error'):
         st.error(error)
     # Keep editable values when Streamlit removes widgets on inactive steps.
-    for key in ('question','query','plan_direction','year_filter','paper_goal','board_mode','map_view','map_topic','gemini_session_key','hf_session_key','ai_provider','ai_enabled'):
+    for key in ('question','query','plan_direction','year_filter','paper_goal','board_mode','map_view','map_topic','gemini_session_key','hf_session_key','ai_provider','ai_guidance_opt_in'):
         if key in st.session_state:
             st.session_state[key]=st.session_state[key]
     st.session_state.setdefault('ui_step','Question')
