@@ -30,16 +30,29 @@ def load_retrieved_paper(record: dict) -> None:
     errors = validate_paper_input(record.get("title"), record.get("abstract"))
     if errors:
         raise ValueError(errors[0])
-    state = _new_reader_state()
-    state["paper"] = Paper(
-        id=record["id"], title=record["title"], abstract=record["abstract"],
-        authors=record.get("authors"), doi=record.get("doi"),
-        publication_date=record.get("publication_date"),
-        source_name=record.get("source_name"), paper_url=record.get("paper_url"),
-        oa_url=record.get("oa_url"), paper_type=record.get("paper_type"),
-        is_retracted=record.get("is_retracted"),
-        retrieved_at=record.get("retrieved_at"), provenance=record.get("provenance"),
-    )
+    current = st.session_state.get("paper_reader")
+    current_paper = current["paper"] if current else None
+    paper_id = record["id"]
+    if current_paper and current_paper.id == paper_id:
+        return
+
+    # Keep inactive retrieved papers separate from the active reader so Reset
+    # can discard the open paper without affecting work on other papers.
+    inactive = st.session_state.setdefault("paper_reader_inactive", {})
+    state = inactive.pop(paper_id, None)
+    if state is None:
+        state = _new_reader_state()
+        state["paper"] = Paper(
+            id=paper_id, title=record["title"], abstract=record["abstract"],
+            authors=record.get("authors"), doi=record.get("doi"),
+            publication_date=record.get("publication_date"),
+            source_name=record.get("source_name"), paper_url=record.get("paper_url"),
+            oa_url=record.get("oa_url"), paper_type=record.get("paper_type"),
+            is_retracted=record.get("is_retracted"),
+            retrieved_at=record.get("retrieved_at"), provenance=record.get("provenance"),
+        )
+    if current_paper and not current_paper.id.startswith("manual:"):
+        inactive[current_paper.id] = current
     st.session_state["paper_reader"] = state
     for key in list(st.session_state):
         if key.startswith("_paper_reader_"):

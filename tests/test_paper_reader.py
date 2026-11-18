@@ -255,7 +255,7 @@ def test_explicit_reset_clears_only_reader_and_allows_a_new_paper():
     assert app.session_state["paper_reader"]["saved_reflections"] is None
 
 
-def test_imported_renderer_and_app_navigation_preserve_existing_flows():
+def test_imported_renderer_and_app_navigation_preserve_existing_flows(monkeypatch):
     imported = AppTest.from_string(
         "from screens.paper_reader import render_paper_reader\nrender_paper_reader()"
     ).run(timeout=15)
@@ -263,12 +263,14 @@ def test_imported_renderer_and_app_navigation_preserve_existing_flows():
     assert imported.title[0].value == "Guided Research Paper Reading"
     from unittest.mock import patch
     from services.papers import normalize
+    monkeypatch.setattr("screens.home.secret", lambda name, default="": default)
     paper = normalize({'id':'https://openalex.org/W123','title':TITLE})
     paper['abstract'] = ABSTRACT
+    other = {**paper, "id": "https://openalex.org/W456"}
     app = AppTest.from_file(str(ROOT / "app.py")).run(timeout=15)
     app.text_input(key='question').input('classroom reading exercise').run()
     _button(app, 'Turn into search').click().run()
-    with patch('screens.home.retrieve', return_value=[paper]):
+    with patch('screens.home.retrieve', return_value=[paper, other]):
         _button(app, 'Find real papers →').click().run()
     _button(app, '◉ Preview').click().run()
     _button(app, 'Open reading mode ⤢').click().run()
@@ -281,4 +283,30 @@ def test_imported_renderer_and_app_navigation_preserve_existing_flows():
     saved = deepcopy(app.session_state['paper_reader']['saved_reflections'])
     _button(app, '← Back to paper').click().run()
     assert app.session_state['paper_reader']['saved_reflections'] == saved
+    _button(app, 'Learn this paper →').click().run()
+    assert app.session_state['paper_reader']['saved_reflections'] == saved
+    assert _widget(app, 'research_problem', 'answer').value == 'Keep this reflection'
+
+    _button(app, '← Back to paper').click().run()
+    _button(app, '← Back to papers').click().run()
+    app.button(key='reading_preview_1').click().run()
+    _button(app, 'Open reading mode ⤢').click().run()
+    _button(app, 'Learn this paper →').click().run()
+    assert app.session_state['paper_reader']['paper'].id == other['id']
+    assert app.session_state['paper_reader']['saved_reflections'] is None
+    assert _widget(app, 'research_problem', 'answer').value == ''
+
+    _button(app, '← Back to paper').click().run()
+    _button(app, '← Back to papers').click().run()
+    app.button(key='reading_preview_0').click().run()
+    _button(app, 'Open reading mode ⤢').click().run()
+    _button(app, 'Learn this paper →').click().run()
+    assert app.session_state['paper_reader']['saved_reflections'] == saved
+    assert _widget(app, 'research_problem', 'answer').value == 'Keep this reflection'
+
+    _button(app, 'Start Another Paper / Reset').click().run()
+    _button(app, '← Back to paper').click().run()
+    _button(app, 'Learn this paper →').click().run()
+    assert app.session_state['paper_reader']['saved_reflections'] is None
+    assert _widget(app, 'research_problem', 'answer').value == ''
     assert not app.exception
