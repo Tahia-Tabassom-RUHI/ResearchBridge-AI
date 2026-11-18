@@ -1,4 +1,5 @@
 """Small private local store for study sets, keyed by an unguessable URL token."""
+from contextlib import closing
 import json
 import os
 from pathlib import Path
@@ -9,6 +10,11 @@ import sqlite3
 
 DEFAULT_DB=Path(__file__).resolve().parents[1]/'.researchbridge'/'vaults.sqlite3'
 TOKEN=re.compile(r'^[A-Za-z0-9_-]{20,64}$')
+MAX_VAULT_SIZE=8_000_000
+
+
+class VaultError(Exception):
+    """An operation could not safely read or save the vault."""
 
 
 def valid_token(value):
@@ -37,22 +43,47 @@ def load_vault(token,path=None):
     if not valid_token(token):
         return None
     try:
-        with _connect(_path(path)) as connection:
-            row=connection.execute('SELECT data FROM vaults WHERE id=?',(token,)).fetchone()
-        return json.loads(row[0]) if row else None
-    except (OSError,sqlite3.Error,ValueError,TypeError):
+        with closing(_connect(_path(path))) as connection:
+            return _read(connection,token)
+    except (OSError,sqlite3.Error,ValueError,TypeError) as exc:
+        raise VaultError('Vault storage could not be read. Reload the page to retry.') from exc
+
+
+def _read(connection,token):
+    row=connection.execute('SELECT data FROM vaults WHERE id=?',(token,)).fetchone()
+    if row is None:
         return None
+    data=json.loads(row[0])
+    if not isinstance(data,dict):
+        raise ValueError('Invalid vault data')
+    return data
+
+
+def update_vault(token,update,path=None):
+    """Read and update under one SQLite write transaction."""
+    if not valid_token(token):
+        raise VaultError('The Vault link is invalid. Reload the page to retry.')
+    try:
+        with closing(_connect(_path(path))) as connection, connection:
+            connection.execute('BEGIN IMMEDIATE')
+            current=_read(connection,token)
+            data=update(current)
+            if data!=current:
+                text=json.dumps(data,ensure_ascii=False,separators=(',',':'))
+                if len(text)>MAX_VAULT_SIZE:
+                    raise VaultError('Vault storage limit reached. Remove saved items or study sets and try again.')
+                connection.execute(
+                    'INSERT INTO vaults(id,data) VALUES (?,?) ON CONFLICT(id) DO UPDATE SET data=excluded.data',
+                    (token,text),
+                )
+        return data
+    except (OSError,sqlite3.Error,ValueError,TypeError) as exc:
+        raise VaultError('Vault storage is unavailable. Try again.') from exc
 
 
 def save_vault(token,data,path=None):
-    if not valid_token(token):
-        return False
     try:
-        text=json.dumps(data,ensure_ascii=False,separators=(',',':'))
-        if len(text)>8_000_000:
-            return False
-        with _connect(_path(path)) as connection:
-            connection.execute('INSERT OR REPLACE INTO vaults(id,data) VALUES (?,?)',(token,text))
+        update_vault(token,lambda current:data,path)
         return True
-    except (OSError,sqlite3.Error,ValueError,TypeError):
+    except VaultError:
         return False

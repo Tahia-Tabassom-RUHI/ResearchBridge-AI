@@ -45,7 +45,7 @@ def add_to_reading(item):
     if item['id'] not in ids:
         ids.append(item['id'])
     st.session_state.setdefault('saved_papers',{})[item['id']]=item
-    persist_vault()
+    persist_vault(added_item_id=item['id'])
 
 
 def remove_from_reading(item):

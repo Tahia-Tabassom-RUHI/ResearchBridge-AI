@@ -162,6 +162,7 @@ def load_results(query, year_value, year_label, openalex_key, extra_queries=()):
     st.session_state.pop('selected_paper',None)
     if st.session_state.get('selected_directions'):
         save_current_combo()
+        return papers
     active=st.session_state.get('active_combo_id')
     combos=st.session_state.get('saved_combos',[])
     if (isinstance(active,int) and 0<=active<len(combos)
@@ -212,22 +213,23 @@ def rename_combo(index):
     name=st.session_state.get(f'combo_name_{index}','').strip()[:75]
     if name:
         st.session_state.saved_combos[index]['name']=name
-        st.session_state.edit_combo_index=None
-        persist_vault()
+        if persist_vault():
+            st.session_state.edit_combo_index=None
 
 
 def remove_combo(index):
     combos=st.session_state.saved_combos
-    st.session_state.deleted_combo={'index':index,'combo':combos.pop(index),
+    deleted={'index':index,'combo':combos.pop(index),
         'was_active':st.session_state.get('active_combo_id')==index}
     active=st.session_state.get('active_combo_id')
     if isinstance(active,int):
         st.session_state.active_combo_id=None if active==index else active-1 if active>index else active
-    persist_vault()
+    if persist_vault():
+        st.session_state.deleted_combo=deleted
 
 
 def undo_remove_combo():
-    deleted=st.session_state.pop('deleted_combo',None)
+    deleted=st.session_state.get('deleted_combo')
     if not deleted:
         return
     index=min(deleted['index'],len(st.session_state.saved_combos))
@@ -237,12 +239,16 @@ def undo_remove_combo():
         st.session_state.active_combo_id=index
     elif isinstance(active,int) and active>=index:
         st.session_state.active_combo_id=active+1
-    persist_vault()
+    if persist_vault():
+        st.session_state.pop('deleted_combo',None)
 
 
 def open_combo(index):
     combo=st.session_state.saved_combos[index]
-    st.session_state.update(active_combo_id=index,topic=combo['topic'],question=combo['topic'],
+    st.session_state.active_combo_id=index
+    if not persist_vault():
+        return False
+    st.session_state.update(topic=combo['topic'],question=combo['topic'],
         discovery_plan=combo['plan'],selected_directions=list(combo['selected']),query=combo['query'],
         year_filter=combo['year_filter'],result_page=0,paper_view='Papers',last_selected_direction=None,
         discovery_sample=combo.get('sample'))
@@ -255,7 +261,7 @@ def open_combo(index):
             st.session_state.pop(key,None)
         st.session_state.ui_step='Direction'
     st.session_state.nav_panel_open=False
-    persist_vault()
+    return True
 
 
 def render_combo_tray():
@@ -280,13 +286,13 @@ def render_combo_tray():
         if st.session_state.get('edit_combo_index')==index:
             st.text_input('Study set name',value=combo['name'],key=f'combo_name_{index}',max_chars=75)
             st.button('Save name',key=f'combo_rename_{index}',on_click=rename_combo,args=(index,))
-    st.caption('Bookmark this page to return to your saved study sets.' if st.session_state.get('vault_saved',True)
-        else 'Local vault storage is unavailable. Keep this app session open.')
+    if st.session_state.get('vault_saved',True):
+        st.caption('Bookmark this page to return to your saved study sets.')
 
 
 def open_combo_reading(index):
-    open_combo(index)
-    st.session_state.ui_step='Combo reading'
+    if open_combo(index):
+        st.session_state.ui_step='Combo reading'
 
 
 def page_combo_reading(ai_key='',enabled=False,model='',provider='huggingface'):
@@ -738,6 +744,8 @@ def page_sources():
 
 def render():
     initialize_vault()
+    if error:=st.session_state.get('vault_error'):
+        st.error(error)
     # Keep editable values when Streamlit removes widgets on inactive steps.
     for key in ('question','query','plan_direction','year_filter','paper_goal','board_mode','map_view','map_topic','gemini_session_key','hf_session_key','ai_provider','ai_enabled'):
         if key in st.session_state:
