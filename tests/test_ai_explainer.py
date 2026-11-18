@@ -336,3 +336,54 @@ def test_success_with_reported_exhaustion_prevents_other_sessions_spending_a_req
     assert second.pack is None
     assert second.attempts[0].kind == "cooldown"
     transport.assert_called_once()
+
+def test_selected_paper_read_and_learn_requires_consent_and_an_explicit_ai_click(
+    monkeypatch, transport
+):
+    from pathlib import Path
+    from streamlit.testing.v1 import AppTest
+
+    paper = {"id": "coach-fixture", "title": TITLE, "abstract": ABSTRACT}
+    monkeypatch.setattr("screens.home.coach_configs", lambda: [CF])
+    monkeypatch.setattr("screens.home.secret", lambda name, default="": default)
+    app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "app.py"))
+    app.session_state["ui_step"] = "Read paper"
+    app.session_state["reader_origin"] = "My Library"
+    app.session_state["reader_id"] = paper["id"]
+    app.session_state["reading_catalog"] = {paper["id"]: paper}
+    app.session_state["saved_papers"] = {paper["id"]: paper}
+    app.run()
+    assert any(tab.label == "Read & Learn" for tab in app.tabs)
+    assert all(button.key != "explain_coach-fixture" for button in app.button)
+    transport.assert_not_called()
+
+    app.button(key="check_coach-fixture").click().run()
+    assert TITLE in [item.value for item in app.subheader]
+    assert ABSTRACT in [item.value for item in app.text]
+    next(b for b in app.button if b.label == "Skip assessment").click().run()
+    assert "Beginner learning cards" in [item.value for item in app.subheader]
+    next(b for b in app.button if b.label == "← Back to paper").click().run()
+    app.button(key="learn_coach-fixture").click().run()
+    reader_paper = app.session_state["paper_reader"]["paper"]
+    assert (reader_paper.id, reader_paper.title, reader_paper.abstract) == (
+        paper["id"], TITLE, ABSTRACT,
+    )
+    next(b for b in app.button if b.label == "← Back to paper").click().run()
+
+    app.button(key="rail_Settings").click().run()
+    app.checkbox(key="ai_guidance_opt_in").check().run()
+    transport.assert_not_called()
+    app.sidebar.button(key="rail_workspace").click().run()
+    app.button(key="workspace_open_coach-fixture").click().run()
+    assert "AI Guided Learning" in [item.value for item in app.subheader]
+    transport.assert_not_called()
+    app.button(key="explain_coach-fixture").click().run()
+    transport.assert_called_once()
+    payload = transport.call_args.args[2]
+    assert json.loads(payload["messages"][1]["content"]) == {"title": TITLE, "abstract": ABSTRACT}
+    assert {f"**{title}**" for title in ai.CARD_TITLES.values()} <= {
+        item.value for item in app.markdown
+    }
+    app.run()
+    assert not app.exception
+    transport.assert_called_once()

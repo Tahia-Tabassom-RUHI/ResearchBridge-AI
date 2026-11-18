@@ -6,7 +6,7 @@ from services.vault_store import VaultError, load_vault, new_token, update_vault
 
 
 VAULT_DEFAULTS=dict(saved_combos=[],saved_papers={},loose_reading_ids=[],
-    active_combo_id=None,light_mode=False)
+    active_combo_id=None,light_mode=False,folders={},paper_folders={},reading_status={})
 CONFLICT_MESSAGE='The Vault changed in another session. Reload this page, then retry your edit.'
 
 
@@ -85,9 +85,9 @@ def _add_to_latest(latest,baseline,candidate,item_id):
     return latest
 
 
-def persist_vault(*,added_item_id=None):
+def persist_vault(*,added_item_id=None,fields=VAULT_DEFAULTS):
     baseline=st.session_state['vault_baseline']
-    candidate={**baseline,**_session_data()}
+    candidate={**baseline,**{key:st.session_state.get(key,VAULT_DEFAULTS[key]) for key in fields}}
 
     def update(latest):
         if latest==baseline:
@@ -105,13 +105,15 @@ def persist_vault(*,added_item_id=None):
         return False
     st.session_state.vault_baseline=deepcopy(saved)
     if saved is not candidate:
-        _apply(saved,('saved_combos','saved_papers','loose_reading_ids'))
+        _apply(saved,('saved_combos','saved_papers','loose_reading_ids','folders','paper_folders','reading_status'))
     st.session_state.pop('vault_error',None)
     st.session_state.vault_saved=True
     return True
 
 
 def remove_item_everywhere(item_id):
+    st.session_state.get('paper_folders',{}).pop(item_id,None)
+    st.session_state.get('reading_status',{}).pop(item_id,None)
     st.session_state.get('saved_papers',{}).pop(item_id,None)
     for combo in st.session_state.get('saved_combos',[]):
         combo['reading_ids']=[value for value in combo.get('reading_ids',[]) if value!=item_id]

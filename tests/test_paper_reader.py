@@ -381,7 +381,7 @@ def test_imported_renderer_and_app_navigation_preserve_existing_flows(monkeypatc
         _button(app, 'Find real papers →').click().run()
     _button(app, '◉ Preview').click().run()
     _button(app, 'Open reading mode ⤢').click().run()
-    _button(app, 'Learn this paper →').click().run()
+    _button(app, 'Guided Reading & Reflections').click().run()
     assert not app.exception
     assert app.session_state['ui_step'] == 'Guided reading'
     loaded = app.session_state['paper_reader']['paper']
@@ -395,7 +395,7 @@ def test_imported_renderer_and_app_navigation_preserve_existing_flows(monkeypatc
     saved = deepcopy(app.session_state['paper_reader']['saved_reflections'])
     _button(app, '← Back to paper').click().run()
     assert app.session_state['paper_reader']['saved_reflections'] == saved
-    _button(app, 'Learn this paper →').click().run()
+    _button(app, 'Guided Reading & Reflections').click().run()
     assert app.session_state['paper_reader']['saved_reflections'] == saved
     assert _widget(app, 'research_problem', 'answer').value == 'Keep this reflection'
 
@@ -403,7 +403,7 @@ def test_imported_renderer_and_app_navigation_preserve_existing_flows(monkeypatc
     _button(app, '← Back to papers').click().run()
     app.button(key='reading_preview_1').click().run()
     _button(app, 'Open reading mode ⤢').click().run()
-    _button(app, 'Learn this paper →').click().run()
+    _button(app, 'Guided Reading & Reflections').click().run()
     assert app.session_state['paper_reader']['paper'].id == other['id']
     assert app.session_state['paper_reader']['saved_reflections'] is None
     assert _widget(app, 'research_problem', 'answer').value == ''
@@ -412,13 +412,13 @@ def test_imported_renderer_and_app_navigation_preserve_existing_flows(monkeypatc
     _button(app, '← Back to papers').click().run()
     app.button(key='reading_preview_0').click().run()
     _button(app, 'Open reading mode ⤢').click().run()
-    _button(app, 'Learn this paper →').click().run()
+    _button(app, 'Guided Reading & Reflections').click().run()
     assert app.session_state['paper_reader']['saved_reflections'] == saved
     assert _widget(app, 'research_problem', 'answer').value == 'Keep this reflection'
 
     _button(app, 'Start Another Paper / Reset').click().run()
     _button(app, '← Back to paper').click().run()
-    _button(app, 'Learn this paper →').click().run()
+    _button(app, 'Guided Reading & Reflections').click().run()
     assert app.session_state['paper_reader']['saved_reflections'] is None
     assert _widget(app, 'research_problem', 'answer').value == ''
     assert not app.exception

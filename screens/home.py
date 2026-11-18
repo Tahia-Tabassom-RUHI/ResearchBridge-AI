@@ -1,5 +1,6 @@
 """Beginner-first discovery: express a question, choose a direction, open real research."""
 import os
+from pathlib import Path
 from urllib.parse import urlencode
 import streamlit as st
 from services.papers import DiscoveryError, is_retracted_or_notice, search_papers, safe_url
@@ -9,11 +10,14 @@ from components.paper_card import paper_card
 from components.bubble_board import combination_board
 from components.reading_workspace import reading_workspace
 from services.demo_map import demo_papers
-from screens.paper_reader import load_retrieved_paper, render_paper_reader
+from screens.library import library_sidebar, render_library
+from services.library import catalog as library_catalog, open_library
+from screens.paper_reader import load_retrieved_paper, open_manual_reader, render_paper_reader
 from services.ai_explainer import CARD_TITLES, generate_explanations, load_provider_configs
+from services.paper_reader import validate_paper_input
 from services.topic_signals import topic_signals, expand_directions_from_sample
 from services.background_articles import search_background_articles
-from screens.discovery_workspace import render_discovery_workspace, add_to_reading, remove_from_reading, reading_ids
+from screens.discovery_workspace import choose_reader, render_discovery_workspace, save_actions
 from services.vault_session import initialize_vault, persist_vault
 
 MAX_COMBOS=30
@@ -298,7 +302,6 @@ def open_combo_reading(index):
 
 
 def page_combo_reading(ai_key='',enabled=False,model='',provider='huggingface'):
-    from screens.discovery_workspace import choose_reader
     index=st.session_state.get('active_combo_id')
     combos=st.session_state.get('saved_combos',[])
     if not isinstance(index,int) or index>=len(combos):
@@ -307,7 +310,7 @@ def page_combo_reading(ai_key='',enabled=False,model='',provider='huggingface'):
     combo=combos[index]
     st.header(combo['name'])
     with st.container(horizontal=True):
-        st.button('← Vault',on_click=go,args=('Vault',))
+        st.button('← Previous research',on_click=go,args=('Vault',))
         st.button('Find more',on_click=open_combo,args=(index,))
     catalog={p['id']:p for p in [*combo.get('papers',[]),*combo.get('articles',[])]}
     catalog.update(st.session_state.get('saved_papers',{}))
@@ -341,6 +344,7 @@ def page_combo_reading(ai_key='',enabled=False,model='',provider='huggingface'):
 
         with coach:
             st.session_state.reader_id=paper['id']
+            st.session_state.reader_origin='Papers'
             st.session_state.setdefault('reading_catalog',{})[paper['id']]=paper
             page_reader(ai_key,enabled,model,provider)
         with foundations:
@@ -349,12 +353,13 @@ def page_combo_reading(ai_key='',enabled=False,model='',provider='huggingface'):
 
 
 def page_vault():
-    st.header('Vault')
+    st.header('Previous research')
+    st.button('← Discover Papers', on_click=go, args=('Question',))
     combos=st.session_state.get('saved_combos',[])
     if not combos:
-        st.caption('No saved combinations.')
+        st.caption('Save a search from Search topics to return to it here.')
         return
-    rows=[{'Combination':c['name'],'Topics':' + '.join(c.get('selected',[])),
+    rows=[{'Saved search':c['name'],'Topics':' + '.join(c.get('selected',[])),
         'Results':len(c.get('papers',[])), 'Reading list':len(c.get('reading_ids',[]))} for c in combos]
     import streamlit.components.v1 as components
     from pathlib import Path
@@ -370,7 +375,7 @@ def page_vault():
     if selected:
         index=selected[0]
         with st.container(horizontal=True):
-            st.button('Open study set',on_click=open_combo_reading,args=(index,),key='vault_open')
+            st.button('Open saved research',on_click=open_combo_reading,args=(index,),key='vault_open')
             with st.popover('Rename'):
                 st.text_input('Name',value=combos[index]['name'],key=f'combo_name_{index}',max_chars=75)
                 st.button('Save',on_click=rename_combo,args=(index,))
@@ -379,7 +384,7 @@ def page_vault():
         st.button('Undo remove',on_click=undo_remove_combo)
 
 
-STEPS = ['Question', 'Direction', 'Papers', 'Saved', 'Sources']
+STEPS = ['Question', 'Direction', 'Papers', 'My Library', 'Sources']
 
 
 def go(step):
@@ -389,8 +394,20 @@ def go(step):
 def open_nav(step):
     st.session_state.nav_panel_open=step in ('Settings',) and not (st.session_state.get('nav_panel_open') and st.session_state.get('nav_panel_step')==step)
     st.session_state.nav_panel_step=step
-    if step in STEPS or step=='Vault':
+    if step in STEPS:
         st.session_state.ui_step=step
+
+
+def open_workspaces():
+    st.session_state.nav_panel_open = False
+    go('Workspaces')
+
+
+def open_knowledge_check(paper=None, lessons_only=False):
+    st.session_state.knowledge_check_paper = paper
+    st.session_state.knowledge_lessons_only = lessons_only
+    st.session_state.nav_panel_open = False
+    go('Knowledge check')
 
 
 def close_nav():
@@ -407,17 +424,31 @@ def sidebar():
     st.session_state.setdefault('nav_panel_step','Question')
     with st.sidebar:
         st.subheader('ResearchBridge')
-        for name,label in (
-            ('Question','Research question'),('Direction','Search topics'),('Papers','Paper results'),
-            ('Vault','Vault · Study sets'),('Sources','Sources & transparency'),
-        ):
-            st.button(label,key='rail_'+name,width='stretch',
-                type='primary' if st.session_state.ui_step==name else 'secondary',
-                disabled=(name=='Papers' and not st.session_state.get('papers'))
-                    or (name=='Direction' and 'discovery_plan' not in st.session_state),
-                on_click=open_nav,args=(name,))
-        st.button('Settings',key='rail_Settings',width='stretch',
-            on_click=open_nav,args=('Settings',))
+        step = st.session_state.ui_step
+        settings = st.session_state.nav_panel_open
+        workspace = step in ('Workspaces', 'Workspace picker', 'Learning Workspace') or (
+            step in ('Read paper', 'Guided reading', 'Knowledge check')
+            and st.session_state.get('reader_origin') == 'Workspace'
+        )
+        reading = step in ('Read paper', 'Guided reading') and not workspace
+        personal_abstract = step == 'Guided reading' and st.session_state.get('guided_standalone')
+        library = step in ('My Library', 'Saved') or (reading and
+            (personal_abstract or st.session_state.get('reader_origin') == 'My Library'))
+        discover = step in ('Question','Direction','Papers','Vault','Combo reading') or (reading and not library)
+        def nav_style(active):
+            return 'primary' if active and not settings else 'tertiary'
+        st.button('Discover Papers', key='rail_Question', icon=':material/search:', type=nav_style(discover),
+                  on_click=open_nav, args=('Question',), width='stretch')
+        st.button('My Library', key='rail_My Library', icon=':material/local_library:', type=nav_style(library),
+                  on_click=open_library, width='stretch')
+        with st.container(key='library_tree', gap=None):
+            library_sidebar()
+        st.button('Workspace', key='rail_workspace', icon=':material/school:',
+                  type=nav_style(workspace), on_click=open_workspaces, width='stretch')
+        st.button('Sources & Transparency', key='rail_Sources', icon=':material/policy:', type=nav_style(step=='Sources'),
+                  on_click=open_nav, args=('Sources',), width='stretch')
+        st.button('Settings', key='rail_Settings', icon=':material/settings:',
+                  type='primary' if settings else 'tertiary', width='stretch', on_click=open_nav,args=('Settings',))
     provider=st.session_state.get('ai_provider','Hugging Face')
     hf_key=st.session_state.get('hf_session_key','') or secret('HF_TOKEN')
     gemini_key=st.session_state.get('gemini_session_key','') or secret('GEMINI_API_KEY')
@@ -429,8 +460,7 @@ def sidebar():
             st.subheader('Settings')
             st.button('Close settings',key='nav_close',on_click=close_nav)
             with st.expander('Learning tools'):
-                st.button('Knowledge check & learning cards',on_click=go,args=('Knowledge check',))
-                st.button('Guided reader · paste an abstract',on_click=go,args=('Guided reading',))
+                st.button('Knowledge check & learning cards',on_click=open_knowledge_check)
             st.toggle('Light mode',key='light_mode',on_change=persist_vault)
             with st.expander('AI connection'):
                 provider=st.selectbox('Provider', ['Hugging Face','Gemini'], key='ai_provider')
@@ -489,14 +519,14 @@ def page_question(ai_key,enabled,model,provider):
         st.session_state.update(topic=question,research_goal='Help me start',discovery_plan=plan,
             query=query_from_question(question),ui_step='Direction',result_page=0,
             selected_directions=[],active_combo_id=None,discovery_sample=sample,last_selected_direction=None)
-        for name in ('plan_direction','papers','weights','searched_query','selected_paper','abstract_help','map_selected','reader_id','search_failure'):
+        for name in ('plan_direction','papers','weights','searched_query','selected_paper','abstract_help','map_selected','reader_id','reader_origin','search_failure'):
             st.session_state.pop(name,None)
         st.rerun()
 
 
 def page_direction(openalex_key,ai_key='',enabled=False,model='',provider='huggingface'):
     plan=st.session_state.discovery_plan
-    st.header('Topic workspace')
+    st.header('Explore your question')
     if st.session_state.pop('ai_notice', None):
         st.caption('Showing guided suggestions. You can edit the search.')
     with st.container(horizontal=True, key='topic_tools', vertical_alignment='center', gap='small'):
@@ -509,7 +539,7 @@ def page_direction(openalex_key,ai_key='',enabled=False,model='',provider='huggi
             year = st.selectbox('Publication window', ['Any year', 'Since 2024', 'Since 2020', 'Since 2015'], key='year_filter')
             if query.strip():
                 st.link_button('Web search ↗', 'https://www.google.com/search?'+urlencode({'q': query}))
-        st.button('Save study set',key='save_combo',on_click=save_current_combo,
+        st.button('Save search',key='save_combo',on_click=save_current_combo,
             disabled=not bool(st.session_state.get('selected_directions')),width='content')
         search_now=st.button('Find real papers →',type='primary',disabled=not query.strip(),width='content')
     st.caption(query)
@@ -570,25 +600,49 @@ def set_result_page(page):
     st.session_state.result_page=page
 
 
+def current_reader_paper(prefer_catalog):
+    reader_id=st.session_state.get('reader_id')
+    catalog=st.session_state.get('reading_catalog',{})
+    paper=catalog.get(reader_id) if prefer_catalog else next(
+        (p for p in st.session_state.get('papers',[]) if p['id']==reader_id),None)
+    if paper is None:
+        paper=st.session_state.get('saved_papers',{}).get(reader_id)
+    if paper is None:
+        paper=catalog.get(reader_id)
+    return paper
+
+
 def page_reader(ai_key,enabled,model,provider):
-    paper=next((p for p in st.session_state.get('papers',[]) if p['id']==st.session_state.get('reader_id')),None)
+    standalone = st.session_state.ui_step == 'Read paper'
+    origin = st.session_state.get('reader_origin')
+    from_library = standalone and origin == 'My Library'
+    from_workspace = standalone and origin == 'Workspace'
+    back_step = 'My Library' if from_library else 'Papers'
+    back_label = '← Back to My Library' if from_library else '← Back to papers'
+    paper = current_reader_paper(from_library or from_workspace)
+    if standalone:
+        with st.container(horizontal=True):
+            if not from_workspace:
+                st.button(back_label, on_click=go, args=(back_step,))
+            st.button('← Back to Workspaces', on_click=open_workspaces)
+            st.button('+ Add Paper', on_click=open_workspace_picker, args=('Read paper',))
+    else:
+        st.button(back_label, on_click=go, args=(back_step,))
     if paper is None:
-        paper=st.session_state.get('saved_papers',{}).get(st.session_state.get('reader_id'))
-    if paper is None:
-        paper=st.session_state.get('reading_catalog',{}).get(st.session_state.get('reader_id'))
-    if paper is None:
-        st.info('Choose a paper from your results or reading tray.')
-        st.button('Back to papers',on_click=go,args=('Papers',))
+        st.info('Choose a paper from your results or My Library.')
         return
-    is_background=paper.get('paper_type')=='Background article'
-    is_source_link=paper.get('paper_type')=='Source link'
-    st.button('← Back to papers',on_click=go,args=('Papers',))
+    is_background = paper.get('paper_type') == 'Background article'
+    is_source_link = paper.get('paper_type') == 'Source link'
     st.subheader(paper['title'])
-    st.caption(' · '.join(filter(None,[paper.get('publication_date'),paper.get('source_name')])))
+    if from_workspace:
+        workspace_paper_details(paper)
+    else:
+        st.caption(' · '.join(filter(None,[paper.get('publication_date'),paper.get('source_name')])))
     if is_background:
         st.caption('Text: Wikipedia contributors · CC BY-SA 4.0. Original page links to its authors and history.')
     workspace_tab,abstract_tab,help_tab,details_tab,source_tab=st.tabs(
-        ['Workspace','Abstract','Simple explanation','Source details','Original page'])
+        ['Workspace','Abstract','Read & Learn','Source details','Original page'],
+        default='Read & Learn' if from_workspace else 'Workspace')
     with workspace_tab:
         st.caption(('Read this background article, group items, connect notes, and draw.' if is_background else
             'Read the retrieved abstract, group saved items, connect notes, and draw. The full paper opens at its source.'))
@@ -599,109 +653,168 @@ def page_reader(ai_key,enabled,model,provider):
         with st.container(height=330,border=True):
             st.write(paper.get('abstract') or 'Abstract unavailable. Open the original source to inspect the paper.')
     with help_tab:
-        configs=coach_configs()
-        team_ai_ready=any(config.free_plan_confirmed for config in configs)
         if is_background or is_source_link:
             st.info('This item helps you explore. The research paper explanation is available on research records.')
         else:
-          if paper.get('abstract'):
-            st.caption('Free reading guide · based on the abstract text')
-            for prompt in ('What question are the authors investigating?', 'How did they study it?', 'Which result is actually stated?'):
-                st.write('• '+prompt)
-            st.caption('Use “Learn this paper” below to save your own answers.')
-          if not paper.get('abstract'):
-            st.info('An abstract is needed before we can explain it.')
-          elif not team_ai_ready and (not enabled or not ai_key):
-            st.caption('For an AI explanation, add a free provider token in the sidebar.')
-          elif st.button('Explain this abstract simply',key='explain_'+paper['id']):
-            if team_ai_ready:
-                try:
-                    with st.spinner('Checking the abstract with Learning Coach…'):
-                        generated=generate_explanations(paper['title'],paper['abstract'],configs,
-                            session_usage=st.session_state.setdefault('coach_usage',{}))
-                    if generated.pack:
-                        st.session_state.abstract_help={'paper_id':paper['id'],'source':'learning_coach','result':generated.pack}
-                    else:
-                        st.warning(generated.fair_use_notice or next((attempt.message for attempt in reversed(generated.attempts)), 'Learning Coach is unavailable.'))
-                except ValueError as exc:
-                    st.warning(str(exc))
+            usable_abstract = not validate_paper_input(paper['title'], paper.get('abstract'))
+            with st.container(horizontal=True):
+                st.button('Knowledge Check', key='check_'+paper['id'],
+                          on_click=open_knowledge_check, args=(paper,))
+                st.button('Prerequisite Lessons', key='lessons_'+paper['id'],
+                          on_click=open_knowledge_check, args=(paper, True))
+                if usable_abstract:
+                    guided_reading_button(paper)
+            st.subheader('AI Guided Learning')
+            if not usable_abstract:
+                st.info('This record needs a usable abstract for Guided Reading and AI explanations. Its source details and original link are still available when supplied.')
             else:
-                try:
-                    if not reserve_demo_ai_call(provider):
-                        st.warning('Hugging Face demo limit reached for this session. The free reading guide is available above.')
-                    else:
-                        with st.spinner('Explaining the abstract with its source passage…'):
-                            result=explain_abstract(paper,st.session_state.get('topic',''),ai_key,model,provider)
-                        st.session_state.abstract_help={'paper_id':paper['id'],'source':provider,'result':result}
-                except AIUnavailable as exc:
-                    st.warning(str(exc))
-          help_result=st.session_state.get('abstract_help')
-          if help_result and help_result['paper_id']==paper['id']:
-            with st.container(height=330,border=True):
-                if help_result.get('source')=='learning_coach':
-                    for name,title in CARD_TITLES.items():
-                        card=help_result['result'][name]
-                        st.write('**'+title+'**')
-                        st.write(card['explanation'])
-                        if card['supporting_excerpt']:
-                            st.caption('From abstract: '+card['supporting_excerpt'])
-                else:
-                    st.write(help_result['result']['orientation'])
-                    st.caption('AI explanation based on the retrieved abstract. Check the original source.')
-                    st.text(help_result['result']['evidence_quote'])
-                    st.write(help_result['result']['reading_tip'])
+                st.caption('Free reading guide · based on the abstract text')
+                for prompt in ('What question are the authors investigating?', 'How did they study it?', 'Which result is actually stated?'):
+                    st.write('• '+prompt)
+                render_ai_guidance(paper, ai_key, enabled, model, provider)
     with details_tab:
         with st.container(height=330,border=True):
             st.write('**Authors:** '+(', '.join(paper.get('authors') or []) or 'Unavailable'))
-            st.write('**Record source:** '+paper.get('provenance',{}).get('source','Unknown'))
+            st.write('**Record source:** '+((paper.get('provenance') or {}).get('source') or 'Unknown'))
             st.write('**Type:** '+(paper.get('paper_type') or 'Unknown'))
-            st.caption('Originally retrieved: '+paper.get('retrieved_at','Unknown'))
+            st.caption('Originally retrieved: '+(paper.get('retrieved_at') or 'Unknown'))
             st.caption('Publication type does not establish peer review. Relevance is not a quality assessment.')
+    original_url=safe_url(paper.get('paper_url'))
+    free_text_url=safe_url(paper.get('oa_url'))
     with source_tab:
-        source_url=safe_url(paper.get('oa_url')) or safe_url(paper.get('paper_url'))
+        source_url=free_text_url or original_url
         if source_url:
-            st.caption('View the original page here when the publisher allows it. If it appears blank, use the link below.')
-            st.iframe(source_url,height=610)
+            st.caption('Some publishers block embedded previews. If the preview is blank, open the source in a new tab.')
             st.link_button('Open original in a new tab ↗',source_url)
+            st.iframe(source_url,height=610)
         else:
             st.info('This source record did not provide a usable original-page link.')
     actions=st.columns(3)
-    if paper.get('paper_url'):
-        actions[0].link_button('Original source ↗',paper['paper_url'],width='stretch')
-    if paper.get('oa_url'):
-        actions[1].link_button('Free text ↗',paper['oa_url'],width='stretch')
-    added=paper['id'] in reading_ids()
-    if actions[2].button('Remove from list' if added else 'Add to reading list',
-            key='reader_save_'+paper['id'],width='stretch'):
-        remove_from_reading(paper) if added else add_to_reading(paper)
-        st.rerun()
-    if not (is_background or is_source_link) and st.button('Learn this paper →',key='learn_'+paper['id']):
-        st.session_state.selected_paper=paper
+    if original_url:
+        actions[0].link_button('Original source ↗',original_url,width='stretch')
+    if free_text_url:
+        actions[1].link_button('Free text ↗',free_text_url,width='stretch')
+    if not (from_library or from_workspace):
+        save_actions(actions[2], paper, 'reader_save_' + paper['id'])
+
+
+def guided_reading_button(paper):
+    if st.button('Guided Reading & Reflections', key='learn_'+paper['id']):
+        st.session_state.selected_paper = paper
         try:
             load_retrieved_paper(paper)
-            st.session_state.ui_step='Guided reading'
-            st.rerun()
         except ValueError:
             st.info('This record needs a longer abstract for guided reading. You can still open the original source.')
+        else:
+            st.session_state.guided_standalone = False
+            go('Guided reading')
+            st.rerun()
+
+
+def open_workspace_picker(return_to):
+    st.session_state.workspace_picker_return = return_to
+    go('Workspace picker')
+
+
+def workspace_paper_details(paper):
+    details = [', '.join(paper.get('authors') or []), paper.get('source_name'), paper.get('publication_date'),
+               (paper.get('provenance') or {}).get('source')]
+    if metadata := ' · '.join(dict.fromkeys(value for value in details if value)):
+        st.caption(metadata)
+    st.caption(st.session_state.reading_status.get(paper['id'], 'To Read'))
+
+
+def page_workspaces():
+    st.header('My Workspaces')
+    with st.container(horizontal=True):
+        st.button('+ Add Paper', type='primary', on_click=open_workspace_picker, args=('Workspaces',))
+        st.button('Read Your Own Abstract', on_click=open_manual_reader)
+    papers = list(library_catalog().values())
+    if not papers:
+        st.info('Save a paper in My Library to open its workspace here.')
+        st.button('Choose a Paper from My Library', on_click=open_library)
+    for start in range(0, len(papers), 3):
+        for column, paper in zip(st.columns(3), papers[start:start + 3]):
+            with column.container(border=True):
+                st.subheader(paper['title'])
+                workspace_paper_details(paper)
+                st.button('Open Workspace', key='workspace_open_'+paper['id'],
+                          on_click=choose_reader, args=(paper, 'Workspace'))
+
+
+def page_workspace_picker():
+    st.header('Add Paper')
+    st.button('← Back', on_click=go, args=(st.session_state.workspace_picker_return,))
+    papers = library_catalog()
+    if not papers:
+        st.info('Your Library has no saved papers yet.')
+        st.button('Choose a Paper from My Library', on_click=open_library)
+        return
+    query = st.text_input('Search saved papers', key='workspace_query').strip().casefold()
+    matches = [paper for paper in papers.values() if query in ' '.join([
+        paper['title'], ' '.join(paper.get('authors') or []), paper.get('source_name') or '',
+    ]).casefold()]
+    if not matches:
+        st.info('No saved papers match your search.')
+    for paper in matches:
+        st.button(paper['title'], key='workspace_pick_'+paper['id'],
+                  on_click=choose_reader, args=(paper, 'Workspace'))
+
+
+def render_ai_guidance(paper, ai_key, enabled, model, provider):
+    configs = coach_configs()
+    team_ai_ready = any(config.free_plan_confirmed for config in configs)
+    if not paper.get('abstract'):
+        st.info('An abstract is needed before we can explain it.')
+    elif not enabled:
+        st.caption('Enable live AI guidance in Settings to request an explanation.')
+    elif not team_ai_ready and not ai_key:
+        st.caption('Connect a provider in Settings to request an explanation.')
+    elif st.button('Explain this abstract simply',key='explain_'+paper['id']):
+        if team_ai_ready:
+            try:
+                with st.spinner('Checking the abstract with Learning Coach…'):
+                    generated=generate_explanations(paper['title'],paper['abstract'],configs,
+                        session_usage=st.session_state.setdefault('coach_usage',{}))
+                if generated.pack:
+                    st.session_state.abstract_help={'paper_id':paper['id'],'source':'learning_coach','result':generated.pack}
+                else:
+                    st.warning(generated.fair_use_notice or next((attempt.message for attempt in reversed(generated.attempts)), 'Learning Coach is unavailable.'))
+            except ValueError as exc:
+                st.warning(str(exc))
+        else:
+            try:
+                if not reserve_demo_ai_call(provider):
+                    st.warning('Hugging Face demo limit reached for this session. The free reading guide is available above.')
+                else:
+                    with st.spinner('Explaining the abstract with its source passage…'):
+                        result=explain_abstract(paper,st.session_state.get('topic',''),ai_key,model,provider)
+                    st.session_state.abstract_help={'paper_id':paper['id'],'source':provider,'result':result}
+            except AIUnavailable as exc:
+                st.warning(str(exc))
+    help_result=st.session_state.get('abstract_help')
+    if help_result and help_result['paper_id']==paper['id']:
+        with st.container(height=330,border=True):
+            if help_result.get('source')=='learning_coach':
+                for name,title in CARD_TITLES.items():
+                    card=help_result['result'][name]
+                    st.write('**'+title+'**')
+                    st.write(card['explanation'])
+                    if card['supporting_excerpt']:
+                        st.caption('From abstract: '+card['supporting_excerpt'])
+            else:
+                st.write(help_result['result']['orientation'])
+                st.caption('AI explanation based on the retrieved abstract. Check the original source.')
+                st.text(help_result['result']['evidence_quote'])
+                st.write(help_result['result']['reading_tip'])
 
 
 def page_guided_reading():
-    st.button('← Back to paper',on_click=go,args=('Read paper',))
+    if st.session_state.get('guided_standalone'):
+        st.button('← Back to My Library', on_click=go, args=('My Library',))
+    elif st.session_state.get('reader_id'):
+        st.button('← Back to paper', on_click=go, args=('Read paper',))
     render_paper_reader()
-
-
-def page_saved():
-    st.header('Your reading tray')
-    saved=list(st.session_state.get('saved_papers',{}).values())
-    if not saved:
-        st.info('Add an item from your results and it will be waiting here in your saved vault.')
-        return
-    maximum=max((len(saved)+2)//3,1)
-    if 'saved_page' in st.session_state:
-        st.session_state.saved_page=min(st.session_state.saved_page,maximum)
-    page=st.number_input('Page',1,maximum,1,key='saved_page')
-    for paper in saved[(page-1)*3:page*3]:
-        paper_card(paper,st.session_state.get('weights',{}),key_prefix='tray_',compact=True)
 
 
 def show_source_warnings(papers, *, details=False):
@@ -760,8 +873,11 @@ def render():
     st.markdown(f'''<style>
       [data-testid="stAppViewContainer"], [data-testid="stMain"], [data-testid="stHeader"] {{background:{page_bg}!important; color:{foreground}!important;}}
       [data-testid="stSidebar"] {{background:{rail_bg}; border-right:1px solid {line};}}
-      [data-testid="stSidebar"] button {{min-height:2.75rem; text-align:left;}}
+      [data-testid="stSidebar"] button, [class*="st-key-library_open_"] button {{
+        min-height:2.75rem; justify-content:flex-start; text-align:left;
+      }}
       [data-testid="stSidebar"] button p {{font-size:1rem; overflow-wrap:anywhere;}}
+      .st-key-library_tree {{border-left:2px solid {line}; padding-left:1rem;}}
       .st-key-nav_panel {{max-width:44rem; padding:1rem;}}
       .block-container {{padding-top:3rem; padding-bottom:2rem; max-width:90rem;}}
       [data-testid="stMain"] p, [data-testid="stPopoverBody"] p {{font-size:1rem; line-height:1.5;}}
@@ -785,28 +901,52 @@ def render():
         [data-testid="stMain"] button:not([kind="primary"]), [data-testid="stSidebar"] button:not([kind="primary"]) {background:#fff!important;color:#174a59!important;border-color:#bad8dc!important;}
         [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"] {border-color:#c5e0e3!important;}
         </style>''',unsafe_allow_html=True)
+    st.html(Path(__file__).with_name("workspace.css"))
     ai_key,enabled,provider,model=sidebar()
     step=st.session_state.ui_step
     if step=='Question' or (step=='Direction' and 'discovery_plan' not in st.session_state):
-        st.header('Research question')
+        st.header('Discover Papers')
         page_question(ai_key,enabled,model,provider)
+        if 'discovery_plan' in st.session_state:
+            st.button('Resume topic exploration', key='rail_Direction', type='tertiary', on_click=go, args=('Direction',))
+        if st.session_state.get('papers'):
+            st.button('Return to your results', key='rail_Papers', type='tertiary', on_click=go, args=('Papers',))
+        with st.expander('Previous research'):
+            searches = st.session_state.get('saved_combos', [])
+            if searches:
+                st.caption(f"{len(searches)} saved · Most recent: {searches[-1]['name']}")
+                st.button('Browse saved searches', key='saved_searches', on_click=go, args=('Vault',))
+            else:
+                st.caption('Searches you save while exploring a question will appear here.')
     elif step=='Direction' and 'discovery_plan' in st.session_state:
         page_direction(secret('OPENALEX_API_KEY'),ai_key,enabled,model,provider)
     elif step=='Papers' and st.session_state.get('papers'):
+        if 'discovery_plan' in st.session_state:
+            st.button('← Refine this search', key='rail_Direction', type='tertiary', on_click=go,args=('Direction',))
+        else:
+            st.button('← Discover Papers', type='tertiary', on_click=go, args=('Question',))
         page_papers(ai_key,enabled,model,provider)
     elif step=='Read paper':
         page_reader(ai_key,enabled,model,provider)
+    elif step in ('Workspaces', 'Learning Workspace'):
+        page_workspaces()
+    elif step=='Workspace picker':
+        page_workspace_picker()
     elif step=='Knowledge check':
         from screens.knowledge_check import render_knowledge_check
-        render_knowledge_check()
+        paper = st.session_state.get('knowledge_check_paper')
+        if paper is not None:
+            st.button('← Back to paper', on_click=go, args=('Read paper',))
+        render_knowledge_check(paper, lessons_only=st.session_state.get('knowledge_lessons_only', False))
     elif step=='Guided reading':
         page_guided_reading()
     elif step=='Combo reading':
         page_combo_reading(ai_key,enabled,model,provider)
     elif step=='Vault':
         page_vault()
-    elif step=='Saved':
-        page_saved()
+    elif step in ('My Library','Saved'):
+        with st.container(key="library_page", gap="small"):
+            render_library(go)
     elif step=='Sources':
         page_sources()
     else:

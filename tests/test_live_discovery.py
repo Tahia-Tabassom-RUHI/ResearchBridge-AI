@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 from unittest.mock import patch
 import pytest
 from services.discovery_ai import AIUnavailable, validate_plan, interpret_question, explain_abstract, guided_plan, generate_json, generate_hf_json
@@ -217,13 +218,23 @@ def test_saved_combinations_restore_distinct_searches_and_results(monkeypatch):
     selection={'index':0,'action':'select'}
     monkeypatch.setattr('streamlit.components.v1.declare_component',
         lambda *args,**kwargs:lambda **kwargs:selection)
-    app.button(key='rail_Vault').click().run()
+    app.button(key='rail_Question').click().run()
+    history = deepcopy(app.session_state['saved_combos'])
+    previous = next(section for section in app.expander if section.label == 'Previous research')
+    previous.button(key='saved_searches').click().run()
+    assert app.header[0].value == 'Previous research'
+    assert app.session_state['saved_combos'] == history
     app.button(key='vault_open').click().run()
     next(b for b in app.button if b.label=='Find more').click().run()
     assert app.session_state['ui_step']=='Papers'
     assert app.session_state['searched_query']==first_query
     selection['index']=1
-    app.button(key='rail_Vault').click().run()
+    app.button(key='rail_Question').click().run()
+    history = deepcopy(app.session_state['saved_combos'])
+    previous = next(section for section in app.expander if section.label == 'Previous research')
+    previous.button(key='saved_searches').click().run()
+    assert app.header[0].value == 'Previous research'
+    assert app.session_state['saved_combos'] == history
     app.button(key='vault_open').click().run()
     next(b for b in app.button if b.label=='Find more').click().run()
     assert app.session_state['ui_step']=='Direction'
@@ -251,7 +262,7 @@ def test_steps_preserve_inputs_and_keep_results_out_of_question_screen():
     from pathlib import Path
     from streamlit.testing.v1 import AppTest
     app=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py'),default_timeout=20).run()
-    assert app.button(key='rail_Papers').disabled
+    assert not any(b.key == 'rail_Papers' for b in app.button)
     app.text_input(key='question').input('Why do I forget things I studied yesterday?').run()
     question=app.text_input(key='question').value
     app.button[0]  # Sidebar is present on every step.

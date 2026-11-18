@@ -1,0 +1,67 @@
+/* Keep the sidebar landmarks and their Library children visually distinct. */
+[data-testid="stSidebarUserContent"] {padding:1rem .85rem}
+[data-testid="stSidebarUserContent"] [data-testid="stVerticalBlock"] {gap:.15rem}
+[data-testid="stSidebarUserContent"] h3 {font-size:1.25rem;padding-bottom:1rem}
+[data-testid="stSidebarUserContent"] button[kind] {
+    justify-content:flex-start!important; text-align:left; min-height:2rem!important;
+    border:0!important; padding:.2rem .65rem; border-radius:.4rem;
+}
+[data-testid="stSidebarUserContent"] button[kind] [data-testid="stMarkdownContainer"] {text-align:left}
+[data-testid="stSidebarUserContent"] button[kind] p {font-size:.93rem;line-height:1.4}
+[data-testid="stSidebarUserContent"] button[kind="primary"],
+.st-key-library_page [class*="st-key-librow_"]:has(button[kind="secondary"]) {
+    background:color-mix(in srgb,#43bcb6 17%,transparent)!important;
+    color:inherit!important;box-shadow:inset 3px 0 #39aaa7;
+}
+.st-key-library_tree {margin:.15rem 0 .45rem .9rem;padding-left:.55rem!important;border-left-width:1px!important}
+.st-key-library_tree [data-testid="stCaptionContainer"] {padding:.55rem .6rem 0}
+.st-key-library_tree .st-key-nav_new button {font-size:.85rem}
+[data-folder-drop-active] {outline:2px solid #4ed4c7!important;background:#164d52!important;color:white!important}
+.library-drag-label {position:fixed;left:0;top:0;z-index:100000;pointer-events:none;max-width:20rem;
+    background:#173f47;color:white;border:1px solid #58c9c3;border-radius:.45rem;padding:.4rem .7rem;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.st-key-library_heading {justify-content:space-between}
+.st-key-library_heading h2 {padding:.1rem 0}
+.st-key-library_toolbar {padding:.35rem .1rem;align-items:center}
+.st-key-library_toolbar button {min-height:1.9rem;padding:.15rem .5rem}
+.st-key-library_toolbar button p {font-size:.85rem}
+.st-key-library_list,.st-key-library_detail {padding:.9rem!important;min-width:0}
+.st-key-library_list {gap:.35rem!important;background:color-mix(in srgb,#588787 5%,transparent)}
+[class*="st-key-librow_"] {padding:.35rem .45rem; border-radius:.35rem;min-width:0;user-select:none;
+    border-bottom:1px solid color-mix(in srgb,#78969b 18%,transparent)}
+[class*="st-key-librow_"]:has([data-testid="stIconMaterial"]) {cursor:grab}
+[class*="st-key-librow_"] button[kind] {text-align:left;justify-content:flex-start!important;
+    width:100%;padding:0;min-height:1.55rem;border:0;background:transparent!important;color:inherit;cursor:inherit}
+[class*="st-key-librow_"] button p {font-size:.95rem;line-height:1.35}
+[class*="st-key-librow_"] [data-testid="stCaptionContainer"] p {font-size:.78rem;line-height:1.2}
+.st-key-library_detail {gap:.65rem!important;overflow-wrap:anywhere}
+.st-key-library_detail h3 {padding-top:0}
+.st-key-library_detail [data-testid="stText"] {white-space:pre-wrap;font-family:inherit;line-height:1.6}
+@media(min-width:801px) {
+    .block-container:has(.st-key-library_page) {padding:3.8rem 2rem .7rem!important}
+    .st-key-library_list,.st-key-library_detail {
+        height:max(12rem,calc(100dvh - var(--library-pane-top,16rem) - 2rem))!important;
+        min-height:0!important;max-height:max(12rem,calc(100dvh - var(--library-pane-top,16rem) - 2rem))!important;
+        flex:none!important; overflow:auto!important; overscroll-behavior:contain; scrollbar-gutter:stable;
+    }
+}
+.st-key-library_list > *, .st-key-library_detail > * {flex-shrink:0!important}
+@media(max-width:800px) {
+    .st-key-library_panes [data-testid="stHorizontalBlock"]:has(> [data-testid="stColumn"]) {flex-direction:column}
+    .st-key-library_panes [data-testid="stColumn"] {width:100%;flex-basis:auto;min-width:0}
+    .st-key-library_list,.st-key-library_detail {height:auto;overflow:visible}
+    .st-key-library_toolbar {flex-wrap:wrap}
+}
+
+[data-testid="stSidebarUserContent"] button[kind] > div,
+[data-testid="stSidebarUserContent"] button[kind] [data-has-shortcut],
+[class*="st-key-librow_"] button[kind] > div,
+[class*="st-key-librow_"] button[kind] [data-has-shortcut] {
+    display:flex; width:100%; justify-content:flex-start!important; text-align:left;
+}
+
+@media (pointer:coarse) {
+    [class*="st-key-librow_"] button [data-testid="stIconMaterial"] {display:none}
+    [class*="st-key-librow_"]:has([data-testid="stIconMaterial"]) {cursor:auto}
+}

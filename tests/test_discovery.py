@@ -47,8 +47,9 @@ def test_question_to_bubble_to_handoff():
     assert len(app.session_state['saved_papers']) == 1
     app.button(key='reading_preview_0').click().run()
     app.button(key='preview_read').click().run()
-    next(b for b in app.button if b.label == 'Learn this paper →').click().run()
-    assert app.session_state['selected_paper']['id'] == sample()['id']
+    assert app.session_state['reader_id'] == sample()['id']
+    assert any('needs a usable abstract' in item.value for item in app.info)
+    assert not any(b.label == 'Guided Reading & Reflections' for b in app.button)
 
 
 def test_empty_and_error_search_keep_question():
@@ -87,7 +88,7 @@ def test_sources_show_partial_failure_and_exclusions(monkeypatch,with_papers):
             patch('services.scholarly.search_europe',side_effect=TimeoutError):
         next(b for b in app.button if b.label=='Find real papers →').click().run()
     assert any('Europe PMC could not respond' in warning.value for warning in app.warning)
-    assert app.button(key='rail_Papers').disabled==(not with_papers)
+    assert (app.session_state['ui_step'] == 'Papers') == with_papers
     app.button(key='rail_Sources').click().run()
     assert app.header[0].value=='Sources & transparency'
     assert any('Providers that responded · Crossref' in text.value for text in app.markdown)

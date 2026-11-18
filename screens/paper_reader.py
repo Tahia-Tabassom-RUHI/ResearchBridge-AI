@@ -90,10 +90,23 @@ def load_retrieved_paper(record: dict) -> None:
         )
     if current_paper and not current_paper.id.startswith("manual:"):
         inactive[current_paper.id] = current
+    elif current_paper:
+        st.session_state["paper_reader_manual"] = current
     st.session_state["paper_reader"] = state
     for key in list(st.session_state):
         if key.startswith("_paper_reader_"):
             st.session_state.pop(key, None)
+
+
+def open_manual_reader() -> None:
+    current = st.session_state.get("paper_reader")
+    paper = current.get("paper") if current else None
+    if paper and not paper.id.startswith("manual:"):
+        st.session_state.setdefault("paper_reader_inactive", {})[paper.id] = current
+        _reset_reader()
+    if not st.session_state.get("paper_reader") and "paper_reader_manual" in st.session_state:
+        st.session_state["paper_reader"] = st.session_state.pop("paper_reader_manual")
+    st.session_state.update(ui_step="Guided reading", guided_standalone=True, nav_panel_open=False)
 
 
 def _reset_reader() -> None:

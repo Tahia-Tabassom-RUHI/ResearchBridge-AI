@@ -74,14 +74,14 @@ def test_stale_remove_reports_conflict_and_leaves_saved_data_intact(monkeypatch)
     second=_app(token)
     first.button(key='reading_add_1').click().run()
     expected=load_vault(token)
-    second.button(key='reading_add_0').click().run()
+    second.button(key='reading_add_0_membership').click().run()
 
     assert 'changed in another session' in second.error[0].value
     assert 'Reload' in second.error[0].value
-    assert second.button(key='reading_add_0').label=='− Remove'
+    assert second.button(key='reading_add_0_membership').label.startswith('Remove from ')
     assert load_vault(token)==expected
     refreshed=_app(token)
-    refreshed.button(key='reading_add_0').click().run()
+    refreshed.button(key='reading_add_0_membership').click().run()
     assert not refreshed.error
     assert load_vault(token)['saved_combos'][0]['reading_ids']==[papers[1]['id']]
 
@@ -97,7 +97,7 @@ def test_stale_add_after_study_set_edit_requests_reload(monkeypatch):
     saved=update_vault(token,rename_study_set)
     app.button(key='reading_add_0').click().run()
     assert 'changed in another session' in app.error[0].value
-    assert app.button(key='reading_add_0').label=='＋ Add'
+    assert app.button(key='reading_add_0').label=='Save to Library'
     assert load_vault(token)==saved
 
 
@@ -112,15 +112,15 @@ def test_failed_add_and_remove_show_errors_without_changing_the_list(monkeypatch
         failed.setattr('services.vault_store.MAX_VAULT_SIZE',1)
         app.button(key='reading_add_1').click().run()
     assert 'storage limit reached' in app.error[0].value
-    assert app.button(key='reading_add_1').label=='＋ Add'
+    assert app.button(key='reading_add_1').label=='Save to Library'
     assert load_vault(token)==expected
 
     with patch('services.vault_store._connect',side_effect=OSError):
-        app.button(key='reading_add_0').click().run()
+        app.button(key='reading_add_0_membership').click().run()
     assert 'storage is unavailable' in app.error[0].value
-    assert app.button(key='reading_add_0').label=='− Remove'
+    assert app.button(key='reading_add_0_membership').label.startswith('Remove from ')
     assert load_vault(token)==expected
-    app.button(key='reading_add_0').click().run()
+    app.button(key='reading_add_0_membership').click().run()
     assert not app.error
     assert not load_vault(token)['saved_combos'][0]['reading_ids']
 
@@ -136,7 +136,8 @@ def test_vault_can_rename_remove_and_undo_a_study_set(monkeypatch):
     app.button(key='save_combo').click().run()
     app.button(key='topic_bubble_1').click().run()
     app.button(key='save_combo').click().run()
-    app.button(key='rail_Vault').click().run()
+    app.button(key='rail_Question').click().run()
+    app.button(key='saved_searches').click().run()
     app.text_input(key='combo_name_0').input('Banana shelf life study').run()
     next(b for b in app.button if b.label=='Save').click().run()
     assert app.session_state['saved_combos'][0]['name']=='Banana shelf life study'

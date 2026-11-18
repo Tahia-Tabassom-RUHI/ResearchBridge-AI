@@ -83,9 +83,10 @@ def test_removing_from_combo_updates_its_reading_list():
     with patch('screens.home.retrieve',return_value=[paper]):
         next(b for b in app.button if b.label=='Find real papers →').click().run()
     app.button(key='reading_add_0').click().run()
-    assert app.button(key='reading_add_0').label=='− Remove'
-    app.button(key='reading_add_0').click().run()
+    assert app.button(key='reading_add_0_membership').label.startswith('Remove from ')
+    app.button(key='reading_add_0_membership').click().run()
     assert app.session_state['saved_combos'][0]['reading_ids']==[]
+    assert paper['id'] in app.session_state['saved_papers']
     app.selectbox(key='reading_type').select('My reading list').run()
     assert not any(b.key=='reading_preview_0' for b in app.button)
 

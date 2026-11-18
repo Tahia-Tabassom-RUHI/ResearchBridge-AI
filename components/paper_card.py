@@ -1,7 +1,7 @@
 """Source-grounded results and a session-only handoff to the learning feature."""
 import streamlit as st
+from screens.discovery_workspace import open_reader, save_actions
 from services.ranking import matches, relevance_details
-from services.vault_session import persist_vault, remove_item_everywhere
 
 def paper_card(paper, weights, key_prefix="", query="", allow_explanation=False, compact=False):
     if compact:
@@ -11,18 +11,8 @@ def paper_card(paper, weights, key_prefix="", query="", allow_explanation=False,
             st.caption(' · '.join(filter(None,[paper.get('publication_date'),paper.get('paper_type'), 'Free text' if paper.get('oa_url') else 'Access unknown'])))
             buttons=st.columns([2,1])
             if buttons[0].button('Open paper →',key=key_prefix+'open_'+paper['id'],width='stretch'):
-                st.session_state.reader_id=paper['id']
-                st.session_state.ui_step='Read paper'
-                st.session_state.nav_panel_open=False
-                st.rerun()
-            saved=st.session_state.setdefault('saved_papers',{})
-            if buttons[1].button('Remove saved' if paper['id'] in saved else 'Save for later',key=key_prefix+'save_'+paper['id'],width='stretch'):
-                if paper['id'] in saved:
-                    remove_item_everywhere(paper['id'])
-                else:
-                    saved[paper['id']]=paper
-                    persist_vault()
-                st.rerun()
+                open_reader(paper)
+            save_actions(buttons[1], paper, key_prefix+'save_'+paper['id'])
         return
     with st.container(border=True):
         if paper.get('provenance', {}).get('source') == 'Illustrative interface demo':
@@ -47,14 +37,7 @@ def paper_card(paper, weights, key_prefix="", query="", allow_explanation=False,
             cols[0].link_button('Original source ↗', paper['paper_url'])
         if paper.get('oa_url'):
             cols[1].link_button('Free text ↗', paper['oa_url'])
-        saved = st.session_state.setdefault('saved_papers', {})
-        if cols[2].button('Remove saved' if paper['id'] in saved else 'Save for later', key=key_prefix+'save_'+paper['id']):
-            if paper['id'] in saved:
-                remove_item_everywhere(paper['id'])
-            else:
-                saved[paper['id']] = paper
-                persist_vault()
-            st.rerun()
+        save_actions(cols[2], paper, key_prefix+'save_'+paper['id'])
         if allow_explanation and paper.get('abstract'):
             if st.button('Explain this abstract simply',key=key_prefix+'explain_'+paper['id']):
                 st.session_state.explain_paper_id=paper['id']

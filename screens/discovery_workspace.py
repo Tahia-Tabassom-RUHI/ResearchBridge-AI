@@ -7,6 +7,7 @@ from services.ranking import matches, shortlist, relevance_details
 from services.research_map import VIEWS, map_data
 from services.background_articles import article_full_text
 from services.vault_session import persist_vault
+from services.library import catalog, open_library
 
 
 LENSES={
@@ -44,24 +45,41 @@ def add_to_reading(item):
     ids=reading_ids()
     if item['id'] not in ids:
         ids.append(item['id'])
-    st.session_state.setdefault('saved_papers',{})[item['id']]=item
+    st.session_state.setdefault('saved_papers',{}).setdefault(item['id'], item)
     persist_vault(added_item_id=item['id'])
 
 
 def remove_from_reading(item):
+    st.session_state.saved_papers.setdefault(item['id'], catalog().get(item['id'], item))
     ids=reading_ids()
     if item['id'] in ids:
         ids.remove(item['id'])
-    elsewhere=any(item['id'] in combo.get('reading_ids',[])
-        for combo in st.session_state.get('saved_combos',[])) or item['id'] in st.session_state.get('loose_reading_ids',[])
-    if not elsewhere:
-        st.session_state.get('saved_papers',{}).pop(item['id'],None)
     persist_vault()
 
 
-def choose_reader(item):
+def save_actions(container, item, key):
+    paper_id = item['id']
+    saved = paper_id in catalog()
+    if not saved:
+        container.button('Save to Library', key=key, on_click=add_to_reading,
+                         args=(item,), type='primary')
+        return
+    with container.popover('Saved to Library'):
+        st.button('Organize in My Library', key=key+'_organize', on_click=open_library,
+                  args=('all', paper_id))
+        active = st.session_state.get('active_combo_id')
+        if isinstance(active, int) and 0 <= active < len(st.session_state.saved_combos):
+            name = st.session_state.saved_combos[active]['name']
+            included = paper_id in reading_ids()
+            st.button(('Remove from ' if included else 'Include in ') + name,
+                      key=key+'_membership', on_click=remove_from_reading if included else add_to_reading,
+                      args=(item,))
+
+
+def choose_reader(item, origin='Papers'):
     st.session_state.setdefault('reading_catalog',{})[item['id']]=item
     st.session_state.reader_id=item['id']
+    st.session_state.reader_origin=origin
     st.session_state.ui_step='Read paper'
     st.session_state.nav_panel_open=False
 
@@ -130,11 +148,7 @@ def item_card(item,index,query,on_explain=None):
             st.caption(('Matches your words: '+', '.join(hits[:5])) if hits else
                 'A broader result. Check the abstract to decide if it fits.')
         actions=st.container(horizontal=True,gap='small')
-        added=item['id'] in reading_ids()
-        if actions.button('− Remove' if added else '＋ Add',key=f'reading_add_{index}',
-                help='Remove from this combination’s reading list' if added else 'Add to this combination’s reading list',width='content'):
-            remove_from_reading(item) if added else add_to_reading(item)
-            st.rerun()
+        save_actions(actions, item, f'reading_add_{index}')
         if actions.button('▾ About',key=f'reading_about_{index}',width='content'):
             current=st.session_state.get('expanded_reading_id')
             st.session_state.expanded_reading_id=None if current==item['id'] else item['id']
@@ -154,8 +168,6 @@ def item_card(item,index,query,on_explain=None):
                 if result:
                     st.write(result['simple'])
                     st.caption('From abstract: '+result['excerpt'])
-        if item['id'] in reading_ids():
-            st.caption('✓ In this combo’s reading list')
 
 
 def render_discovery_workspace(papers,articles,query,weights,on_explain=None):

@@ -64,12 +64,22 @@ def _render_prerequisites(
             st.write(f"**Reflection question:** {concept.reflection_question}")
 
 
-def render_knowledge_check() -> None:
+def render_knowledge_check(paper: dict | None = None, *, lessons_only: bool = False) -> None:
     """Render a topic assessment, persistent results, or skip confirmation."""
-    st.title("Quick Knowledge Check")
-    st.caption(
-        "Simple demo assessment: this is not a validated measure of ability."
-    )
+    st.title("Prerequisite Lessons" if lessons_only else "Quick Knowledge Check")
+    if not lessons_only:
+        st.caption("Simple demo assessment: this is not a validated measure of ability.")
+
+    paper_id = paper["id"] if paper is not None else None
+    if st.session_state.get("knowledge_check_context") != paper_id:
+        _reset_assessment()
+        st.session_state["knowledge_check_context"] = paper_id
+    if paper is not None:
+        st.subheader(paper["title"])
+        st.caption("Choose a foundation topic for this paper.")
+        if paper.get("abstract"):
+            with st.popover("Paper abstract"):
+                st.text(paper["abstract"])
 
     st.session_state.setdefault("knowledge_check_skipped", False)
     st.session_state.setdefault("knowledge_check_answers", [None, None, None])
@@ -81,6 +91,10 @@ def render_knowledge_check() -> None:
         key="knowledge_check_topic",
         on_change=_reset_assessment,
     )
+
+    if lessons_only:
+        _render_prerequisites(topic, skipped=True)
+        return
 
     if st.session_state["knowledge_check_skipped"]:
         st.success("Assessment skipped")
