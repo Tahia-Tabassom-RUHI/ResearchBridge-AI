@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 from streamlit.testing.v1 import AppTest
@@ -40,9 +41,11 @@ def _new_app():
     return app
 
 
-def _load_paper(app, title=TITLE, abstract=ABSTRACT):
+def _load_paper(app, title=TITLE, abstract=ABSTRACT, **metadata):
     next(w for w in app.text_input if w.key == "_paper_reader_title").set_value(title)
     next(w for w in app.text_area if w.key == "_paper_reader_abstract").set_value(abstract)
+    for field, value in metadata.items():
+        app.text_input(key=f"_paper_reader_{field}").set_value(value)
     _button(app, "Start Reading").click().run()
     assert not app.exception
     return app
@@ -105,7 +108,13 @@ def test_fixed_prompts_cover_four_reading_tasks_with_hints():
 def test_initial_screen_and_validation_block_loading():
     app = _new_app()
     assert app.title[0].value == "Guided Research Paper Reading"
-    assert len(app.text_input) == 1
+    assert [widget.key for widget in app.text_input] == [
+        "_paper_reader_title",
+        "_paper_reader_url",
+        "_paper_reader_doi",
+        "_paper_reader_authors",
+        "_paper_reader_year",
+    ]
     assert len(app.text_area) == 1
     assert not app.expander
     _button(app, "Start Reading").click().run()
@@ -255,6 +264,96 @@ def test_explicit_reset_clears_only_reader_and_allows_a_new_paper():
     assert app.session_state["paper_reader"]["saved_reflections"] is None
 
 
+@pytest.mark.parametrize(
+    "url",
+    ["https://example.test/paper?version=1", "http://example.test/paper", "https://[::1]/paper"],
+)
+def test_optional_metadata_and_original_link(url):
+    app = _load_paper(
+        _new_app(),
+        url=f" {url} ",
+        doi=" 10.0000/synthetic-test-only ",
+        authors=" Fixture Author A; ; Fixture Author B ",
+        year=" 2020 ",
+    )
+    paper = app.session_state["paper_reader"]["paper"]
+    assert paper.paper_url == url
+    assert paper.authors == ["Fixture Author A", "Fixture Author B"]
+    assert paper.publication_date == "2020"
+    assert paper.doi == "10.0000/synthetic-test-only"
+    assert paper.provenance == {"origin": "user_provided", "verification": "unverified"}
+    assert [link.proto.url for link in app.get("link_button")] == [url]
+    texts = [item.value for item in app.text]
+    assert "Authors: Fixture Author A; Fixture Author B" in texts
+    assert "DOI: 10.0000/synthetic-test-only" in texts
+    assert "Publication year: 2020" in texts
+    assert any("user-provided and unverified" in item.value for item in app.caption)
+
+    _widget(app, "research_problem", "answer").set_value("A saved reflection").run()
+    _button(app, "Save Reflections").click().run()
+    app.run()
+    state = app.session_state["paper_reader"]
+    assert state["paper"] == paper
+    assert state["saved_reflections"]["research_problem"]["answer"] == "A saved reflection"
+
+    _button(app, "Start Another Paper / Reset").click().run()
+    assert app.session_state["paper_reader"]["paper"] is None
+    for field in ("url", "doi", "authors", "year"):
+        assert app.text_input(key=f"_paper_reader_{field}").value == ""
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "javascript:alert(1)", "data:text/html,bad", "file:///tmp/paper",
+        "ftp://example.test", "//example.test/paper", "https://",
+        "https://bad host/paper", "https://user:password@example.test",
+        "https://example.test:bad", "https://example.test:70000",
+        "https://example.test:", "https://example.test/%ZZ",
+        "https://example.test/%0a", "https://bad_host.test", "https://999.999.999.999",
+    ],
+)
+def test_unsafe_or_malformed_original_url_cannot_load_paper(url):
+    app = _load_paper(_new_app(), url=url)
+    assert app.session_state["paper_reader"]["paper"] is None
+    assert any("HTTP or HTTPS" in item.value for item in app.error)
+    assert not app.get("link_button")
+
+
+@pytest.mark.parametrize("year", ["0", "20xx", "2020-01-01", "0000"])
+def test_optional_year_validation(year):
+    app = _load_paper(_new_app(), year=year)
+    assert app.session_state["paper_reader"]["paper"] is None
+    assert any("four-digit" in item.value for item in app.error)
+
+
+def test_metadata_never_fetches_or_invokes_ai(monkeypatch):
+    blocked = Mock(side_effect=AssertionError("External access forbidden"))
+    monkeypatch.setattr("socket.create_connection", blocked)
+    monkeypatch.setattr("urllib.request.urlopen", blocked)
+    monkeypatch.setattr("services.ai_explainer.urlopen", blocked)
+    monkeypatch.setattr("services.ai_explainer.generate_explanations", blocked)
+    app = _load_paper(_new_app(), url="https://example.test/synthetic", doi="10.0000/example")
+    assert app.session_state["paper_reader"]["paper"] is not None
+    blocked.assert_not_called()
+
+
+def test_metadata_is_session_isolated_and_unsafe_stored_links_are_hidden():
+    first = _load_paper(_new_app(), url="https://example.test/synthetic")
+    second = _load_paper(_new_app())
+    paper = second.session_state["paper_reader"]["paper"]
+    assert paper.paper_url is None
+    assert paper.doi is None
+    assert paper.authors is None
+    assert paper.publication_date is None
+    assert not second.get("link_button")
+
+    first.session_state["paper_reader"]["paper"].paper_url = "javascript:alert(1)"
+    first.run()
+    assert not first.exception
+    assert not first.get("link_button")
+
+
 def test_imported_renderer_and_app_navigation_preserve_existing_flows(monkeypatch):
     imported = AppTest.from_string(
         "from screens.paper_reader import render_paper_reader\nrender_paper_reader()"
@@ -264,7 +363,15 @@ def test_imported_renderer_and_app_navigation_preserve_existing_flows(monkeypatc
     from unittest.mock import patch
     from services.papers import normalize
     monkeypatch.setattr("screens.home.secret", lambda name, default="": default)
-    paper = normalize({'id':'https://openalex.org/W123','title':TITLE})
+    paper = normalize({
+        "id": "https://openalex.org/W123",
+        "title": TITLE,
+        "doi": "10.0000/discovery-fixture",
+        "authorships": [{"author": {"display_name": "Discovery Fixture Author"}}],
+        "publication_date": "2020-01-01",
+        "primary_location": {"source": {"display_name": "Discovery Fixture Journal"}},
+        "open_access": {"oa_url": "https://example.test/discovery/full-text"},
+    })
     paper['abstract'] = ABSTRACT
     other = {**paper, "id": "https://openalex.org/W456"}
     app = AppTest.from_file(str(ROOT / "app.py")).run(timeout=15)
@@ -277,7 +384,12 @@ def test_imported_renderer_and_app_navigation_preserve_existing_flows(monkeypatc
     _button(app, 'Learn this paper →').click().run()
     assert not app.exception
     assert app.session_state['ui_step'] == 'Guided reading'
-    assert app.session_state['paper_reader']['paper'].id == paper['id']
+    loaded = app.session_state['paper_reader']['paper']
+    for field in ("id", "doi", "authors", "publication_date", "source_name", "provenance"):
+        assert getattr(loaded, field) == paper[field]
+    assert [link.proto.url for link in app.get("link_button")] == [
+        paper["paper_url"], paper["oa_url"],
+    ]
     _widget(app, 'research_problem', 'answer').set_value('Keep this reflection').run()
     _button(app, 'Save Reflections').click().run()
     saved = deepcopy(app.session_state['paper_reader']['saved_reflections'])

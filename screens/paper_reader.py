@@ -1,6 +1,9 @@
 """Session-only guided reading of a student-supplied paper abstract."""
 
+import ipaddress
+import re
 from copy import deepcopy
+from urllib.parse import urlsplit
 from uuid import uuid4
 
 import streamlit as st
@@ -12,6 +15,40 @@ from services.paper_reader import (
     excerpt_matches,
     validate_paper_input,
 )
+
+
+def _safe_original_url(value: object) -> bool:
+    """Validate a manual link locally without resolving its destination."""
+    if not isinstance(value, str) or not value:
+        return False
+    if any(c.isspace() or ord(c) < 32 or ord(c) == 127 for c in value):
+        return False
+    if "\\" in value or re.search(r"%(?![0-9a-fA-F]{2})|%0[ad]", value, re.IGNORECASE):
+        return False
+    try:
+        parsed = urlsplit(value)
+        if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+            return False
+        if parsed.username is not None or parsed.password is not None:
+            return False
+        if parsed.netloc.endswith(":") or (
+            parsed.port is not None and not 1 <= parsed.port <= 65535
+        ):
+            return False
+
+        host = parsed.hostname.rstrip(".")
+        if ":" in host or re.fullmatch(r"[0-9.]+", host):
+            ipaddress.ip_address(host)
+        else:
+            host = host.encode("idna").decode("ascii")
+            label_pattern = r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?"
+            if len(host) > 253 or any(
+                not re.fullmatch(label_pattern, label) for label in host.split(".")
+            ):
+                return False
+    except ValueError:
+        return False
+    return True
 
 
 def _new_reader_state() -> dict:
@@ -118,22 +155,57 @@ def render_paper_reader() -> None:
                 "This is a length check, not a scientific quality check.",
                 key="_paper_reader_abstract",
             )
+            st.caption("Optional metadata is supplied by you and remains unverified.")
+            original_url = st.text_input(
+                "Original paper URL (optional)", key="_paper_reader_url"
+            )
+            doi = st.text_input("DOI (optional)", key="_paper_reader_doi")
+            authors = st.text_input(
+                "Authors (optional, separate with semicolons)", key="_paper_reader_authors"
+            )
+            year = st.text_input("Publication year (optional)", key="_paper_reader_year")
             start = st.form_submit_button("Start Reading")
         if start:
             errors = validate_paper_input(title, abstract)
+            original_url = original_url.strip()
+            year = year.strip()
+            if original_url and not _safe_original_url(original_url):
+                errors.append("Enter a valid HTTP or HTTPS original paper URL without credentials.")
+            if year and not re.fullmatch(r"[1-9][0-9]{3}", year):
+                errors.append("Enter a four-digit publication year, or leave it blank.")
             if errors:
                 for error in errors:
                     st.error(error)
             else:
                 state["paper"] = Paper(
-                    id=f"manual:{uuid4()}", title=title.strip(), abstract=abstract
+                    id=f"manual:{uuid4()}",
+                    title=title.strip(),
+                    abstract=abstract,
+                    paper_url=original_url or None,
+                    doi=doi.strip() or None,
+                    authors=[name.strip() for name in authors.split(";") if name.strip()] or None,
+                    publication_date=year or None,
+                    source_name="Manual entry",
+                    provenance={"origin": "user_provided", "verification": "unverified"},
                 )
                 st.rerun()
         return
 
     paper = state["paper"]
     st.subheader(paper.title)
-    if paper.paper_url:
+    is_manual = paper.id.startswith("manual:")
+    if is_manual:
+        st.caption("Manually entered paper and metadata are user-provided and unverified.")
+        if paper.authors:
+            st.text("Authors: " + "; ".join(paper.authors))
+        if paper.publication_date:
+            st.text("Publication year: " + paper.publication_date)
+        if paper.doi:
+            st.text("DOI: " + paper.doi)
+        if paper.paper_url and _safe_original_url(paper.paper_url):
+            st.text("Original source: " + paper.paper_url)
+            st.link_button("Open user-provided paper ↗", paper.paper_url)
+    elif paper.paper_url:
         st.link_button("Open original paper ↗", paper.paper_url)
     if paper.oa_url:
         st.link_button("Open free full text ↗", paper.oa_url)
