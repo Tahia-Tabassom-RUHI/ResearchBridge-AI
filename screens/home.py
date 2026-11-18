@@ -2,7 +2,7 @@
 import os
 from urllib.parse import urlencode
 import streamlit as st
-from services.papers import DiscoveryError, search_papers, safe_url
+from services.papers import DiscoveryError, is_retracted_or_notice, search_papers, safe_url
 from services.ranking import query_from_question, suggest_directions, shortlist
 from services.discovery_ai import AIUnavailable, DEFAULT_MODEL, DEFAULT_HF_MODEL, guided_plan, interpret_question, explain_abstract
 from components.paper_card import paper_card
@@ -147,6 +147,7 @@ def load_results(query, year_value, year_label, openalex_key, extra_queries=()):
     with st.spinner('Finding beginner background articles…'):
         articles=retrieve_background(query)
     st.session_state.papers=papers
+    st.session_state.pop('search_failure',None)
     st.session_state.background_articles=articles
     st.session_state.nav_panel_open=False
     st.session_state.pop('map_selected',None)
@@ -248,6 +249,7 @@ def open_combo(index):
     st.session_state.active_combo_id=index
     if not persist_vault():
         return False
+    st.session_state.pop('search_failure',None)
     st.session_state.update(topic=combo['topic'],question=combo['topic'],
         discovery_plan=combo['plan'],selected_directions=list(combo['selected']),query=combo['query'],
         year_filter=combo['year_filter'],result_page=0,paper_view='Papers',last_selected_direction=None,
@@ -388,7 +390,7 @@ def open_nav(step):
     st.session_state.nav_panel_open=step in ('Settings',) and not (st.session_state.get('nav_panel_open') and st.session_state.get('nav_panel_step')==step)
     st.session_state.nav_panel_step=step
     if step in STEPS or step=='Vault':
-        st.session_state.ui_step='Direction' if step=='Question' else step
+        st.session_state.ui_step=step
 
 
 def close_nav():
@@ -401,19 +403,20 @@ def toggle_theme():
 
 
 def sidebar():
-    ready={'Question':True,'Direction':True,
-        'Papers':bool(st.session_state.get('papers')),
-        'Vault':True,'Saved':True,'Sources':bool(st.session_state.get('papers'))}
     st.session_state.setdefault('nav_panel_open',False)
     st.session_state.setdefault('nav_panel_step','Question')
-    icons={'Question':'⌕','Direction':'◌','Papers':'▤','Vault':'▣','Saved':'☆','Sources':'ⓘ'}
     with st.sidebar:
-        st.markdown('**RB**')
-        for name in ('Direction','Papers','Vault'):
-            st.button(icons[name],key='rail_'+name,help='Workspace' if name=='Direction' else name,width='stretch',
-                type='primary' if st.session_state.get('nav_panel_open') and st.session_state.nav_panel_step==name else 'secondary',
-                disabled=not ready[name],on_click=open_nav,args=(name,))
-        st.button('⚙',key='rail_Settings',help='Settings and demo tools',width='stretch',
+        st.subheader('ResearchBridge')
+        for name,label in (
+            ('Question','Research question'),('Direction','Search topics'),('Papers','Paper results'),
+            ('Vault','Vault · Study sets'),('Sources','Sources & transparency'),
+        ):
+            st.button(label,key='rail_'+name,width='stretch',
+                type='primary' if st.session_state.ui_step==name else 'secondary',
+                disabled=(name=='Papers' and not st.session_state.get('papers'))
+                    or (name=='Direction' and 'discovery_plan' not in st.session_state),
+                on_click=open_nav,args=(name,))
+        st.button('Settings',key='rail_Settings',width='stretch',
             on_click=open_nav,args=('Settings',))
     provider=st.session_state.get('ai_provider','Hugging Face')
     hf_key=st.session_state.get('hf_session_key','') or secret('HF_TOKEN')
@@ -422,41 +425,14 @@ def sidebar():
     model=secret('HF_MODEL',DEFAULT_HF_MODEL) if provider=='Hugging Face' else secret('GEMINI_MODEL',DEFAULT_MODEL)
     enabled=st.session_state.get('ai_guidance_opt_in',False)
     if st.session_state.nav_panel_open:
-        with st.container(key='nav_panel'):
-            heading,close=st.columns([5,1],vertical_alignment='center')
-            heading.markdown('### '+st.session_state.nav_panel_step)
-            close.button('−',key='nav_close',help='Minimize to icon strip',on_click=close_nav)
-            panel=st.session_state.nav_panel_step
-            if panel=='Vault':
-                st.caption('Tap a study set to open it.')
-                render_combo_tray()
-            elif panel=='Question':
-                st.caption('Start with a question in your own words.')
-                if st.session_state.get('topic'):
-                    st.write(st.session_state.topic[:120])
-            elif panel=='Direction':
-                st.caption('Move topic bubbles into your combination.')
-                selected=st.session_state.get('selected_directions',[])
-                st.write(' + '.join(selected) if selected else 'No topics chosen yet.')
-                if selected:
-                    st.button('Save this combo',key='panel_save_combo',on_click=save_current_combo,width='stretch')
-            elif panel=='Papers':
-                st.caption('Choose a bubble lens on the left. Explore its reading items on the right.')
-                st.write(f"{len(st.session_state.get('papers',[]))} research records · {len(st.session_state.get('background_articles',[]))} background articles")
-            elif panel=='Saved':
-                saved=list(st.session_state.get('saved_papers',{}).values())
-                st.caption(f'{len(saved)} saved papers')
-                for paper in saved[:8]:
-                    st.write('• '+paper['title'][:65])
-            elif panel=='Sources':
-                st.caption('Where the results came from')
-                st.write('OpenAlex, Crossref and Europe PMC source records when available.')
-            elif panel=='Settings':
-              with st.popover('Learning tools'):
+        with st.container(key='nav_panel',border=True):
+            st.subheader('Settings')
+            st.button('Close settings',key='nav_close',on_click=close_nav)
+            with st.expander('Learning tools'):
                 st.button('Knowledge check & learning cards',on_click=go,args=('Knowledge check',))
                 st.button('Guided reader · paste an abstract',on_click=go,args=('Guided reading',))
-              st.toggle('Light mode',key='light_mode',on_change=persist_vault)
-              with st.expander('AI connection'):
+            st.toggle('Light mode',key='light_mode',on_change=persist_vault)
+            with st.expander('AI connection'):
                 provider=st.selectbox('Provider', ['Hugging Face','Gemini'], key='ai_provider')
                 hf_key=st.text_input('Hugging Face token (this session only)',type='password',key='hf_session_key') or secret('HF_TOKEN')
                 gemini_key=st.text_input('Gemini key (this session only)',type='password',key='gemini_session_key') or secret('GEMINI_API_KEY')
@@ -469,7 +445,7 @@ def sidebar():
                 else:
                     st.link_button('Get a Gemini API key ↗','https://aistudio.google.com/api-keys')
                 st.button('Forget session key',on_click=forget_session_key)
-              with st.expander('Rehearsal & examples'):
+            with st.expander('Rehearsal & examples'):
                 if st.button('Try an example research map',key='try_map_demo'):
                     install_search(demo_papers(),'Illustrative research-map demo','Illustrative years','Papers')
                     st.rerun()
@@ -487,14 +463,14 @@ def install_search(papers,query,year,step):
         searched_year=year,background_articles=[],nav_panel_open=False,
         ui_step='Papers' if step=='Bubble map' else step,
         result_page=0,selected_directions=[],active_combo_id=None)
-    for key in ('map_selected','reader_id','abstract_help','plan_direction'):
+    for key in ('map_selected','reader_id','abstract_help','plan_direction','search_failure'):
         st.session_state.pop(key,None)
 
 
 def page_question(ai_key,enabled,model,provider):
     question = st.text_input(
-        'Your research question', key='question',
-        placeholder='wondering that…', max_chars=700, label_visibility='collapsed',
+        'Your question', key='question',
+        placeholder='wondering that…', max_chars=700,
     )
     if st.button('Turn into search', type='primary', disabled=not question.strip()):
         plan=guided_plan(question)
@@ -513,7 +489,7 @@ def page_question(ai_key,enabled,model,provider):
         st.session_state.update(topic=question,research_goal='Help me start',discovery_plan=plan,
             query=query_from_question(question),ui_step='Direction',result_page=0,
             selected_directions=[],active_combo_id=None,discovery_sample=sample,last_selected_direction=None)
-        for name in ('plan_direction','papers','weights','searched_query','selected_paper','abstract_help','map_selected','reader_id'):
+        for name in ('plan_direction','papers','weights','searched_query','selected_paper','abstract_help','map_selected','reader_id','search_failure'):
             st.session_state.pop(name,None)
         st.rerun()
 
@@ -524,16 +500,16 @@ def page_direction(openalex_key,ai_key='',enabled=False,model='',provider='huggi
     if st.session_state.pop('ai_notice', None):
         st.caption('Showing guided suggestions. You can edit the search.')
     with st.container(horizontal=True, key='topic_tools', vertical_alignment='center', gap='small'):
-        with st.popover('⌕ Search', width='content'):
+        with st.popover('Edit question or search terms', width='content'):
             page_question(ai_key,enabled,model,provider)
             with st.expander('Exact search terms'):
                 st.text_input('Search terms', key='query', max_chars=500)
         query=st.session_state.get('query','')
-        with st.popover('⚑', help='Search filters', width='content'):
+        with st.popover('Search filters', width='content'):
             year = st.selectbox('Publication window', ['Any year', 'Since 2024', 'Since 2020', 'Since 2015'], key='year_filter')
             if query.strip():
                 st.link_button('Web search ↗', 'https://www.google.com/search?'+urlencode({'q': query}))
-        st.button('▣',key='save_combo',help='Save combination',on_click=save_current_combo,
+        st.button('Save study set',key='save_combo',on_click=save_current_combo,
             disabled=not bool(st.session_state.get('selected_directions')),width='content')
         search_now=st.button('Find real papers →',type='primary',disabled=not query.strip(),width='content')
     st.caption(query)
@@ -547,7 +523,9 @@ def page_direction(openalex_key,ai_key='',enabled=False,model='',provider='huggi
                 st.rerun()
             else:
                 st.warning('No records found. Try a shorter phrase, a different direction, or Any year.')
+                show_source_warnings(papers)
         except DiscoveryError as exc:
+            st.session_state.search_failure=(query,str(exc))
             st.error(str(exc))
 
 
@@ -560,6 +538,7 @@ def sample_notice(papers):
 
 def page_papers(ai_key,enabled,model,provider):
     sample_notice(st.session_state.papers)
+    show_source_warnings(st.session_state.papers)
     available=any(config.free_plan_confirmed for config in coach_configs()) or bool(enabled and ai_key)
     explain=(lambda item: explain_result_item(item,ai_key,model,provider)) if available else None
     render_discovery_workspace(st.session_state.papers,
@@ -725,21 +704,42 @@ def page_saved():
         paper_card(paper,st.session_state.get('weights',{}),key_prefix='tray_',compact=True)
 
 
+def show_source_warnings(papers, *, details=False):
+    first=papers[0] if papers else {}
+    for notice in getattr(papers,'notices',first.get('search_notices',[])):
+        st.warning(notice)
+    excluded=[paper for paper in papers if is_retracted_or_notice(paper)]
+    if excluded and details:
+        st.subheader('Excluded retractions and notices')
+        for paper in excluded:
+            status='Retracted paper' if paper.get('is_retracted') is True else 'Retraction notice'
+            st.warning(f"{status} · {paper['title']}")
+    elif excluded:
+        st.warning(f'{len(excluded)} retracted papers or notices were excluded. See Sources & transparency.')
+
+
 def page_sources():
-    st.header('Sources & what we could check')
-    papers=st.session_state.papers
+    st.header('Sources & transparency')
+    papers=st.session_state.get('papers',[])
     sample_notice(papers)
-    st.write('Titles, authors, dates and links come from scholarly source records. Abstracts are not full papers; missing metadata stays unknown.')
-    st.write('Search: '+st.session_state.searched_query)
-    st.caption('Originally retrieved: '+papers[0]['retrieved_at'])
-    st.caption('Citation counts have different coverage between providers. Counts do not establish scientific agreement.')
-    for notice in papers[0].get('search_notices',[]):
-        st.info(notice)
-    retracted=[p['title'] for p in papers if p.get('is_retracted')]
-    if retracted:
-        with st.expander('Excluded retracted records'):
-            for title in retracted:
-                st.warning(title)
+    st.write('Titles, authors, dates and links come from scholarly source records. The app shows retrieved abstracts and leaves missing metadata unknown.')
+    st.caption('Citation counts vary by provider and measure attention. Check the paper’s methods before relying on its findings.')
+    if failure:=st.session_state.get('search_failure'):
+        query,message=failure
+        st.write(f'Latest search · {query}')
+        st.error(message)
+    if query:=st.session_state.get('searched_query'):
+        st.write(f'Search details · {query}')
+        if papers and papers[0].get('retrieved_at'):
+            st.caption('Originally retrieved · '+papers[0]['retrieved_at'])
+        providers=getattr(papers,'sources',papers[0].get('search_sources',[]) if papers else [])
+        if providers:
+            st.write('Providers that responded · '+', '.join(providers))
+        if not papers:
+            st.info('This search returned no paper records.')
+        show_source_warnings(papers,details=True)
+    elif not failure:
+        st.info('Search for papers to see which providers responded, search warnings, and records excluded for retraction.')
 
 
 def render():
@@ -747,74 +747,49 @@ def render():
     if error:=st.session_state.get('vault_error'):
         st.error(error)
     # Keep editable values when Streamlit removes widgets on inactive steps.
-    for key in ('question','query','plan_direction','year_filter','paper_goal','board_mode','map_view','map_topic','gemini_session_key','hf_session_key','ai_provider','ai_guidance_opt_in'):
+    for key in ('question','query','plan_direction','year_filter','paper_goal','board_mode','map_view','map_topic','gemini_session_key','hf_session_key','ai_provider','ai_guidance_opt_in','light_mode'):
         if key in st.session_state:
             st.session_state[key]=st.session_state[key]
     st.session_state.setdefault('ui_step','Question')
     st.session_state.setdefault('nav_panel_open',False)
     light=st.session_state.get('light_mode',False)
     rail_bg='#dff1f3' if light else '#081c29'
-    panel_bg='#eef8f9' if light else '#102938'
     page_bg='#f8fcfd' if light else '#0b1721'
     foreground='#173946' if light else '#e7f3f4'
     line='#b5d9dc' if light else '#2c6671'
     st.markdown(f'''<style>
       [data-testid="stAppViewContainer"], [data-testid="stMain"], [data-testid="stHeader"] {{background:{page_bg}!important; color:{foreground}!important;}}
-      [data-testid="stSidebar"] {{width:52px!important; min-width:52px!important; max-width:52px!important; transform:none!important; background:{rail_bg}!important; border-right:1px solid {line};}}
-      [data-testid="stSidebarContent"] {{padding:10px 5px!important; width:52px!important;}}
-      [data-testid="stSidebarCollapseButton"], [data-testid="stSidebarCollapsedControl"], [data-testid="stExpandSidebarButton"] {{display:none!important;}}
-      [data-testid="stSidebar"] p {{text-align:center;}}
-      [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {{gap:.42rem!important;}}
-      [data-testid="stSidebar"] button {{min-height:38px!important; height:38px!important; padding:0!important; font-size:18px!important; border-radius:11px!important;}}
-      .st-key-nav_panel {{position:fixed!important; left:60px; top:72px; bottom:auto; width:260px; max-height:min(65vh,520px); z-index:999; overflow-y:auto; padding:10px 12px; background:{panel_bg}; border:1px solid {line}; border-radius:18px; box-shadow:12px 16px 34px #06162055;}}
-      .st-key-nav_panel h3 {{font-size:1rem!important; margin:0!important;}}
-      .st-key-nav_panel button {{min-height:30px!important;}}
-      .st-key-nav_panel .st-key-nav_close button {{min-height:38px!important; font-size:1.35rem!important;}}
-      .block-container {{padding-top:3rem; padding-bottom:1.2rem; padding-left:28px; padding-right:24px; max-width:1500px;}}
-      [data-testid="stMain"] button {{min-height:28px!important;padding:3px 9px!important;border-radius:6px!important;}}
-      [data-testid="stPopoverBody"] {{max-width:320px!important;padding:12px!important;}}
-      [data-testid="stPopoverBody"] p {{font-size:12px!important;}}
-      [data-testid="stMain"] input {{min-height:30px!important;font-size:13px!important;}}
-      [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"] {{border-radius:6px!important;}}
-      .st-key-topic_tools {{border-bottom:1px solid {line};padding-bottom:6px;}}
-      .st-key-topic_tools [data-testid="stButton"], .st-key-topic_tools [data-testid="stPopover"] {{width:auto!important;}}
-      .st-key-reading_type [role="radiogroup"], .st-key-bubble_lens [role="radiogroup"], .st-key-result_order [role="radiogroup"] {{flex-wrap:wrap!important;overflow:visible!important;max-width:100%!important;gap:5px!important;}}
-      .st-key-reading_type [data-variant="pills"], .st-key-bubble_lens [data-variant="pills"], .st-key-result_order [data-variant="pills"] {{min-height:35px!important;padding:5px 9px!important;font-size:12px!important;}}
-      [data-testid="stMain"] p {{font-size:13px;line-height:1.35;}}
-      [data-testid="stVerticalBlock"] {{gap:.5rem;}}
-      [role="tooltip"] {{max-width:230px!important;font-size:12px!important;line-height:1.35!important;pointer-events:none!important;}}
-      [data-testid="stTooltipContent"] {{max-width:230px!important;font-size:12px!important;}}
-      [data-testid="stToolbar"] {{display:none;}}
-      h1 {{font-size:1.65rem!important;}} h2 {{font-size:1.2rem!important;}}
-      .st-key-packed_board {{max-width:330px!important;}}
-      @media (max-width:1000px) {{.block-container {{padding-left:20px;}}}}
-      @media (max-width:700px) {{.block-container {{padding:1rem 1rem 1rem 68px;}} h2 {{font-size:1.4rem!important;}} .st-key-nav_panel {{width:min(295px,calc(100vw - 66px));}}}}
+      [data-testid="stSidebar"] {{background:{rail_bg}; border-right:1px solid {line};}}
+      [data-testid="stSidebar"] button {{min-height:2.75rem; text-align:left;}}
+      [data-testid="stSidebar"] button p {{font-size:1rem; overflow-wrap:anywhere;}}
+      .st-key-nav_panel {{max-width:44rem; padding:1rem;}}
+      .block-container {{padding-top:3rem; padding-bottom:2rem; max-width:90rem;}}
+      [data-testid="stMain"] p, [data-testid="stPopoverBody"] p {{font-size:1rem; line-height:1.5;}}
+      [data-testid="stMain"] :is(input, textarea), [data-testid="stPopoverBody"] :is(input,textarea) {{font-size:1rem;}}
+      [data-testid="stPopoverBody"] {{max-width:min(28rem, 94vw);}}
+      .st-key-topic_tools {{border-bottom:1px solid {line}; padding-bottom:.75rem;}}
+      [data-testid="stMain"] button:focus-visible, [data-testid="stSidebar"] button:focus-visible {{
+        outline:2px solid {foreground}; outline-offset:2px;
+      }}
+      @media (max-width:700px) {{
+        .block-container {{padding:3rem 1rem 1.5rem;}}
+        .st-key-nav_panel {{padding:.75rem;}}
+      }}
     </style>''',unsafe_allow_html=True)
     if light:
         st.markdown('''<style>
         [data-testid="stMain"] p, [data-testid="stMain"] h1, [data-testid="stMain"] h2, [data-testid="stMain"] h3,
-        [data-testid="stMain"] label, [data-testid="stSidebar"] p {color:#173946!important;}
+        [data-testid="stMain"] label, [data-testid="stSidebar"] :is(p,h3) {color:#173946!important;}
         [data-testid="stMain"] input, [data-testid="stMain"] textarea,
         [data-testid="stMain"] [data-baseweb="select"] > div {background:#fff!important;color:#173946!important;border-color:#bad8dc!important;}
         [data-testid="stMain"] button:not([kind="primary"]), [data-testid="stSidebar"] button:not([kind="primary"]) {background:#fff!important;color:#174a59!important;border-color:#bad8dc!important;}
         [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"] {border-color:#c5e0e3!important;}
         </style>''',unsafe_allow_html=True)
-    st.markdown("""<style>
-    [data-testid="stSidebar"] button,
-    [data-testid="stSidebar"] button:not([kind="primary"]) {
-        background:transparent!important;border:0!important;box-shadow:none!important;
-        border-radius:0!important;
-    }
-    [data-testid="stSidebar"] button:hover {color:#41c6c7!important;background:transparent!important;}
-    [data-testid="stSidebar"] button:focus-visible {outline:1px solid #41c6c7!important;outline-offset:-4px;}
-    </style>""",unsafe_allow_html=True)
     ai_key,enabled,provider,model=sidebar()
     step=st.session_state.ui_step
     if step=='Question' or (step=='Direction' and 'discovery_plan' not in st.session_state):
-        st.header('Workspace')
-        with st.container(horizontal=True,key='topic_tools'):
-            with st.popover('⌕ Search',width='content'):
-                page_question(ai_key,enabled,model,provider)
+        st.header('Research question')
+        page_question(ai_key,enabled,model,provider)
     elif step=='Direction' and 'discovery_plan' in st.session_state:
         page_direction(secret('OPENALEX_API_KEY'),ai_key,enabled,model,provider)
     elif step=='Papers' and st.session_state.get('papers'):
@@ -832,7 +807,7 @@ def render():
         page_vault()
     elif step=='Saved':
         page_saved()
-    elif step=='Sources' and st.session_state.get('papers'):
+    elif step=='Sources':
         page_sources()
     else:
         st.session_state.ui_step='Question'

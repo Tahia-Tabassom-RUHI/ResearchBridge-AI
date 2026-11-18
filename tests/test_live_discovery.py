@@ -165,14 +165,14 @@ def test_guidance_direction_choice_and_focus_changes_real_search():
     from pathlib import Path
     from streamlit.testing.v1 import AppTest
     app=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py'),default_timeout=20).run()
-    app.text_area[0].input('Why do I forget things I studied yesterday?').run()
+    app.text_input(key='question').input('Why do I forget things I studied yesterday?').run()
     next(b for b in app.button if b.label == 'Turn into search').click().run()
     app.button(key='topic_bubble_1').click().run()
     assert app.text_input(key='query').value=='retrieval practice learning'
     p=crossref_record({'DOI':'10.1234/test','title':['Retrieval practice learning'],'subject':['Memory']})
     with patch('screens.home.retrieve',return_value=[p]):
         next(b for b in app.button if b.label=='Find real papers →').click().run()
-    assert app.pills(key='bubble_lens').value=='Topics'
+    assert app.selectbox(key='bubble_lens').value=='Topics'
     assert not app.exception
 
 
@@ -180,7 +180,7 @@ def test_topic_combination_keeps_the_question_and_changes_search():
     from pathlib import Path
     from streamlit.testing.v1 import AppTest
     app=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py'),default_timeout=20).run()
-    app.text_area[0].input('Banana good for how long?').run()
+    app.text_input(key='question').input('Banana good for how long?').run()
     next(b for b in app.button if b.label == 'Turn into search').click().run()
     labels=[item['label'] for item in app.session_state['discovery_plan']['directions']]
     assert labels[:2]==['Shelf life','Storage']
@@ -195,11 +195,11 @@ def test_topic_combination_keeps_the_question_and_changes_search():
     assert not app.exception
 
 
-def test_saved_combinations_restore_distinct_searches_and_results():
+def test_saved_combinations_restore_distinct_searches_and_results(monkeypatch):
     from pathlib import Path
     from streamlit.testing.v1 import AppTest
     app=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py'),default_timeout=20).run()
-    app.text_area[0].input('Banana good for how long?').run()
+    app.text_input(key='question').input('Banana good for how long?').run()
     next(b for b in app.button if b.label=='Turn into search').click().run()
     app.button(key='topic_bubble_0').click().run()
     first_query=app.text_input(key='query').value
@@ -214,12 +214,18 @@ def test_saved_combinations_restore_distinct_searches_and_results():
     assert second_query!=first_query
     app.button(key='save_combo').click().run()
     assert len(app.session_state['saved_combos'])==2
+    selection={'index':0,'action':'select'}
+    monkeypatch.setattr('streamlit.components.v1.declare_component',
+        lambda *args,**kwargs:lambda **kwargs:selection)
     app.button(key='rail_Vault').click().run()
-    app.button(key='combo_0').click().run()
+    app.button(key='vault_open').click().run()
+    next(b for b in app.button if b.label=='Find more').click().run()
     assert app.session_state['ui_step']=='Papers'
     assert app.session_state['searched_query']==first_query
+    selection['index']=1
     app.button(key='rail_Vault').click().run()
-    app.button(key='combo_1').click().run()
+    app.button(key='vault_open').click().run()
+    next(b for b in app.button if b.label=='Find more').click().run()
     assert app.session_state['ui_step']=='Direction'
     assert app.text_input(key='query').value==second_query
     assert not app.exception
@@ -246,14 +252,14 @@ def test_steps_preserve_inputs_and_keep_results_out_of_question_screen():
     from streamlit.testing.v1 import AppTest
     app=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py'),default_timeout=20).run()
     assert app.button(key='rail_Papers').disabled
-    app.text_area[0].input('Why do I forget things I studied yesterday?').run()
-    question=app.text_area[0].value
+    app.text_input(key='question').input('Why do I forget things I studied yesterday?').run()
+    question=app.text_input(key='question').value
     app.button[0]  # Sidebar is present on every step.
     next(b for b in app.button if b.label == 'Turn into search').click().run()
     app.text_input(key='query').input('my edited search').run()
     app.selectbox(key='year_filter').select('Since 2020').run()
     app.button(key='rail_Question').click().run()
-    assert app.text_area[0].value==question
+    assert app.text_input(key='question').value==question
     app.button(key='rail_Direction').click().run()
     assert app.text_input(key='query').value=='my edited search'
     assert app.selectbox(key='year_filter').value=='Since 2020'

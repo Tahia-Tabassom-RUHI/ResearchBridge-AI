@@ -52,7 +52,7 @@ def test_background_articles_are_labelled_and_have_real_source_urls():
 
 def test_combo_reading_list_and_quick_preview():
     app=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py')).run()
-    app.text_area[0].input('Banana good for how long?').run()
+    app.text_input(key='question').input('Banana good for how long?').run()
     next(b for b in app.button if b.label=='Turn into search').click().run()
     app.button(key='topic_bubble_0').click().run()
     paper=crossref_record({'DOI':'10.1234/shelf','title':['Banana shelf life'],
@@ -65,7 +65,7 @@ def test_combo_reading_list_and_quick_preview():
     assert any('Bananas change during storage.' in node.value for node in app.markdown)
     app.button(key='reading_add_0').click().run()
     assert paper['id'] in app.session_state['saved_combos'][0]['reading_ids']
-    app.pills(key='reading_type').set_value('My reading list').run()
+    app.selectbox(key='reading_type').select('My reading list').run()
     assert app.button(key='reading_preview_0')
     app.button(key='reading_preview_0').click().run()
     app.button(key='preview_read').click().run()
@@ -76,7 +76,7 @@ def test_combo_reading_list_and_quick_preview():
 
 def test_removing_from_combo_updates_its_reading_list():
     app=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py')).run()
-    app.text_area[0].input('Banana good for how long?').run()
+    app.text_input(key='question').input('Banana good for how long?').run()
     next(b for b in app.button if b.label=='Turn into search').click().run()
     app.button(key='topic_bubble_0').click().run()
     paper=crossref_record({'DOI':'10.1234/remove','title':['Banana shelf life'],'subject':['Shelf life']})
@@ -86,7 +86,7 @@ def test_removing_from_combo_updates_its_reading_list():
     assert app.button(key='reading_add_0').label=='− Remove'
     app.button(key='reading_add_0').click().run()
     assert app.session_state['saved_combos'][0]['reading_ids']==[]
-    app.pills(key='reading_type').set_value('My reading list').run()
+    app.selectbox(key='reading_type').select('My reading list').run()
     assert not any(b.key=='reading_preview_0' for b in app.button)
 
 

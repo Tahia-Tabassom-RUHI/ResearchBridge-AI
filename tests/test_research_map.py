@@ -56,19 +56,19 @@ def test_subset_views_and_dates():
 
 def test_all_map_views_and_source_drilldown():
     app = AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py'), default_timeout=30).run()
-    app.text_area[0].input('storage').run()
+    app.text_input(key='question').input('storage').run()
     next(b for b in app.button if b.label == 'Turn into search').click().run()
     with patch('screens.home.retrieve', return_value=[record()]):
         next(b for b in app.button if b.label == 'Find real papers →').click().run()
     for lens in ('Topics','Authors','Countries','Institutions','Venues','Citations','Reviews','Years'):
-        app.pills(key='bubble_lens').set_value(lens).run()
+        app.selectbox(key='bubble_lens').select(lens).run()
         assert not app.exception, lens
-    app.pills(key='bubble_lens').set_value('Authors').run()
+    app.selectbox(key='bubble_lens').select('Authors').run()
     next(b for b in app.button if b.key == 'metric_https://openalex.org/A1').click().run()
     assert app.session_state['map_selected'] == 'https://openalex.org/A1'
     app.button(key='reading_add_0').click().run()
     assert len(app.session_state['saved_papers']) == 1
-    app.pills(key='bubble_lens').set_value('Reviews').run()
+    app.selectbox(key='bubble_lens').select('Reviews').run()
     assert 'map_selected' not in app.session_state
     assert not app.exception
 

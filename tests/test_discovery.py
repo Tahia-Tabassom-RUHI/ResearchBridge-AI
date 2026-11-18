@@ -1,5 +1,6 @@
 from pathlib import Path
 from unittest.mock import patch
+import pytest
 from streamlit.testing.v1 import AppTest
 from services.papers import normalize, abstract_text
 from services.ranking import rank_papers, query_from_question, starter_directions
@@ -33,7 +34,7 @@ def test_starter_is_not_general_understanding():
 
 def test_question_to_bubble_to_handoff():
     app = AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py')).run()
-    app.text_area[0].input('fruit juice storage').run()
+    app.text_input(key='question').input('fruit juice storage').run()
     next(b for b in app.button if b.label == 'Turn into search').click().run()
     with patch('screens.home.retrieve', return_value=[sample()]):
         next(b for b in app.button if b.label == 'Find real papers →').click().run()
@@ -53,7 +54,7 @@ def test_question_to_bubble_to_handoff():
 def test_empty_and_error_search_keep_question():
     from services.papers import DiscoveryError
     app = AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py')).run()
-    app.text_area[0].input('orbital mechanics').run()
+    app.text_input(key='question').input('orbital mechanics').run()
     next(b for b in app.button if b.label == 'Turn into search').click().run()
     with patch('screens.home.retrieve', return_value=[]):
         next(b for b in app.button if b.label == 'Find real papers →').click().run()
@@ -61,8 +62,42 @@ def test_empty_and_error_search_keep_question():
     with patch('screens.home.retrieve', side_effect=DiscoveryError('Service unavailable')):
         next(b for b in app.button if b.label == 'Find real papers →').click().run()
     assert app.error[0].value == 'Service unavailable'
+    app.button(key='rail_Sources').click().run()
+    assert app.error[0].value == 'Service unavailable'
     app.button(key='rail_Question').click().run()
-    assert app.text_area[0].value == 'orbital mechanics'
+    assert app.text_input(key='question').value == 'orbital mechanics'
+    assert not app.exception
+
+
+@pytest.mark.parametrize('with_papers',[False,True])
+def test_sources_show_partial_failure_and_exclusions(monkeypatch,with_papers):
+    from services.scholarly import crossref_record
+
+    monkeypatch.setattr('screens.home.secret',lambda name,default='':default)
+    valid=crossref_record({'DOI':'10.1234/valid','title':['Storage study']})
+    retracted={**valid,'id':'old','doi':None,'title':'Withdrawn study','is_retracted':True}
+    notice={**valid,'id':'notice','doi':None,'title':'Withdrawal notice','paper_type':'retraction-notice'}
+    papers=[valid,retracted,notice] if with_papers else []
+    app=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py')).run()
+    query='storage publications' if with_papers else 'missing storage publications'
+    app.text_input(key='question').input(query).run()
+    next(b for b in app.button if b.label=='Turn into search').click().run()
+
+    with patch('services.scholarly.search_crossref',return_value=papers), \
+            patch('services.scholarly.search_europe',side_effect=TimeoutError):
+        next(b for b in app.button if b.label=='Find real papers →').click().run()
+    assert any('Europe PMC could not respond' in warning.value for warning in app.warning)
+    assert app.button(key='rail_Papers').disabled==(not with_papers)
+    app.button(key='rail_Sources').click().run()
+    assert app.header[0].value=='Sources & transparency'
+    assert any('Providers that responded · Crossref' in text.value for text in app.markdown)
+    warnings=[warning.value for warning in app.warning]
+    assert any('Europe PMC could not respond' in warning for warning in warnings)
+    if with_papers:
+        assert 'Retracted paper · Withdrawn study' in warnings
+        assert 'Retraction notice · Withdrawal notice' in warnings
+    else:
+        assert any('no paper records' in prompt.value for prompt in app.info)
     assert not app.exception
 
 

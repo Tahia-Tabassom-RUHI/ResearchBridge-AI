@@ -10,6 +10,15 @@ from urllib.request import Request, urlopen
 from services.papers import DiscoveryError, biomedical_ids, doi_url, provider_records, safe_url
 
 
+class SearchResults(list):
+    """Carry search-level status even when the list of papers is empty."""
+
+    def __init__(self,papers,notices,sources):
+        super().__init__(papers)
+        self.notices=list(dict.fromkeys(notices))
+        self.sources=sorted(set(sources))
+
+
 def clean(value):
     return re.sub(r'\s+', ' ', unescape(re.sub('<[^>]+>', ' ', value or ''))).strip() or None
 
@@ -267,7 +276,8 @@ def discover(query, year=None, api_key=None, extra_queries=()):
     papers = merge_records(results)
     if year:
         papers = [p for p in papers if p.get('publication_date') and p['publication_date'][:4]>=year]
-    for paper in papers:
-        paper['search_notices'] = list(dict.fromkeys(notices))
-        paper['search_sources'] = sorted(set(successful))
-    return papers[:80]
+    report = SearchResults(papers[:80],notices,successful)
+    for paper in report:
+        paper['search_notices'] = report.notices
+        paper['search_sources'] = report.sources
+    return report
