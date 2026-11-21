@@ -13,6 +13,7 @@ from components.reading_workspace import reading_workspace
 from services.demo_map import demo_papers
 from screens.journal import journal_header
 from screens.library import library_sidebar, render_library
+from screens.research_matrix import render as render_research_matrix
 from services.library import catalog as library_catalog, open_library
 from screens.paper_reader import load_retrieved_paper, open_manual_reader
 from services.ai_explainer import CARD_TITLES, generate_explanations, load_provider_configs
@@ -933,13 +934,16 @@ def open_tool(target):
     elif origin == "Learning Assistant":
         paper = current_tool_paper()
     elif origin == "Notes":
-        paper = state.paper_tools["Notes"][0]
+        note = state.get("paper_tools", {}).get("Notes")
+        paper = note[0] if note else None
     else:
         paper = None
     if paper:
         state.setdefault("paper_tools", {})[target] = (paper, origin)
         if target == "Learning Assistant":
             state.assistant_picker = False
+        go(target)
+    elif target == "Notes":
         go(target)
     else:
         open_workspace_picker(origin, target)
@@ -953,10 +957,8 @@ def current_tool_paper():
     return state.paper_tools["Learning Assistant"][0]
 
 
-def page_paper_tool(step, ai_key, enabled, model, provider):
+def paper_tool_heading(step, paper):
     state = st.session_state
-    paper = current_tool_paper() if step == "Learning Assistant" else state.paper_tools["Notes"][0]
-    st.title(step)
     if step == "Learning Assistant" and state.get("assistant_picker"):
         study_navigation(step)
     else:
@@ -970,9 +972,28 @@ def page_paper_tool(step, ai_key, enabled, model, provider):
     workspace_paper_details(paper)
     if paper.get("doi"):
         st.caption(f"DOI · {paper['doi']}")
-    if step == "Notes":
-        reading_workspace(paper, {})
+
+
+def page_notes():
+    st.title("Notes")
+    section = st.radio("Notes section", ("My Notes", "Research Matrix"), horizontal=True,
+                       label_visibility="collapsed", key="notes_section")
+    if section == "Research Matrix":
+        render_research_matrix()
         return
+    note = st.session_state.get("paper_tools", {}).get("Notes")
+    if note is None:
+        st.button("Choose Paper from Library", on_click=open_workspace_picker, args=("Notes", "Notes"))
+        return
+    paper = note[0]
+    paper_tool_heading("Notes", paper)
+    reading_workspace(paper, {})
+
+
+def page_paper_tool(step, ai_key, enabled, model, provider):
+    paper = current_tool_paper()
+    st.title(step)
+    paper_tool_heading(step, paper)
     with st.container(horizontal=True):
         st.button("Knowledge Check", on_click=open_knowledge_check, args=(paper,))
         st.button("Prerequisite Lessons", on_click=open_knowledge_check, args=(paper, True))
@@ -1103,7 +1124,9 @@ def render_destination(ai_key, enabled, model, provider):
         render_knowledge_check(paper, lessons_only=st.session_state.get('knowledge_lessons_only', False))
     elif step=='Guided reading':
         page_guided_reading(ai_key,enabled,model,provider)
-    elif step in ("Learning Assistant", "Notes"):
+    elif step == "Notes":
+        page_notes()
+    elif step == "Learning Assistant":
         page_paper_tool(step, ai_key, enabled, model, provider)
     elif step=='Combo reading':
         page_combo_reading(ai_key,enabled,model,provider)

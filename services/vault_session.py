@@ -6,7 +6,8 @@ from services.vault_store import VaultError, load_vault, new_token, update_vault
 
 
 VAULT_DEFAULTS=dict(saved_combos=[],saved_papers={},loose_reading_ids=[],
-    active_combo_id=None,light_mode=False,folders={},paper_folders={},reading_status={})
+    active_combo_id=None,light_mode=False,folders={},paper_folders={},reading_status={},
+    research_matrices={},research_comparisons={})
 CONFLICT_MESSAGE='The Vault changed in another session. Reload this page, then retry your edit.'
 
 
