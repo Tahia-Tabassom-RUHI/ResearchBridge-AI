@@ -1,4 +1,5 @@
 """Beginner-first discovery: express a question, choose a direction, open real research."""
+from dataclasses import asdict
 import os
 from pathlib import Path
 from urllib.parse import urlencode
@@ -10,9 +11,10 @@ from components.paper_card import paper_card
 from components.bubble_board import combination_board
 from components.reading_workspace import reading_workspace
 from services.demo_map import demo_papers
+from screens.journal import journal_header
 from screens.library import library_sidebar, render_library
 from services.library import catalog as library_catalog, open_library
-from screens.paper_reader import load_retrieved_paper, open_manual_reader, render_paper_reader
+from screens.paper_reader import load_retrieved_paper, open_manual_reader
 from services.ai_explainer import CARD_TITLES, generate_explanations, load_provider_configs
 from services.paper_reader import validate_paper_input
 from services.topic_signals import topic_signals, expand_directions_from_sample
@@ -340,7 +342,7 @@ def page_combo_reading(ai_key='',enabled=False,model='',provider='huggingface'):
             else:
                 st.caption('No source link supplied.')
         with notes:
-            reading_workspace(paper,{p['id']:p for p in items},st.session_state.get('light_mode',False))
+            reading_workspace(paper,{p['id']:p for p in items})
 
         with coach:
             st.session_state.reader_id=paper['id']
@@ -364,7 +366,7 @@ def page_vault():
     import streamlit.components.v1 as components
     from pathlib import Path
     table=components.declare_component('vault_double_click',path=str(Path(__file__).resolve().parents[1]/'components'/'vault_table'))
-    event=table(rows=rows,light=st.session_state.get('light_mode',False),key='vault_table',default=None)
+    event=table(rows=rows,key='vault_table',default=None)
     selected=[]
     if event and 0<=event.get('index',-1)<len(combos):
         selected=[event['index']]
@@ -392,8 +394,7 @@ def go(step):
 
 
 def open_nav(step):
-    st.session_state.nav_panel_open=step in ('Settings',) and not (st.session_state.get('nav_panel_open') and st.session_state.get('nav_panel_step')==step)
-    st.session_state.nav_panel_step=step
+    st.session_state.nav_panel_open = step == "Settings" and not st.session_state.get("nav_panel_open")
     if step in STEPS:
         st.session_state.ui_step=step
 
@@ -404,6 +405,7 @@ def open_workspaces():
 
 
 def open_knowledge_check(paper=None, lessons_only=False):
+    st.session_state.knowledge_return = st.session_state.ui_step
     st.session_state.knowledge_check_paper = paper
     st.session_state.knowledge_lessons_only = lessons_only
     st.session_state.nav_panel_open = False
@@ -414,41 +416,32 @@ def close_nav():
     st.session_state.nav_panel_open=False
 
 
-def toggle_theme():
-    st.session_state.light_mode=not st.session_state.get('light_mode',False)
-    persist_vault()
-
-
 def sidebar():
     st.session_state.setdefault('nav_panel_open',False)
-    st.session_state.setdefault('nav_panel_step','Question')
     with st.sidebar:
-        st.subheader('ResearchBridge')
+        st.html('<div class="journal-brand"><img src="app/static/journal/brand.svg" alt="">ResearchBridge</div>')
         step = st.session_state.ui_step
         settings = st.session_state.nav_panel_open
-        workspace = step in ('Workspaces', 'Workspace picker', 'Learning Workspace') or (
-            step in ('Read paper', 'Guided reading', 'Knowledge check')
-            and st.session_state.get('reader_origin') == 'Workspace'
-        )
-        reading = step in ('Read paper', 'Guided reading') and not workspace
-        personal_abstract = step == 'Guided reading' and st.session_state.get('guided_standalone')
-        library = step in ('My Library', 'Saved') or (reading and
-            (personal_abstract or st.session_state.get('reader_origin') == 'My Library'))
-        discover = step in ('Question','Direction','Papers','Vault','Combo reading') or (reading and not library)
-        def nav_style(active):
-            return 'primary' if active and not settings else 'tertiary'
-        st.button('Discover Papers', key='rail_Question', icon=':material/search:', type=nav_style(discover),
-                  on_click=open_nav, args=('Question',), width='stretch')
-        st.button('My Library', key='rail_My Library', icon=':material/local_library:', type=nav_style(library),
-                  on_click=open_library, width='stretch')
-        with st.container(key='library_tree', gap=None):
+        def nav(label, key, icon, active, callback, *args):
+            st.button(label, key=key, icon=f":material/{icon}:",
+                      type="primary" if active and not settings else "tertiary",
+                      width="stretch", on_click=callback, args=args)
+        nav("Discover", "rail_Question", "explore", step in ("Question", "Direction", "Papers"),
+            open_nav, "Question")
+        nav("My Library", "rail_My Library", "local_library", step in ("My Library", "Saved"), open_library)
+        with st.container(key="library_tree", gap=None):
             library_sidebar()
-        st.button('Workspace', key='rail_workspace', icon=':material/school:',
-                  type=nav_style(workspace), on_click=open_workspaces, width='stretch')
-        st.button('Sources & Transparency', key='rail_Sources', icon=':material/policy:', type=nav_style(step=='Sources'),
-                  on_click=open_nav, args=('Sources',), width='stretch')
-        st.button('Settings', key='rail_Settings', icon=':material/settings:',
-                  type='primary' if settings else 'tertiary', width='stretch', on_click=open_nav,args=('Settings',))
+        nav("Guided Reading", "rail_guided", "menu_book", step == "Guided reading",
+            open_tool, "Guided reading")
+        nav("Learning Assistant", "rail_assistant", "school", step == "Learning Assistant",
+            open_tool, "Learning Assistant")
+        nav("Notes", "rail_notes", "edit_note", step == "Notes",
+            open_tool, "Notes")
+        nav("Workspace", "rail_workspace", "dashboard", step in ("Workspaces", "Workspace picker", "Read paper"),
+            open_workspaces)
+        nav("Sources", "rail_Sources", "source", step == "Sources", open_nav, "Sources")
+        st.button("Settings", key="rail_Settings", icon=":material/settings:",
+                  type="primary" if settings else "tertiary", width="stretch", on_click=open_nav, args=("Settings",))
     provider=st.session_state.get('ai_provider','Hugging Face')
     hf_key=st.session_state.get('hf_session_key','') or secret('HF_TOKEN')
     gemini_key=st.session_state.get('gemini_session_key','') or secret('GEMINI_API_KEY')
@@ -461,7 +454,6 @@ def sidebar():
             st.button('Close settings',key='nav_close',on_click=close_nav)
             with st.expander('Learning tools'):
                 st.button('Knowledge check & learning cards',on_click=open_knowledge_check)
-            st.toggle('Light mode',key='light_mode',on_change=persist_vault)
             with st.expander('AI connection'):
                 provider=st.selectbox('Provider', ['Hugging Face','Gemini'], key='ai_provider')
                 hf_key=st.text_input('Hugging Face token (this session only)',type='password',key='hf_session_key') or secret('HF_TOKEN')
@@ -493,7 +485,7 @@ def install_search(papers,query,year,step):
         searched_year=year,background_articles=[],nav_panel_open=False,
         ui_step='Papers' if step=='Bubble map' else step,
         result_page=0,selected_directions=[],active_combo_id=None)
-    for key in ('map_selected','reader_id','abstract_help','plan_direction','search_failure'):
+    for key in ('map_selected','reader_id','plan_direction','search_failure'):
         st.session_state.pop(key,None)
 
 
@@ -519,7 +511,7 @@ def page_question(ai_key,enabled,model,provider):
         st.session_state.update(topic=question,research_goal='Help me start',discovery_plan=plan,
             query=query_from_question(question),ui_step='Direction',result_page=0,
             selected_directions=[],active_combo_id=None,discovery_sample=sample,last_selected_direction=None)
-        for name in ('plan_direction','papers','weights','searched_query','selected_paper','abstract_help','map_selected','reader_id','reader_origin','search_failure'):
+        for name in ('plan_direction','papers','weights','searched_query','selected_paper','map_selected','reader_id','reader_origin','search_failure'):
             st.session_state.pop(name,None)
         st.rerun()
 
@@ -616,12 +608,14 @@ def page_reader(ai_key,enabled,model,provider):
     standalone = st.session_state.ui_step == 'Read paper'
     origin = st.session_state.get('reader_origin')
     from_library = standalone and origin == 'My Library'
-    from_workspace = standalone and origin == 'Workspace'
+    from_workspace = standalone and origin in ('Workspace', 'Workspace picker')
     back_step = 'My Library' if from_library else 'Papers'
     back_label = '← Back to My Library' if from_library else '← Back to papers'
     paper = current_reader_paper(from_library or from_workspace)
     if standalone:
         with st.container(horizontal=True):
+            if origin == 'Workspace picker':
+                st.button('← Back to paper picker', on_click=return_to_picker, args=('Read paper',))
             if not from_workspace:
                 st.button(back_label, on_click=go, args=(back_step,))
             st.button('← Back to Workspaces', on_click=open_workspaces)
@@ -642,11 +636,11 @@ def page_reader(ai_key,enabled,model,provider):
         st.caption('Text: Wikipedia contributors · CC BY-SA 4.0. Original page links to its authors and history.')
     workspace_tab,abstract_tab,help_tab,details_tab,source_tab=st.tabs(
         ['Workspace','Abstract','Read & Learn','Source details','Original page'],
-        default='Read & Learn' if from_workspace else 'Workspace')
+        default='Read & Learn' if origin == 'Workspace' else 'Workspace')
     with workspace_tab:
         st.caption(('Read this background article, group items, connect notes, and draw.' if is_background else
             'Read the retrieved abstract, group saved items, connect notes, and draw. The full paper opens at its source.'))
-        reading_workspace(paper,st.session_state.get('saved_papers',{}),st.session_state.get('light_mode',False))
+        reading_workspace(paper,st.session_state.get('saved_papers',{}))
     with abstract_tab:
         st.caption('Background article text; use research records for evidence.' if is_background else
             'Retrieved abstract only; the full paper has not been reviewed.')
@@ -706,14 +700,73 @@ def guided_reading_button(paper):
         except ValueError:
             st.info('This record needs a longer abstract for guided reading. You can still open the original source.')
         else:
+            st.session_state.pop('guided_picker', None)
+            st.session_state.pop('manual_picker', None)
             st.session_state.guided_standalone = False
             go('Guided reading')
             st.rerun()
 
 
-def open_workspace_picker(return_to):
-    st.session_state.workspace_picker_return = return_to
-    go('Workspace picker')
+PICKER_ACTIONS = {
+    "Guided reading": "Start Guided Reading",
+    "Learning Assistant": "Start AI Guided Learning",
+    "Notes": "Open Personal Notes",
+    "Read paper": "Open Paper Workspace",
+}
+
+
+def open_workspace_picker(return_to, target="Read paper"):
+    st.session_state.setdefault("picker_origins", {})[target] = return_to
+    st.session_state.update(workspace_picker_return=return_to, picker_target=target,
+                            picker_selection=[], workspace_query="", nav_panel_open=False)
+    go("Workspace picker")
+
+
+def activate_study_paper(target, index):
+    state = st.session_state
+    queue = state.study_queues[target]
+    paper = queue["papers"][index]
+    if target == "Guided reading":
+        state.pop("manual_picker", None)
+        load_retrieved_paper(paper)
+        state.guided_picker = True
+    if target == "Learning Assistant":
+        state.assistant_picker = True
+    queue["index"] = index
+    go(target)
+
+
+def return_to_picker(target):
+    state = st.session_state
+    if state.picker_target != target:
+        origin = state.picker_origins[target]
+        open_workspace_picker(origin, target)
+        queue = state.get("study_queues", {}).get(target)
+        if queue:
+            state.picker_selection = [paper["id"] for paper in queue["papers"]]
+    else:
+        go("Workspace picker")
+
+
+def study_navigation(target):
+    queue = st.session_state.study_queues[target]
+    index = queue["index"]
+    with st.container(horizontal=True, vertical_alignment="center"):
+        st.button("← Back to paper picker", on_click=return_to_picker, args=(target,))
+        if len(queue["papers"]) > 1:
+            st.button("Previous Paper", disabled=index == 0,
+                      on_click=activate_study_paper, args=(target, index - 1))
+            st.caption(f"Paper {index + 1} of {len(queue['papers'])}")
+            st.button("Next Paper", disabled=index == len(queue["papers"]) - 1,
+                      on_click=activate_study_paper, args=(target, index + 1))
+
+
+def pick_study_paper(paper_id, widget):
+    selection = st.session_state.picker_selection
+    if st.session_state[widget]:
+        selection.append(paper_id)
+    else:
+        selection.remove(paper_id)
 
 
 def workspace_paper_details(paper):
@@ -732,7 +785,7 @@ def page_workspaces():
     papers = list(library_catalog().values())
     if not papers:
         st.info('Save a paper in My Library to open its workspace here.')
-        st.button('Choose a Paper from My Library', on_click=open_library)
+        st.button('Choose a Paper from My Library', on_click=open_workspace_picker, args=('Workspaces',))
     for start in range(0, len(papers), 3):
         for column, paper in zip(st.columns(3), papers[start:start + 3]):
             with column.container(border=True):
@@ -742,23 +795,63 @@ def page_workspaces():
                           on_click=choose_reader, args=(paper, 'Workspace'))
 
 
+def open_manual_from_picker():
+    open_manual_reader()
+    st.session_state.manual_picker = True
+
+
 def page_workspace_picker():
-    st.header('Add Paper')
-    st.button('← Back', on_click=go, args=(st.session_state.workspace_picker_return,))
+    state = st.session_state
+    target = state.picker_target
+    action = PICKER_ACTIONS[target]
+    multiple = target in ("Guided reading", "Learning Assistant")
+    st.header("Choose papers" if multiple else "Choose a paper")
+    st.button("← Back", on_click=go, args=(state.workspace_picker_return,))
+    if target == "Guided reading":
+        st.button("Read your own abstract", on_click=open_manual_from_picker)
     papers = library_catalog()
     if not papers:
-        st.info('Your Library has no saved papers yet.')
-        st.button('Choose a Paper from My Library', on_click=open_library)
+        st.info("Your Library has no saved papers yet.")
+        st.button("Discover Papers", on_click=go, args=("Question",))
         return
-    query = st.text_input('Search saved papers', key='workspace_query').strip().casefold()
+    query = st.text_input("Search saved papers", key="workspace_query").strip().casefold()
+    selected = [key for key in state.picker_selection if key in papers]
+    state.picker_selection = selected
+
+    if multiple:
+        st.caption(f"{len(selected)} selected for learning")
+        if st.button("Start Learning" if len(selected) > 1 else action,
+                     key="start_learning", type="primary", disabled=not selected):
+            state.setdefault("study_queues", {})[target] = {"papers": [papers[key] for key in selected]}
+            activate_study_paper(target, 0)
+            st.rerun()
+
     matches = [paper for paper in papers.values() if query in ' '.join([
         paper['title'], ' '.join(paper.get('authors') or []), paper.get('source_name') or '',
     ]).casefold()]
     if not matches:
-        st.info('No saved papers match your search.')
+        st.info("No saved papers match your search.")
     for paper in matches:
-        st.button(paper['title'], key='workspace_pick_'+paper['id'],
-                  on_click=choose_reader, args=(paper, 'Workspace'))
+        paper_id = paper["id"]
+        if multiple:
+            usable = (paper.get("paper_type") not in ("Background article", "Source link")
+                      and not validate_paper_input(paper["title"], paper.get("abstract")))
+            widget = "study_select_" + paper_id
+            state[widget] = paper_id in selected
+            st.checkbox(paper["title"], key=widget, disabled=not usable,
+                        on_change=pick_study_paper, args=(paper_id, widget))
+            if not usable:
+                st.caption("Requires a research record with a usable abstract.")
+        else:
+            with st.container(horizontal=True, vertical_alignment="center"):
+                st.text(paper["title"])
+                if st.button(action, key="workspace_pick_" + paper_id, help=paper["title"]):
+                    if target == "Read paper":
+                        choose_reader(paper, "Workspace picker")
+                    else:
+                        state.setdefault("paper_tools", {})[target] = (paper, "Workspace picker")
+                        go(target)
+                    st.rerun()
 
 
 def render_ai_guidance(paper, ai_key, enabled, model, provider):
@@ -777,7 +870,7 @@ def render_ai_guidance(paper, ai_key, enabled, model, provider):
                     generated=generate_explanations(paper['title'],paper['abstract'],configs,
                         session_usage=st.session_state.setdefault('coach_usage',{}))
                 if generated.pack:
-                    st.session_state.abstract_help={'paper_id':paper['id'],'source':'learning_coach','result':generated.pack}
+                    st.session_state.setdefault('abstract_help_by_paper', {})[paper['id']]={'source':'learning_coach','result':generated.pack}
                 else:
                     st.warning(generated.fair_use_notice or next((attempt.message for attempt in reversed(generated.attempts)), 'Learning Coach is unavailable.'))
             except ValueError as exc:
@@ -789,11 +882,11 @@ def render_ai_guidance(paper, ai_key, enabled, model, provider):
                 else:
                     with st.spinner('Explaining the abstract with its source passage…'):
                         result=explain_abstract(paper,st.session_state.get('topic',''),ai_key,model,provider)
-                    st.session_state.abstract_help={'paper_id':paper['id'],'source':provider,'result':result}
+                    st.session_state.setdefault('abstract_help_by_paper', {})[paper['id']]={'source':provider,'result':result}
             except AIUnavailable as exc:
                 st.warning(str(exc))
-    help_result=st.session_state.get('abstract_help')
-    if help_result and help_result['paper_id']==paper['id']:
+    help_result=st.session_state.get('abstract_help_by_paper', {}).get(paper['id'])
+    if help_result:
         with st.container(height=330,border=True):
             if help_result.get('source')=='learning_coach':
                 for name,title in CARD_TITLES.items():
@@ -809,12 +902,110 @@ def render_ai_guidance(paper, ai_key, enabled, model, provider):
                 st.write(help_result['result']['reading_tip'])
 
 
-def page_guided_reading():
-    if st.session_state.get('guided_standalone'):
+def open_guided():
+    st.session_state.nav_panel_open = False
+    go("Guided reading")
+
+
+def open_tool(target):
+    state = st.session_state
+    origin = state.ui_step
+    if origin == "Workspace picker":
+        origin = state.workspace_picker_return
+    state.nav_panel_open = False
+    if origin == target:
+        go(target)
+        return
+    if origin in ("Notes", "Learning Assistant"):
+        previous = state.get("paper_tools", {}).get(origin)
+        from_queue = origin == "Learning Assistant" and state.get("assistant_picker")
+        if not from_queue and previous and previous[1] == target:
+            go(target)
+            return
+    if target == "Guided reading":
+        open_workspace_picker(origin, target)
+        return
+    if origin == "Read paper":
+        paper = current_reader_paper(True)
+    elif origin == "Guided reading":
+        active = state.get("paper_reader", {}).get("paper")
+        paper = asdict(active) if active else None
+    elif origin == "Learning Assistant":
+        paper = current_tool_paper()
+    elif origin == "Notes":
+        paper = state.paper_tools["Notes"][0]
+    else:
+        paper = None
+    if paper:
+        state.setdefault("paper_tools", {})[target] = (paper, origin)
+        if target == "Learning Assistant":
+            state.assistant_picker = False
+        go(target)
+    else:
+        open_workspace_picker(origin, target)
+
+
+def current_tool_paper():
+    state = st.session_state
+    if state.get("assistant_picker"):
+        queue = state.study_queues["Learning Assistant"]
+        return queue["papers"][queue["index"]]
+    return state.paper_tools["Learning Assistant"][0]
+
+
+def page_paper_tool(step, ai_key, enabled, model, provider):
+    state = st.session_state
+    paper = current_tool_paper() if step == "Learning Assistant" else state.paper_tools["Notes"][0]
+    st.title(step)
+    if step == "Learning Assistant" and state.get("assistant_picker"):
+        study_navigation(step)
+    else:
+        origin = state.paper_tools[step][1]
+        if origin == "Workspace picker":
+            st.button("← Back to paper picker", on_click=return_to_picker, args=(step,))
+        else:
+            st.button("← Back", on_click=go, args=(origin,))
+    st.button("Choose Paper from Library", on_click=open_workspace_picker, args=(step, step))
+    st.subheader(paper["title"])
+    workspace_paper_details(paper)
+    if paper.get("doi"):
+        st.caption(f"DOI · {paper['doi']}")
+    if step == "Notes":
+        reading_workspace(paper, {})
+        return
+    with st.container(horizontal=True):
+        st.button("Knowledge Check", on_click=open_knowledge_check, args=(paper,))
+        st.button("Prerequisite Lessons", on_click=open_knowledge_check, args=(paper, True))
+    if paper.get("abstract"):
+        with st.expander("Paper abstract"):
+            st.text(paper["abstract"])
+    st.subheader("AI Guided Learning")
+    st.write("What question do the authors ask? Which passage describes their method or result?")
+    if (paper["id"].startswith("manual:") or paper.get("paper_type") in ("Background article", "Source link")
+            or validate_paper_input(paper["title"], paper.get("abstract"))):
+        st.caption("Live explanations require a retrieved research record with a usable abstract.")
+    else:
+        render_ai_guidance(paper, ai_key, enabled, model, provider)
+
+
+def page_guided_reading(ai_key, enabled, model, provider):
+    from screens.paper_reader import render_journal_reader
+
+    journal_header("Guided Reading", "Read closely, make connections, and put ideas into your own words.",
+                   "Guided Reading", guided=True)
+    if st.session_state.get("guided_picker"):
+        study_navigation("Guided reading")
+    st.button("Choose Paper from Library", on_click=open_workspace_picker,
+              args=("Guided reading", "Guided reading"))
+    render_journal_reader(lambda record: render_ai_guidance(record, ai_key, enabled, model, provider))
+    if st.session_state.get('guided_picker'):
+        return
+    if st.session_state.get("manual_picker"):
+        st.button("← Back to paper picker", on_click=return_to_picker, args=("Guided reading",))
+    elif st.session_state.get('guided_standalone'):
         st.button('← Back to My Library', on_click=go, args=('My Library',))
     elif st.session_state.get('reader_id'):
         st.button('← Back to paper', on_click=go, args=('Read paper',))
-    render_paper_reader()
 
 
 def show_source_warnings(papers, *, details=False):
@@ -860,50 +1051,20 @@ def render():
     if error:=st.session_state.get('vault_error'):
         st.error(error)
     # Keep editable values when Streamlit removes widgets on inactive steps.
-    for key in ('question','query','plan_direction','year_filter','paper_goal','board_mode','map_view','map_topic','gemini_session_key','hf_session_key','ai_provider','ai_guidance_opt_in','light_mode'):
+    for key in ('question','query','plan_direction','year_filter','paper_goal','board_mode','map_view','map_topic','gemini_session_key','hf_session_key','ai_provider','ai_guidance_opt_in','workspace_query','library_search','library_sort','library_unassigned'):
         if key in st.session_state:
             st.session_state[key]=st.session_state[key]
     st.session_state.setdefault('ui_step','Question')
     st.session_state.setdefault('nav_panel_open',False)
-    light=st.session_state.get('light_mode',False)
-    rail_bg='#dff1f3' if light else '#081c29'
-    page_bg='#f8fcfd' if light else '#0b1721'
-    foreground='#173946' if light else '#e7f3f4'
-    line='#b5d9dc' if light else '#2c6671'
-    st.markdown(f'''<style>
-      [data-testid="stAppViewContainer"], [data-testid="stMain"], [data-testid="stHeader"] {{background:{page_bg}!important; color:{foreground}!important;}}
-      [data-testid="stSidebar"] {{background:{rail_bg}; border-right:1px solid {line};}}
-      [data-testid="stSidebar"] button, [class*="st-key-library_open_"] button {{
-        min-height:2.75rem; justify-content:flex-start; text-align:left;
-      }}
-      [data-testid="stSidebar"] button p {{font-size:1rem; overflow-wrap:anywhere;}}
-      .st-key-library_tree {{border-left:2px solid {line}; padding-left:1rem;}}
-      .st-key-nav_panel {{max-width:44rem; padding:1rem;}}
-      .block-container {{padding-top:3rem; padding-bottom:2rem; max-width:90rem;}}
-      [data-testid="stMain"] p, [data-testid="stPopoverBody"] p {{font-size:1rem; line-height:1.5;}}
-      [data-testid="stMain"] :is(input, textarea), [data-testid="stPopoverBody"] :is(input,textarea) {{font-size:1rem;}}
-      [data-testid="stPopoverBody"] {{max-width:min(28rem, 94vw);}}
-      .st-key-topic_tools {{border-bottom:1px solid {line}; padding-bottom:.75rem;}}
-      [data-testid="stMain"] button:focus-visible, [data-testid="stSidebar"] button:focus-visible {{
-        outline:2px solid {foreground}; outline-offset:2px;
-      }}
-      @media (max-width:700px) {{
-        .block-container {{padding:3rem 1rem 1.5rem;}}
-        .st-key-nav_panel {{padding:.75rem;}}
-      }}
-    </style>''',unsafe_allow_html=True)
-    if light:
-        st.markdown('''<style>
-        [data-testid="stMain"] p, [data-testid="stMain"] h1, [data-testid="stMain"] h2, [data-testid="stMain"] h3,
-        [data-testid="stMain"] label, [data-testid="stSidebar"] :is(p,h3) {color:#173946!important;}
-        [data-testid="stMain"] input, [data-testid="stMain"] textarea,
-        [data-testid="stMain"] [data-baseweb="select"] > div {background:#fff!important;color:#173946!important;border-color:#bad8dc!important;}
-        [data-testid="stMain"] button:not([kind="primary"]), [data-testid="stSidebar"] button:not([kind="primary"]) {background:#fff!important;color:#174a59!important;border-color:#bad8dc!important;}
-        [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"] {border-color:#c5e0e3!important;}
-        </style>''',unsafe_allow_html=True)
     st.html(Path(__file__).with_name("workspace.css"))
-    ai_key,enabled,provider,model=sidebar()
-    step=st.session_state.ui_step
+    with st.container(key="journal_page"):
+        ai_key, enabled, provider, model = sidebar()
+        if not st.session_state.nav_panel_open:
+            render_destination(ai_key, enabled, model, provider)
+
+
+def render_destination(ai_key, enabled, model, provider):
+    step = st.session_state.ui_step
     if step=='Question' or (step=='Direction' and 'discovery_plan' not in st.session_state):
         st.header('Discover Papers')
         page_question(ai_key,enabled,model,provider)
@@ -935,18 +1096,22 @@ def render():
     elif step=='Knowledge check':
         from screens.knowledge_check import render_knowledge_check
         paper = st.session_state.get('knowledge_check_paper')
-        if paper is not None:
-            st.button('← Back to paper', on_click=go, args=('Read paper',))
+        origin = st.session_state.get("knowledge_return")
+        if origin:
+            st.button("← Back to paper" if origin == "Read paper" else "← Back",
+                      on_click=go, args=(origin,))
         render_knowledge_check(paper, lessons_only=st.session_state.get('knowledge_lessons_only', False))
     elif step=='Guided reading':
-        page_guided_reading()
+        page_guided_reading(ai_key,enabled,model,provider)
+    elif step in ("Learning Assistant", "Notes"):
+        page_paper_tool(step, ai_key, enabled, model, provider)
     elif step=='Combo reading':
         page_combo_reading(ai_key,enabled,model,provider)
     elif step=='Vault':
         page_vault()
     elif step in ('My Library','Saved'):
         with st.container(key="library_page", gap="small"):
-            render_library(go)
+            render_library(go, open_guided)
     elif step=='Sources':
         page_sources()
     else:

@@ -182,6 +182,35 @@ def test_discovery_save_can_be_reopened_and_read_in_new_session(monkeypatch):
     assert not first.exception and not second.exception
 
 
+def test_journal_shelf_sort_and_guided_tool_handoff():
+    late = _paper(51, "Later seminar")
+    early = _paper(52, "Earlier seminar")
+    token = new_token()
+    assert save_vault(token, {"saved_papers": {p["id"]: p for p in (late, early)},
+                              "folders": {"seminar": {"name": "Seminar", "description": ""}},
+                              "paper_folders": {early["id"]: "seminar"}})
+    app = _app(token)
+    _open_library(app)
+    app.selectbox(key="library_sort").select("Title A–Z").run()
+    assert _listed(app) == [early["title"], late["title"]]
+    app.button(key="shelf_seminar").click().run()
+    assert _listed(app) == [early["title"]]
+    app.button(key="library_guided").click().run()
+    app.button(key="rail_assistant").click().run()
+    assert app.session_state["ui_step"] == "Learning Assistant"
+    assert any("Enable live AI guidance" in c.value for c in app.caption)
+    app.button(key="rail_notes").click().run()
+    assert app.session_state["ui_step"] == "Notes"
+    assert any("Linked notes" in frame.proto.srcdoc for frame in app.get("iframe"))
+    assert not any("AI Guided Learning" == h.value for h in app.subheader)
+    app.sidebar.button(key="rail_guided").click().run()
+    app.checkbox(key="study_select_" + early["id"]).check().run()
+    app.button(key="start_learning").click().run()
+    app.text_input(key="guided_library_query").set_value("Later").run()
+    assert _listed(app) == [late["title"]]
+    assert not app.exception
+
+
 def test_saved_paper_with_unusable_sources_has_no_external_actions():
     paper = {
         **_paper(11, "Record without a usable source"),
@@ -324,4 +353,70 @@ if st.button("Move both"):
     _button(app, "Move both").click().run()
     assert load_vault(token)["paper_folders"] == dict.fromkeys(records, "target")
     assert load_vault(token)["saved_papers"] == records
+    assert not app.exception
+
+
+def test_settings_is_exclusive_and_restores_library_selection():
+    paper = _paper(81, "Saved seminar")
+    token = new_token()
+    assert save_vault(token, {"saved_papers": {paper["id"]: paper}, "light_mode": True})
+    app = _app(token)
+    _open_library(app)
+    app.checkbox(key="select_" + paper["id"]).check().run()
+    app.sidebar.button(key="rail_Settings").click().run()
+    assert not _listed(app)
+    assert not app.header
+    assert not app.toggle
+    assert any(section.value == "Settings" for section in app.subheader)
+    app.button(key="nav_close").click().run()
+    assert app.checkbox(key="select_" + paper["id"]).value
+    assert load_vault(token)["light_mode"] is True
+
+
+@pytest.mark.parametrize("destination,rail,action", [
+    ("Guided reading", "rail_guided", "Start Guided Reading"),
+    ("Learning Assistant", "rail_assistant", "Start AI Guided Learning"),
+])
+def test_study_picker_opens_ordered_queue_and_restores_paper_state(destination, rail, action):
+    first, second = _paper(91, "First reading"), _paper(92, "Second reading")
+    token = new_token()
+    assert save_vault(token, {"saved_papers": {p["id"]: p for p in (first, second)}})
+    app = _app(token)
+    app.sidebar.button(key=rail).click().run()
+    app.checkbox(key="study_select_" + second["id"]).check().run()
+    assert app.button(key="start_learning").label == action
+    app.text_input(key="workspace_query").set_value("First").run()
+    app.checkbox(key="study_select_" + first["id"]).check().run()
+    assert app.button(key="start_learning").label == "Start Learning"
+    app.button(key="start_learning").click().run()
+    assert app.session_state["ui_step"] == destination
+    answer = "_paper_reader_research_problem_answer"
+    if destination == "Guided reading":
+        loaded = app.session_state["paper_reader"]["paper"]
+        assert (loaded.id, loaded.title, loaded.abstract, loaded.doi) == (
+            second["id"], second["title"], second["abstract"], second.get("doi"))
+        app.text_area(key=answer).set_value("Second paper reflection").run()
+    else:
+        assert any(c.value == second["title"] for c in app.subheader)
+        assert any("Enable live AI guidance" in c.value for c in app.caption)
+    _button(app, "Next Paper").click().run()
+    assert any(c.value == first["title"] for c in app.subheader)
+    if destination == "Guided reading":
+        assert app.text_area(key=answer).value == ""
+        app.text_area(key=answer).set_value("First paper reflection").run()
+    _button(app, "Previous Paper").click().run()
+    assert any(c.value == second["title"] for c in app.subheader)
+    if destination == "Guided reading":
+        assert app.text_area(key=answer).value == "Second paper reflection"
+    if destination == "Learning Assistant":
+        app.sidebar.button(key="rail_notes").click().run()
+        assert app.session_state["ui_step"] == "Notes"
+        _button(app, "← Back").click().run()
+        assert app.session_state["ui_step"] == "Learning Assistant"
+        assert any(c.value == second["title"] for c in app.subheader)
+    _button(app, "← Back to paper picker").click().run()
+    assert app.session_state["picker_selection"] == [second["id"], first["id"]]
+    _button(app, "← Back").click().run()
+    assert app.session_state["ui_step"] == "Question"
+    assert set(load_vault(token)["saved_papers"]) == {first["id"], second["id"]}
     assert not app.exception

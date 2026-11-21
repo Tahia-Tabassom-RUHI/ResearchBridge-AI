@@ -44,9 +44,9 @@ export default function (component) {
     }
     function aim(e) {
         const hit = document.elementFromPoint(e.clientX, e.clientY);
-        const id = keyed(hit, "folder_");
+        const id = keyed(hit, "shelf_") || keyed(hit, "folder_");
         const button = bridge.component.data.folders.includes(id)
-            ? hit.closest('[class*="st-key-folder_"]').querySelector("button") : null;
+            ? hit.closest('button') : null;
         if (button !== target) {
             target?.removeAttribute("data-folder-drop-active");
             target = button;

@@ -26,8 +26,8 @@ def test_starter_app_runs():
 
     assert not app.exception
     assert [button.label for button in app.sidebar.button]==[
-        'Discover Papers','My Library','All Papers','To Read','+ New Folder',
-        'Workspace','Sources & Transparency','Settings',
+        'Discover','My Library','All Papers','To Read','+ New Folder',
+        'Guided Reading','Learning Assistant','Notes','Workspace','Sources','Settings',
     ]
     assert app.text_input(key='question').proto.placeholder == "wondering that…"
     assert not any(b.key == 'rail_Papers' for b in app.button)
@@ -76,9 +76,9 @@ def test_workspaces_open_and_switch_saved_papers_without_losing_reflections(monk
 
     click("+ Add Paper")
     app.text_input(key="workspace_query").set_value("sample author").run()
-    assert app.button(key="workspace_pick_workshop").label == first["title"]
+    assert app.button(key="workspace_pick_workshop").label == "Open Paper Workspace"
     assert not any(b.key == "workspace_pick_seminar" for b in app.button)
-    click(first["title"])
+    app.button(key="workspace_pick_workshop").click().run()
     assert app.session_state["reader_id"] == first["id"]
     assert app.session_state["ui_step"] == "Read paper"
     assert {"Workspace", "Abstract", "Read & Learn", "Source details", "Original page"} == {
@@ -90,7 +90,7 @@ def test_workspaces_open_and_switch_saved_papers_without_losing_reflections(monk
     click("← Back to paper")
 
     click("+ Add Paper")
-    click(second["title"])
+    app.button(key="workspace_pick_seminar").click().run()
     assert app.session_state["reader_id"] == second["id"]
     click("Guided Reading & Reflections")
     assert app.text_area(key=answer).value == ""

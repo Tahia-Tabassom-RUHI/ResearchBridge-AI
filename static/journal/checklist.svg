@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 106" fill="none">
+<defs>
+    <linearGradient id="board" x2=".8" y2="1"><stop stop-color="#9ebba1"/><stop offset="1" stop-color="#6e957d"/></linearGradient>
+    <linearGradient id="paper" x2=".7" y2="1"><stop stop-color="#fff7d9"/><stop offset="1" stop-color="#ecd49f"/></linearGradient>
+  </defs>
+  <g stroke="#463933" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="65" cy="95" rx="52" ry="4.5" fill="#917653" opacity=".2" stroke="none"/>
+    <g transform="rotate(-10 55 53)">
+      <path d="M19 19q0-5 5-5l62-.9q5 0 5 5L90 86q0 5-5 6l-61 1q-4-.3-4-5Z" fill="url(#board)"/>
+      <path d="m25 23 58-1-1 62-56 2Z" fill="#d5ba8d"/>
+      <path d="m24 20 58 1-1 51-11 11-44 1Z" fill="url(#paper)"/>
+      <path d="m70 83 1-12 10 .5Z" fill="#e7c58a" stroke-width="1.15"/>
+      <path d="M37 20q-1-5 4-6l5-.5q-1-8 6-8 7 .1 7 7l5 1q5 0 5 5l-1 6-31 .2Z" fill="#8a9e9b"/>
+      <path d="M41 20q9-1 24 0" stroke="#c6d2bd" stroke-width="1.6"/>
+      <circle cx="52.5" cy="12.6" r="2.5" fill="#f4dfaf" stroke-width="1.25"/>
+      <path d="m32 33 8-.3.1 8-8 .3Zm1 16 8-.4v8.4l-8 .4Zm1 16 8-.3v8.4l-8 .2Z" stroke-width="1.3" fill="#f3e3b6"/>
+      <path d="m31.5 36 4.1 4 7.9-10M32.5 52l4.1 4 8-10" stroke="#4c795b" stroke-width="2.45"/>
+      <path d="m48 34 23-.3m-23 5 15-.2m-14 11 23-.2m-23 5 16-.3m-16 11 17-.1m-16 5 11-.2" stroke="#9d8062" stroke-width="1.2"/>
+      <path d="m25 87 9 .2m43-1.7 8-.1" stroke="#60816a" stroke-width="1"/>
+    </g>
+    <g transform="rotate(32 91 56)">
+      <path d="m86 22 12 .2-.8 55-5.8 14-5.4-14Z" fill="#edac4e"/>
+      <path d="m90 25-1 50m5-50-1 50" stroke="#bb7841" stroke-width="1"/>
+      <path d="m86 77 5 2 6-2-5.6 14Z" fill="#f1d5a3" stroke-width="1.25"/>
+      <path d="m89.8 87.4 3.1-1.3-1.5 5Z" fill="#463933" stroke-width=".7"/>
+      <path d="m86 23 .3-8q.5-4 6-4t6 4l-.3 8Z" fill="#dc8d88"/>
+      <path d="m85.8 20.8 12.6.3-.1 7.3-12.7-.4Z" fill="#adb9ae" stroke-width="1.25"/>
+      <path d="m88 23.6 8-.1" stroke="#f1e4bc" stroke-width="1.25"/>
+    </g>
+    <path d="m10 26-6-2m11-7-2-5" stroke="#ac8054" stroke-width="1.4"/>
+  </g>
+</svg>

@@ -2,6 +2,7 @@
 
 import ipaddress
 import re
+from dataclasses import asdict
 from copy import deepcopy
 from urllib.parse import urlsplit
 from uuid import uuid4
@@ -93,6 +94,7 @@ def load_retrieved_paper(record: dict) -> None:
     elif current_paper:
         st.session_state["paper_reader_manual"] = current
     st.session_state["paper_reader"] = state
+    select_tool()
     for key in list(st.session_state):
         if key.startswith("_paper_reader_"):
             st.session_state.pop(key, None)
@@ -106,6 +108,9 @@ def open_manual_reader() -> None:
         _reset_reader()
     if not st.session_state.get("paper_reader") and "paper_reader_manual" in st.session_state:
         st.session_state["paper_reader"] = st.session_state.pop("paper_reader_manual")
+    select_tool()
+    st.session_state.pop("guided_picker", None)
+    st.session_state.pop("manual_picker", None)
     st.session_state.update(ui_step="Guided reading", guided_standalone=True, nav_panel_open=False)
 
 
@@ -155,56 +160,61 @@ def render_paper_reader() -> None:
         "Guided, rule-based demo. No AI is used and correctness is not "
         "automatically assessed. Work is kept only in this Streamlit session."
     )
-    st.session_state.setdefault("paper_reader", _new_reader_state())
-    state = st.session_state["paper_reader"]
-
+    state = st.session_state.setdefault("paper_reader", _new_reader_state())
     if state["paper"] is None:
-        with st.form("paper_reader_load"):
-            title = st.text_input("Paper title", key="_paper_reader_title")
-            abstract = st.text_area(
-                "Paste the abstract",
-                height=220,
-                help=f"Use at least {MIN_ABSTRACT_WORDS} words containing letters. "
-                "This is a length check, not a scientific quality check.",
-                key="_paper_reader_abstract",
-            )
-            st.caption("Optional metadata is supplied by you and remains unverified.")
-            original_url = st.text_input(
-                "Original paper URL (optional)", key="_paper_reader_url"
-            )
-            doi = st.text_input("DOI (optional)", key="_paper_reader_doi")
-            authors = st.text_input(
-                "Authors (optional, separate with semicolons)", key="_paper_reader_authors"
-            )
-            year = st.text_input("Publication year (optional)", key="_paper_reader_year")
-            start = st.form_submit_button("Start Reading")
-        if start:
-            errors = validate_paper_input(title, abstract)
-            original_url = original_url.strip()
-            year = year.strip()
-            if original_url and not _safe_original_url(original_url):
-                errors.append("Enter a valid HTTP or HTTPS original paper URL without credentials.")
-            if year and not re.fullmatch(r"[1-9][0-9]{3}", year):
-                errors.append("Enter a four-digit publication year, or leave it blank.")
-            if errors:
-                for error in errors:
-                    st.error(error)
-            else:
-                state["paper"] = Paper(
-                    id=f"manual:{uuid4()}",
-                    title=title.strip(),
-                    abstract=abstract,
-                    paper_url=original_url or None,
-                    doi=doi.strip() or None,
-                    authors=[name.strip() for name in authors.split(";") if name.strip()] or None,
-                    publication_date=year or None,
-                    source_name="Manual entry",
-                    provenance={"origin": "user_provided", "verification": "unverified"},
-                )
-                st.rerun()
+        _load_form(state)
         return
+    _document(state["paper"])
+    _reflections(state)
 
-    paper = state["paper"]
+
+def _load_form(state):
+    with st.form("paper_reader_load"):
+        title = st.text_input("Paper title", key="_paper_reader_title")
+        abstract = st.text_area(
+            "Paste the abstract",
+            height=220,
+            help=f"Use at least {MIN_ABSTRACT_WORDS} words containing letters. "
+            "This is a length check, not a scientific quality check.",
+            key="_paper_reader_abstract",
+        )
+        st.caption("Optional metadata is supplied by you and remains unverified.")
+        original_url = st.text_input(
+            "Original paper URL (optional)", key="_paper_reader_url"
+        )
+        doi = st.text_input("DOI (optional)", key="_paper_reader_doi")
+        authors = st.text_input(
+            "Authors (optional, separate with semicolons)", key="_paper_reader_authors"
+        )
+        year = st.text_input("Publication year (optional)", key="_paper_reader_year")
+        start = st.form_submit_button("Start Reading")
+    if start:
+        errors = validate_paper_input(title, abstract)
+        original_url = original_url.strip()
+        year = year.strip()
+        if original_url and not _safe_original_url(original_url):
+            errors.append("Enter a valid HTTP or HTTPS original paper URL without credentials.")
+        if year and not re.fullmatch(r"[1-9][0-9]{3}", year):
+            errors.append("Enter a four-digit publication year, or leave it blank.")
+        if errors:
+            for error in errors:
+                st.error(error)
+        else:
+            state["paper"] = Paper(
+                id=f"manual:{uuid4()}",
+                title=title.strip(),
+                abstract=abstract,
+                paper_url=original_url or None,
+                doi=doi.strip() or None,
+                authors=[name.strip() for name in authors.split(";") if name.strip()] or None,
+                publication_date=year or None,
+                source_name="Manual entry",
+                provenance={"origin": "user_provided", "verification": "unverified"},
+            )
+            st.rerun()
+
+
+def _document(paper):
     st.subheader(paper.title)
     is_manual = paper.id.startswith("manual:")
     if is_manual:
@@ -218,17 +228,31 @@ def render_paper_reader() -> None:
         if paper.paper_url and _safe_original_url(paper.paper_url):
             st.text("Original source: " + paper.paper_url)
             st.link_button("Open user-provided paper ↗", paper.paper_url)
-    elif paper.paper_url:
-        st.link_button("Open original paper ↗", paper.paper_url)
-    if paper.oa_url:
+    else:
+        if paper.authors:
+            st.text(", ".join(paper.authors))
+        source = (paper.provenance or {}).get("source")
+        metadata = [paper.source_name, paper.publication_date, source, paper.doi]
+        if any(metadata):
+            st.caption(" · ".join(dict.fromkeys(filter(None, metadata))))
+        if paper.is_retracted:
+            st.warning("The source marks this paper as retracted.")
+        if _safe_original_url(paper.paper_url):
+            st.link_button("Open original paper ↗", paper.paper_url)
+    if _safe_original_url(paper.oa_url):
         st.link_button("Open free full text ↗", paper.oa_url)
-    st.write("Original abstract")
-    st.text(paper.abstract)
+    with st.container(key="journal_abstract"):
+        st.markdown("**Original abstract**")
+        st.text(paper.abstract)
     st.button("Start Another Paper / Reset", on_click=_reset_reader)
+
+
+def _reflections(state):
+    paper = state["paper"]
     st.subheader("Guided reflections")
     st.write(
         "Use your own words and stay within the supplied abstract. You can save "
-        "an incomplete draft. If a point is absent, select 'Not stated in the abstract'."
+        "an incomplete draft for this session. If a point is absent, select 'Not stated in the abstract'."
     )
     st.caption(
         "A source-matching check only looks for the excerpt's text, ignoring "
@@ -272,6 +296,68 @@ def render_paper_reader() -> None:
         else:
             st.info("Unsaved changes. Your previous saved review is shown below.")
         _render_saved_review(paper, saved)
+
+
+TOOLS = (
+    ("check", "Knowledge Check", "Try a short check of your background knowledge."),
+    ("prereq", "Prerequisite Cards", "Brush up on the ideas behind the paper."),
+    ("reflect", "Guided Reflections", "Connect your interpretation to the abstract."),
+    ("assistant", "Learning Assistant", "Work through the abstract with a reading guide."),
+    ("notes", "Personal Notes", "Collect questions and connect your notes."),
+)
+
+
+def select_tool(key=None):
+    st.session_state.guided_tool = key
+    for other, _, _ in TOOLS:
+        st.session_state["disclosure_" + other] = other == key
+
+
+def _toggle_tool(key):
+    select_tool(key if st.session_state["disclosure_" + key] else None)
+
+
+def render_journal_reader(explain):
+    from components.reading_workspace import reading_workspace
+    from screens.knowledge_check import render_knowledge_check
+
+    state = st.session_state.setdefault("paper_reader", _new_reader_state())
+    paper = state["paper"]
+    record = asdict(paper) if paper else None
+    left, right = st.container(key="guided_columns").columns([1.22, 1], gap="medium")
+    with left:
+        st.header("Paper reader")
+        with st.container(key="journal_document", border=True):
+            if paper:
+                _document(paper)
+            else:
+                st.subheader("Read an abstract")
+                st.write("Choose a saved paper or paste an abstract to begin.")
+                _load_form(state)
+    with right:
+        st.header("Learning tools")
+        for key, name, description in TOOLS:
+            st.session_state.setdefault("disclosure_" + key, st.session_state.get("guided_tool") == key)
+            with st.container(key="tool_" + key):
+                panel = st.expander(f"**{name}**  \n{description}",
+                                    key="disclosure_" + key, on_change=_toggle_tool, args=(key,))
+                with panel:
+                    # Reflection widgets keep their established draft callbacks even when collapsed.
+                    if key == "reflect" and paper:
+                        _reflections(state)
+                    elif panel.open:
+                        if key in ("check", "prereq"):
+                            render_knowledge_check(record, lessons_only=key == "prereq")
+                        elif not paper:
+                            st.info("Open a paper or paste an abstract to use this tool.")
+                        elif key == "assistant":
+                            st.write("What question do the authors ask? Which passage describes their method or result?")
+                            if paper.id.startswith("manual:"):
+                                st.caption("Live explanations are available for retrieved research records.")
+                            else:
+                                explain(record)
+                        elif key == "notes":
+                            reading_workspace(record, {}, notes_only=True)
 
 
 if __name__ == "__main__":

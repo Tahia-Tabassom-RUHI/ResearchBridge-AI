@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 106" fill="none">
+<defs>
+    <linearGradient id="leaf" x2=".85" y2="1"><stop stop-color="#fff9d3"/><stop offset=".67" stop-color="#fff1c5"/><stop offset="1" stop-color="#d5b27c"/></linearGradient>
+    <linearGradient id="cover" x2=".7" y2="1"><stop stop-color="#809f87"/><stop offset="1" stop-color="#446953"/></linearGradient>
+  </defs>
+  <g stroke="#463a32" stroke-linejoin="round" stroke-linecap="round" stroke-width="1.9">
+    <path d="M4 87q26-5 63-4l50-6q10 1 5 6-27 11-59 13-30 4-59-4Z" fill="#997a54" opacity=".2" stroke="none"/>
+    <!-- A clothbound field notebook, open to a botanical study. -->
+    <path d="m3 36 44-16 11 4 42-18 22 60-48 23-14 3L7 91Z" fill="url(#cover)"/>
+    <path d="m6 38 41-15 12 4 40-17 18 54-46 21-11 4-50-1Z" fill="#b8a283"/>
+    <path d="M5 32q31-16 52-8 12-11 40-18l19 54Q91 67 71 81q-5 6-11 4-21-7-48-3Z" fill="#f0d6a3"/>
+    <path d="M5 29q27-17 51-7l12 57q-18-12-56-5Z" fill="url(#leaf)"/>
+    <path d="M56 22Q73 8 98 4l14 54Q87 64 68 79Z" fill="#fff4d0"/>
+    <path d="M57 25q7 23 10 48m-55 5q28-5 48 2m-39 2q26-2 40 2m10-3q20-14 43-20m-34 16 33-13" stroke-width=".95" stroke="#9e7d54"/>
+    <path d="M17 34q13-7 26-6m-24 12q12-6 20-5m-19 10q13-5 25-4m-23 10q14-5 24-3m-23 10 19-4m-18 9 17-3" stroke-width="1.45" stroke="#947751"/>
+    <path d="m66 26 22-9m-21 14 14-6" stroke="#ac8661" stroke-width="1.3"/>
+    <path d="M81 62q7-11 8-28m-3 18q-11 0-11-12 9 2 11 12Zm2-7q0-12 9-16 1 10-9 16Zm-6 15q8-11 18-10-4 9-18 10Z" fill="#87aa76" stroke="#5a6b48" stroke-width="1.4"/>
+    <path d="m67 19 6-4 9 34-5-1-3 5Z" fill="#c8665d" stroke-width="1.25"/>
+    <g transform="rotate(-17 94 79)">
+      <path d="m69 79 11-3 35 .5q3 2 0 7l-35-.5Z" fill="#eda652"/>
+      <path d="m69 79 11-3 .5 7Z" fill="#edd6b0"/><path d="m69 79 3.5-1-.2 2.3Z" fill="#514337" stroke-width=".7"/>
+      <path d="m84 78.1 23 .3m-18 2.3 17 .2" stroke="#be753f" stroke-width=".9"/>
+      <path d="m108 76 5 .2-.3 7-5-.2Z" fill="#d6c4a6" stroke-width="1"/>
+      <path d="m113 76 5-.1q4 1 2 7l-7 .4Z" fill="#df8e89" stroke-width="1.3"/>
+    </g>
+    <path d="M18 90q6 2 10 1m86-20 4-2" stroke="#795a42" stroke-width=".9" opacity=".7"/>
+  </g>
+</svg>

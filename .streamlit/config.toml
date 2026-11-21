@@ -1,4 +1,5 @@
 [server]
+enableStaticServing = true
 headless = true
 fileWatcherType = "poll"
 runOnSave = true
@@ -7,9 +8,14 @@ runOnSave = true
 gatherUsageStats = false
 
 [theme]
-base = "dark"
-primaryColor = "#40c5c5"
-backgroundColor = "#0b1721"
-secondaryBackgroundColor = "#142b36"
-textColor = "#e7f3f4"
+base = "light"
+primaryColor = "#835a24"
+backgroundColor = "#f8efdd"
+secondaryBackgroundColor = "#fff8eb"
+textColor = "#30251f"
 font = "sans serif"
+
+[theme.sidebar]
+backgroundColor = "#242120"
+secondaryBackgroundColor = "#48413a"
+textColor = "#eee4d7"

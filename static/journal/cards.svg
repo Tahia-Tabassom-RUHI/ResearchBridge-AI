@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 106" fill="none">
+<defs><linearGradient id="cream" x2=".72" y2="1"><stop stop-color="#fff7d9"/><stop offset="1" stop-color="#f0d49b"/></linearGradient></defs>
+  <g stroke="#453a35" stroke-width="1.85" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="62" cy="94" rx="56" ry="5" fill="#8f7354" stroke="none" opacity=".2"/>
+    <!-- Three fanned index cards, tabbed and ruled like an illustrated field guide. -->
+    <g transform="rotate(-23 49 45)">
+      <path d="M13 18q-2-4 3-5h23l4-5 19 .5 3 4 17 .3q4 1 4 5l-.3 48q0 4-4 4l-65 1q-4-.2-4-4Z" fill="#a4c4d4"/>
+      <path d="m18 23 58-1m-57 7 31-.5m-32 6 20-.4m-19 13 23-2" stroke="#688d9b" stroke-width="1.15"/>
+      <path d="m50 12 9-.2" stroke="#638a94" stroke-width="1.2"/>
+    </g>
+    <g transform="rotate(-9 61 53)">
+      <path d="M19 30q0-4 4-4l44-.2 5-5.5 19 .2 3 5 4 .1q4 0 4 4l-1.2 46q0 4-4 4l-74 1q-4-.3-4-4Z" fill="#93bc93"/>
+      <path d="m25 34 64-.7m-63 7 40-.5m-40 6 29-.6" stroke="#6e9671" stroke-width="1.15"/>
+    </g>
+    <g transform="rotate(6 67 67)">
+      <path d="M27 46q0-4 5-4l76-.5q5 0 5 5l-1 41q0 5-5 5l-75 1q-5 0-5-4Z" fill="#c6ab7e"/>
+      <path d="M25 42q0-4 5-4l76-.4q5-.2 5 4l-1 42q0 5-5 5l-74 1q-5-.2-5-4Z" fill="url(#cream)"/>
+      <path d="m29 48 78-1" stroke="#ce8b79" stroke-width="1.2"/>
+      <path d="m65 56 32-.5m-31 6 26-.4m-26 6 31-.4m-31 6 20-.4" stroke="#957d60" stroke-width="1.1"/>
+      <path d="M40 80q6-12 15-24m-10 15q-11-1-12-12 11 2 12 12Zm3-6q0-9 11-14 0 9-11 14Zm-5 11q8-9 17-7-5 8-17 7Z" fill="#97b781" stroke="#50684a" stroke-width="1.45"/>
+      <path d="m32 43 8-.2m47 39 12-.2" stroke="#e1bd80" stroke-width="1.3"/>
+      <circle cx="31" cy="84" r="1.1" fill="#817263" stroke="none"/>
+    </g>
+    <path d="m103 16 4-5m1 12 7-2" stroke="#aa8460" stroke-width="1.4"/>
+  </g>
+</svg>

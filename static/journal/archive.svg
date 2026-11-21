@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 106" fill="none">
+<defs>
+    <linearGradient id="rose" x2=".8" y2="1"><stop stop-color="#eca18b"/><stop offset="1" stop-color="#cc7766"/></linearGradient>
+    <linearGradient id="card" x2=".8" y2="1"><stop stop-color="#fff6d9"/><stop offset="1" stop-color="#e9d1a0"/></linearGradient>
+  </defs>
+  <g stroke="#4a3a33" stroke-width="1.85" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M4 89q21-5 55-6l58-4q11 3 3 7-33 8-91 12-17 0-25-4Z" fill="#9d7155" opacity=".2" stroke="none"/>
+    <!-- A specimen folder with a pressed sprig, in a cloth-covered file box. -->
+    <path d="m13 55-4-32q0-2 3-2l26-4 8 5 48-6 7 41Z" fill="#87aaa4"/>
+    <path d="m16 42 3-22 26-4 8 5 41-2 3 34Z" fill="#c9b4d2"/>
+    <path d="m21 58-7-29 53-9 9 6 4 31Z" fill="#f0bf75"/>
+    <path d="m33 57-4-38 50-6 11 8 3 35Z" fill="url(#card)"/>
+    <path d="m79 13 1 10 10-2Z" fill="#d8b987" stroke-width="1.1"/>
+    <path d="m36 26 27-3m-27 8 34-4m-33 9 26-3" stroke="#ab8d70" stroke-width="1.15"/>
+    <path d="m50 52-4-24 39-8 10 30Z" fill="#d8e3b9"/>
+    <path d="M85 56q7-19 15-43m-5 18q-7-9-5-18 9 5 5 18Zm-5 12q-10-4-12-14 12 2 12 14Zm4-10q3-11 16-14-4 10-16 14Zm4-13q1-12 11-17 0 10-11 17Z" fill="#84a879" stroke="#506847" stroke-width="1.5"/>
+    <path d="m98 30 8-8m-17 18-7-7m13-7-4-9" stroke="#becb94" stroke-width=".85"/>
+    <path d="m6 52 14-9 79-8 19 11-8 37-83 11L7 80Z" fill="#a86355"/>
+    <path d="m6 49 20 11 93-15-19-9-77 8Z" fill="#e7a78c"/>
+    <path d="m16 49 10-4 69-7 10 6-78 12Z" fill="#795343"/>
+    <path d="m28 51-.9-8 25-4.5 6 3 31-5 4 8Z" fill="#ead9a7"/>
+    <path d="m6 50 20 9 2 35L9 82Z" fill="#be7565"/>
+    <path d="m26 59 92-14-7 38-83 12Z" fill="url(#rose)"/>
+    <path d="M30 63q42-6 83-14l-.8 4-82 14Z" fill="#f5b69c" stroke="none"/>
+    <path d="m54 62 34-5-.8 15-33 5Z" fill="#c7985e" stroke-width="1.4"/>
+    <path d="m58 65 26-4-.3 8-26 4Z" fill="#f9edc9" stroke-width="1"/>
+    <path d="m63 67 14-2" stroke="#aa8b63" stroke-width="1.15"/>
+    <path d="m10 58 3 19m2 2 4 3m13 8 25-4m28-3 19-3m-2-4 4-.8" stroke="#99604f" stroke-width="1"/>
+    <path d="m104 61 2-2m-2 8 2-2" stroke="#bd7763" stroke-width=".9"/>
+  </g>
+</svg>

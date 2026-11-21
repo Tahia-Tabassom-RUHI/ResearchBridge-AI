@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 106" fill="none">
+<defs>
+    <linearGradient id="feathers" x2=".75" y2="1"><stop stop-color="#e3af76"/><stop offset=".55" stop-color="#c18558"/><stop offset="1" stop-color="#955f49"/></linearGradient>
+    <linearGradient id="bib" x2=".5" y2="1"><stop stop-color="#fff1ce"/><stop offset="1" stop-color="#edc78d"/></linearGradient>
+  </defs>
+  <g stroke="#423633" stroke-width="1.85" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="63" cy="98" rx="57" ry="4" fill="#9c7753" opacity=".22" stroke="none"/>
+    <!-- Sideways stacked books form the owl's little reading perch. -->
+    <path d="m10 90 83-6 19 3-.5 8-83 7-18-4Z" fill="#79999e"/>
+    <path d="m28 94 80-6-.2 5-80 7Z" fill="#f5dfb7" stroke-width="1.1"/>
+    <path d="m18 82 76-3 10 4-.5 5-75 5-11-3Z" fill="#ba7773"/>
+    <path d="m31 86 70-4-1 4-69 4Z" fill="#efdaae" stroke-width="1"/>
+    <!-- A slightly tilted mortarboard, round wire spectacles and scalloped breast. -->
+    <path d="M24 58q-3-14 1-25l-2-10 15 6q20-11 43-1l12-12 2 18q6 11 5 26-1 21-17 26-20 6-45-1Q23 81 24 58Z" fill="url(#feathers)"/>
+    <path d="M34 63q.5-18 22-18 21-7 31 13 7 19-10 26-15 6-32-1-10-7-11-20Z" fill="url(#bib)" stroke="none"/>
+    <path d="M33 53Q15 55 17 78q11-1 20-17m53-8q16 3 20 23-15 1-26-14" fill="#b67e5b"/>
+    <path d="M22 69q3-7 9-11m-8 16 7-7m64-9 8 9m-7-3 8 7" stroke="#865b49" stroke-width="1.15"/>
+    <path d="M29 37q5-10 17-7 7 .5 12 8 4-11 15-13 12-2 17 7-8 24-28 28-22 1-33-23Z" fill="#f0d7a8" stroke="none"/>
+    <path d="m23 41 9 3m51-9 12-5m-39 9q5-4 7-1" stroke="#594b3d" stroke-width="2.5"/>
+    <circle cx="44" cy="46" r="13.2" fill="#fff3d6" stroke-width="2.55"/>
+    <circle cx="76" cy="40" r="13.6" fill="#fff3d6" stroke-width="2.55"/>
+    <path d="m35 40 6-4m25 0 5-4m10 17 4-5" stroke="#d6b68a" stroke-width="1"/>
+    <ellipse cx="47" cy="46.8" rx="4.3" ry="5.6" fill="#403b36" stroke="none"/>
+    <ellipse cx="74" cy="41.7" rx="4.5" ry="5.9" fill="#403b36" stroke="none"/>
+    <circle cx="48.1" cy="44.8" r="1.6" fill="#fff5de" stroke="none"/><circle cx="75.4" cy="39.8" r="1.7" fill="#fff5de" stroke="none"/>
+    <path d="M54 52q5-5 11-3l-4 11Z" fill="#e2a34a" stroke-width="1.35"/>
+    <path d="m43 65 3 2 2-4m7 2 3 3 3-4m7-2 3 3 3-4m-24 13 4 2 3-4m6-2 4 3 3-4" stroke="#b58a60" stroke-width="1.55"/>
+    <path d="M40 85q1-5 5-.5 0-5 4-.6m23-1q1-5 4-.5 1-5 4-.7" stroke="#936239" stroke-width="2.8"/>
+    <g transform="rotate(-8 55 22)">
+      <path d="m34 19 1 12q15-8 34-3l6-12Z" fill="#657a78"/>
+      <path d="m23 18 30-15 35 9-32 14Z" fill="#587675"/>
+      <path d="m30 17 23-10 26 6m-41 11 3-1" stroke="#a5b8a3" stroke-width="1.1"/>
+      <path d="m55 13-27 9-6 13" stroke="#e0b669" stroke-width="2.25"/>
+      <path d="m22 33-5 7 6 2 2-8Z" fill="#e4b75f" stroke-width="1.2"/>
+      <ellipse cx="55" cy="13" rx="2" ry="1.1" fill="#dbc895" stroke-width="1"/>
+    </g>
+    <path d="m98 11 2-5m5 9 5-2" stroke="#a17d4f" stroke-width="1.4"/>
+  </g>
+</svg>

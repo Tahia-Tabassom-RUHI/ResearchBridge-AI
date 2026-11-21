@@ -46,8 +46,8 @@ def bubble_board(weights, metrics=None, on_select=None, namespace='packed_board'
     selected = None
     board_class = f'.st-key-{namespace}'
     orb_class = f'{namespace}_orb_'
-    board_bg = '#f4fbfc' if st.session_state.get('light_mode') else '#112734'
-    board_border = '#c8e5e6' if st.session_state.get('light_mode') else '#244452'
+    board_bg = '#fff8eb'
+    board_border = '#c6b79d'
     css = f'''<style>
     {board_class} {{position:relative!important; width:100%!important; max-width:340px; aspect-ratio:1; margin:auto; background:{board_bg}; border:1px solid {board_border}; border-radius:28px; overflow:hidden; display:block!important; container-type:inline-size;}}
     {board_class} > [data-testid="stLayoutWrapper"] {{position:static!important;}}
@@ -101,8 +101,8 @@ def combination_board(directions, selected, on_select, namespace='topic', signal
         if maximum else 48 for label in labels}
     nodes=pack_circles({label:1 for label in labels}, radii)
     board=f'{namespace}_composition'
-    background='#f4fbfc' if st.session_state.get('light_mode') else '#112734'
-    border='#c8e5e6' if st.session_state.get('light_mode') else '#244452'
+    background='#fff8eb'
+    border='#c6b79d'
     rules=[f'''<style>
       .st-key-{board} {{position:relative!important; width:100%; max-width:520px; aspect-ratio:2; container-type:inline-size; background:{background}; border:1px solid {border}; border-radius:12px; overflow:hidden;}}
       .st-key-{board}:after {{content:"";position:absolute;left:50%;top:7%;bottom:7%;border-left:2px dashed #4b8a96;pointer-events:none;}}
